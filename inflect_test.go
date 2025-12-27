@@ -601,6 +601,79 @@ func TestSingular(t *testing.T) {
 	}
 }
 
+func TestCompare(t *testing.T) {
+	tests := []struct {
+		name  string
+		word1 string
+		word2 string
+		want  string
+	}{
+		// Equal words
+		{name: "same word", word1: "cat", word2: "cat", want: "eq"},
+		{name: "same word uppercase", word1: "CAT", word2: "CAT", want: "eq"},
+		{name: "same word mixed case", word1: "Cat", word2: "cat", want: "eq"},
+		{name: "same plural", word1: "cats", word2: "cats", want: "eq"},
+		{name: "empty strings", word1: "", word2: "", want: "eq"},
+
+		// Singular to plural
+		{name: "cat to cats", word1: "cat", word2: "cats", want: "s:p"},
+		{name: "dog to dogs", word1: "dog", word2: "dogs", want: "s:p"},
+		{name: "box to boxes", word1: "box", word2: "boxes", want: "s:p"},
+		{name: "city to cities", word1: "city", word2: "cities", want: "s:p"},
+		{name: "child to children", word1: "child", word2: "children", want: "s:p"},
+		{name: "mouse to mice", word1: "mouse", word2: "mice", want: "s:p"},
+		{name: "knife to knives", word1: "knife", word2: "knives", want: "s:p"},
+		{name: "analysis to analyses", word1: "analysis", word2: "analyses", want: "s:p"},
+		{name: "index to indices", word1: "index", word2: "indices", want: "s:p"},
+		{name: "cactus to cacti", word1: "cactus", word2: "cacti", want: "s:p"},
+
+		// Plural to singular
+		{name: "cats to cat", word1: "cats", word2: "cat", want: "p:s"},
+		{name: "dogs to dog", word1: "dogs", word2: "dog", want: "p:s"},
+		{name: "boxes to box", word1: "boxes", word2: "box", want: "p:s"},
+		{name: "cities to city", word1: "cities", word2: "city", want: "p:s"},
+		{name: "children to child", word1: "children", word2: "child", want: "p:s"},
+		{name: "mice to mouse", word1: "mice", word2: "mouse", want: "p:s"},
+		{name: "knives to knife", word1: "knives", word2: "knife", want: "p:s"},
+		{name: "analyses to analysis", word1: "analyses", word2: "analysis", want: "p:s"},
+		{name: "indices to index", word1: "indices", word2: "index", want: "p:s"},
+		{name: "cacti to cactus", word1: "cacti", word2: "cactus", want: "p:s"},
+
+		// Both plurals (different plural forms of same word)
+		{name: "indexes to indices", word1: "indexes", word2: "indices", want: "p:p"},
+		{name: "indices to indexes", word1: "indices", word2: "indexes", want: "p:p"},
+
+		// Unrelated words
+		{name: "cat to dog", word1: "cat", word2: "dog", want: ""},
+		{name: "cats to dogs", word1: "cats", word2: "dogs", want: ""},
+		{name: "child to mouse", word1: "child", word2: "mouse", want: ""},
+		{name: "box to fox", word1: "box", word2: "fox", want: ""},
+
+		// Empty string edge cases
+		{name: "empty and word", word1: "", word2: "cat", want: ""},
+		{name: "word and empty", word1: "cat", word2: "", want: ""},
+
+		// Case preservation in comparison
+		{name: "Cat to Cats", word1: "Cat", word2: "Cats", want: "s:p"},
+		{name: "CAT to CATS", word1: "CAT", word2: "CATS", want: "s:p"},
+		{name: "CATS to CAT", word1: "CATS", word2: "CAT", want: "p:s"},
+
+		// Unchanged plurals
+		{name: "sheep to sheep", word1: "sheep", word2: "sheep", want: "eq"},
+		{name: "deer to deer", word1: "deer", word2: "deer", want: "eq"},
+		{name: "fish to fish", word1: "fish", word2: "fish", want: "eq"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Compare(tt.word1, tt.word2)
+			if got != tt.want {
+				t.Errorf("Compare(%q, %q) = %q, want %q", tt.word1, tt.word2, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestPlural(t *testing.T) {
 	tests := []struct {
 		name  string

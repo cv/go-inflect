@@ -944,3 +944,68 @@ func JoinWithSep(words []string, conj string, sep string) string {
 		return strings.Join(words[:len(words)-1], sep) + sep + conj + " " + words[len(words)-1]
 	}
 }
+
+// Compare compares two words for singular/plural equality.
+//
+// It returns:
+//   - "eq" if the words are equal (case-insensitive)
+//   - "s:p" if word1 is singular and word2 is its plural form
+//   - "p:s" if word1 is plural and word2 is its singular form
+//   - "p:p" if both words are different plural forms of the same word
+//   - "" if the words are not related
+//
+// Examples:
+//   - Compare("cat", "cat") returns "eq"
+//   - Compare("cat", "cats") returns "s:p"
+//   - Compare("cats", "cat") returns "p:s"
+//   - Compare("indexes", "indices") returns "p:p"
+//   - Compare("cat", "dog") returns ""
+func Compare(word1, word2 string) string {
+	// Handle empty strings
+	if word1 == "" || word2 == "" {
+		if word1 == "" && word2 == "" {
+			return "eq"
+		}
+		return ""
+	}
+
+	// Normalize for comparison
+	lower1 := strings.ToLower(word1)
+	lower2 := strings.ToLower(word2)
+
+	// Same word
+	if lower1 == lower2 {
+		return "eq"
+	}
+
+	// Check if word1 is singular and word2 is its plural
+	// Use Plural() for verification since Singular() has edge cases
+	if strings.ToLower(Plural(word1)) == lower2 {
+		return "s:p"
+	}
+
+	// Check if word2 is singular and word1 is its plural
+	if strings.ToLower(Plural(word2)) == lower1 {
+		return "p:s"
+	}
+
+	// Check if both are different plural forms of the same singular word
+	singular1 := strings.ToLower(Singular(word1))
+	singular2 := strings.ToLower(Singular(word2))
+
+	if singular1 == singular2 {
+		// Verify both are actually plurals (different from their singular form)
+		// by checking that pluralizing the singular gives us something related
+		pluralOfSingular := strings.ToLower(Plural(singular1))
+		// If both words singularize to the same thing, and that singular
+		// can be pluralized, they're both plural forms
+		if lower1 != singular1 && lower2 != singular2 {
+			// Additional verification: ensure the singular is valid
+			if pluralOfSingular == lower1 || pluralOfSingular == lower2 {
+				return "p:p"
+			}
+		}
+	}
+
+	return ""
+}
