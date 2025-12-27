@@ -2191,3 +2191,121 @@ func TestNumIntegration(t *testing.T) {
 		}
 	})
 }
+
+func TestClassical(t *testing.T) {
+	// Clean up after test
+	defer inflect.Classical(false)
+
+	tests := []struct {
+		name    string
+		enabled bool
+	}{
+		{name: "enable classical mode", enabled: true},
+		{name: "disable classical mode", enabled: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.Classical(tt.enabled)
+			got := inflect.IsClassical()
+			if got != tt.enabled {
+				t.Errorf("after Classical(%v): IsClassical() = %v, want %v", tt.enabled, got, tt.enabled)
+			}
+		})
+	}
+}
+
+func TestIsClassical(t *testing.T) {
+	// Clean up after test
+	defer inflect.Classical(false)
+
+	tests := []struct {
+		name  string
+		setup func()
+		want  bool
+	}{
+		{
+			name:  "default state is false",
+			setup: func() { inflect.Classical(false) },
+			want:  false,
+		},
+		{
+			name:  "after enabling",
+			setup: func() { inflect.Classical(true) },
+			want:  true,
+		},
+		{
+			name:  "after enabling then disabling",
+			setup: func() { inflect.Classical(true); inflect.Classical(false) },
+			want:  false,
+		},
+		{
+			name: "after multiple toggles ending enabled",
+			setup: func() {
+				inflect.Classical(false)
+				inflect.Classical(true)
+				inflect.Classical(false)
+				inflect.Classical(true)
+			},
+			want: true,
+		},
+		{
+			name: "after multiple toggles ending disabled",
+			setup: func() {
+				inflect.Classical(true)
+				inflect.Classical(false)
+				inflect.Classical(true)
+				inflect.Classical(false)
+			},
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setup()
+			got := inflect.IsClassical()
+			if got != tt.want {
+				t.Errorf("IsClassical() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestClassicalIntegration(t *testing.T) {
+	// Clean up after test
+	defer inflect.Classical(false)
+
+	t.Run("complete workflow", func(t *testing.T) {
+		// 1. Initial/default state should be false
+		inflect.Classical(false)
+		if got := inflect.IsClassical(); got != false {
+			t.Errorf("Initial IsClassical() = %v, want false", got)
+		}
+
+		// 2. Enable classical mode
+		inflect.Classical(true)
+		if got := inflect.IsClassical(); got != true {
+			t.Errorf("After Classical(true): IsClassical() = %v, want true", got)
+		}
+
+		// 3. Disable classical mode
+		inflect.Classical(false)
+		if got := inflect.IsClassical(); got != false {
+			t.Errorf("After Classical(false): IsClassical() = %v, want false", got)
+		}
+
+		// 4. Toggle multiple times
+		inflect.Classical(true)
+		inflect.Classical(true) // Setting to same value should work
+		if got := inflect.IsClassical(); got != true {
+			t.Errorf("After double Classical(true): IsClassical() = %v, want true", got)
+		}
+
+		inflect.Classical(false)
+		inflect.Classical(false) // Setting to same value should work
+		if got := inflect.IsClassical(); got != false {
+			t.Errorf("After double Classical(false): IsClassical() = %v, want false", got)
+		}
+	})
+}

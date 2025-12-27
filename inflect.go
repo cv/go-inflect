@@ -16,6 +16,11 @@ import (
 // A value of 0 indicates no default is set.
 var defaultNum int
 
+// classicalMode controls whether to prefer classical Latin/Greek plurals.
+// When true, words like "formula" become "formulae" instead of "formulas".
+// Default is false (modern English plurals).
+var classicalMode bool
+
 // customAWords stores words that should be forced to use "a" instead of "an".
 // The keys are lowercase versions of the words/patterns.
 var customAWords = make(map[string]bool)
@@ -274,6 +279,41 @@ func UndefAn(word string) bool {
 func DefAReset() {
 	customAWords = make(map[string]bool)
 	customAnWords = make(map[string]bool)
+}
+
+// Classical enables or disables classical pluralization mode.
+//
+// When enabled (true), Plural() prefers classical Latin/Greek plural forms:
+//   - formula -> formulae (instead of formulas)
+//   - antenna -> antennae (instead of antennas)
+//   - vertebra -> vertebrae (instead of vertebras)
+//   - alumna -> alumnae (instead of alumnas)
+//
+// When disabled (false, the default), modern English plurals are used.
+//
+// Examples:
+//
+//	Classical(true)
+//	Plural("formula") // returns "formulae"
+//	Classical(false)
+//	Plural("formula") // returns "formulas"
+func Classical(enabled bool) {
+	classicalMode = enabled
+}
+
+// IsClassical returns whether classical pluralization mode is enabled.
+//
+// Returns true if Classical(true) was called, false otherwise.
+//
+// Examples:
+//
+//	IsClassical() // returns false (default)
+//	Classical(true)
+//	IsClassical() // returns true
+//	Classical(false)
+//	IsClassical() // returns false
+func IsClassical() bool {
+	return classicalMode
 }
 
 // Plural returns the plural form of an English noun.
