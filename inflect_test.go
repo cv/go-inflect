@@ -2035,3 +2035,159 @@ func TestDefAdjIntegration(t *testing.T) {
 		}
 	})
 }
+
+func TestNum(t *testing.T) {
+	// Clear state before tests
+	inflect.Num(0)
+
+	tests := []struct {
+		name       string
+		args       []int
+		wantReturn int
+		wantGetNum int
+	}{
+		// Store positive values
+		{name: "store 5", args: []int{5}, wantReturn: 5, wantGetNum: 5},
+		{name: "store 1", args: []int{1}, wantReturn: 1, wantGetNum: 1},
+		{name: "store 100", args: []int{100}, wantReturn: 100, wantGetNum: 100},
+		{name: "store large number", args: []int{999999}, wantReturn: 999999, wantGetNum: 999999},
+
+		// Clear with 0
+		{name: "clear with 0", args: []int{0}, wantReturn: 0, wantGetNum: 0},
+
+		// Clear with no args
+		{name: "clear with no args", args: []int{}, wantReturn: 0, wantGetNum: 0},
+
+		// Negative values
+		{name: "store negative", args: []int{-5}, wantReturn: -5, wantGetNum: -5},
+		{name: "store -1", args: []int{-1}, wantReturn: -1, wantGetNum: -1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Reset state before each test
+			inflect.Num(0)
+
+			var got int
+			if len(tt.args) == 0 {
+				got = inflect.Num()
+			} else {
+				got = inflect.Num(tt.args[0])
+			}
+
+			if got != tt.wantReturn {
+				t.Errorf("Num(%v) = %d, want %d", tt.args, got, tt.wantReturn)
+			}
+
+			gotNum := inflect.GetNum()
+			if gotNum != tt.wantGetNum {
+				t.Errorf("After Num(%v): GetNum() = %d, want %d", tt.args, gotNum, tt.wantGetNum)
+			}
+		})
+	}
+
+	// Clean up
+	inflect.Num(0)
+}
+
+func TestGetNum(t *testing.T) {
+	tests := []struct {
+		name    string
+		setup   func()
+		wantNum int
+	}{
+		{
+			name:    "initial state",
+			setup:   func() { inflect.Num(0) },
+			wantNum: 0,
+		},
+		{
+			name:    "after storing 5",
+			setup:   func() { inflect.Num(5) },
+			wantNum: 5,
+		},
+		{
+			name:    "after storing 10",
+			setup:   func() { inflect.Num(10) },
+			wantNum: 10,
+		},
+		{
+			name:    "after clearing with 0",
+			setup:   func() { inflect.Num(5); inflect.Num(0) },
+			wantNum: 0,
+		},
+		{
+			name:    "after clearing with no args",
+			setup:   func() { inflect.Num(5); inflect.Num() },
+			wantNum: 0,
+		},
+		{
+			name:    "after multiple stores",
+			setup:   func() { inflect.Num(1); inflect.Num(2); inflect.Num(3) },
+			wantNum: 3,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setup()
+			got := inflect.GetNum()
+			if got != tt.wantNum {
+				t.Errorf("GetNum() = %d, want %d", got, tt.wantNum)
+			}
+		})
+	}
+
+	// Clean up
+	inflect.Num(0)
+}
+
+func TestNumIntegration(t *testing.T) {
+	// Clean up after test
+	defer inflect.Num(0)
+
+	t.Run("complete workflow", func(t *testing.T) {
+		// 1. Initial state should be 0
+		inflect.Num(0)
+		if got := inflect.GetNum(); got != 0 {
+			t.Errorf("Initial GetNum() = %d, want 0", got)
+		}
+
+		// 2. Store a value
+		ret := inflect.Num(5)
+		if ret != 5 {
+			t.Errorf("Num(5) = %d, want 5", ret)
+		}
+		if got := inflect.GetNum(); got != 5 {
+			t.Errorf("After Num(5): GetNum() = %d, want 5", got)
+		}
+
+		// 3. Update the value
+		ret = inflect.Num(10)
+		if ret != 10 {
+			t.Errorf("Num(10) = %d, want 10", ret)
+		}
+		if got := inflect.GetNum(); got != 10 {
+			t.Errorf("After Num(10): GetNum() = %d, want 10", got)
+		}
+
+		// 4. Clear with 0
+		ret = inflect.Num(0)
+		if ret != 0 {
+			t.Errorf("Num(0) = %d, want 0", ret)
+		}
+		if got := inflect.GetNum(); got != 0 {
+			t.Errorf("After Num(0): GetNum() = %d, want 0", got)
+		}
+
+		// 5. Store again and clear with no args
+		inflect.Num(7)
+		ret = inflect.Num()
+		if ret != 0 {
+			t.Errorf("Num() = %d, want 0", ret)
+		}
+		if got := inflect.GetNum(); got != 0 {
+			t.Errorf("After Num(): GetNum() = %d, want 0", got)
+		}
+	})
+}

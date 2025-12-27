@@ -12,6 +12,10 @@ import (
 	"unicode"
 )
 
+// defaultNum stores the default count for number-related functions.
+// A value of 0 indicates no default is set.
+var defaultNum int
+
 // customAWords stores words that should be forced to use "a" instead of "an".
 // The keys are lowercase versions of the words/patterns.
 var customAWords = make(map[string]bool)
@@ -1389,6 +1393,37 @@ func CompareVerbs(verb1, verb2 string) string {
 func CompareAdjs(adj1, adj2 string) string {
 	// TODO: Implement adjective comparison
 	return ""
+}
+
+// Num stores and retrieves a default count for number-related operations.
+//
+// When called with a positive integer, it stores that value as the default
+// count and returns it. When called with 0 or no arguments, it clears the
+// default count and returns 0.
+//
+// Examples:
+//   - Num(5) stores 5 as default count, returns 5
+//   - Num(0) clears the default count, returns 0
+//   - Num() clears the default count, returns 0
+func Num(n ...int) int {
+	if len(n) == 0 || n[0] == 0 {
+		defaultNum = 0
+		return 0
+	}
+	defaultNum = n[0]
+	return defaultNum
+}
+
+// GetNum retrieves the current default count.
+//
+// Returns 0 if no default has been set or if it was cleared.
+//
+// Examples:
+//   - After Num(5): GetNum() returns 5
+//   - After Num(0) or Num(): GetNum() returns 0
+//   - Before any Num() call: GetNum() returns 0
+func GetNum() int {
+	return defaultNum
 }
 
 // No returns a count and noun phrase in English, using "no" for zero counts.
