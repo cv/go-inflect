@@ -29,6 +29,79 @@ var customAWords = make(map[string]bool)
 // The keys are lowercase versions of the words/patterns.
 var customAnWords = make(map[string]bool)
 
+// silentHWords contains words starting with silent 'h' that take "an".
+var silentHWords = map[string]bool{
+	"honest": true, "heir": true, "heiress": true, "heirloom": true,
+	"honor": true, "honour": true, "hour": true, "hourly": true,
+}
+
+// lowercaseAbbrevs contains lowercase abbreviations pronounced letter-by-letter.
+var lowercaseAbbrevs = map[string]bool{
+	"mpeg": true, "jpeg": true, "gif": true, "sql": true, "html": true,
+	"xml": true, "fbi": true, "cia": true, "nsa": true,
+}
+
+// changeToVesWords contains words ending in -f/-fe that change to -ves.
+var changeToVesWords = map[string]bool{
+	"calf": true, "elf": true, "half": true, "knife": true, "leaf": true,
+	"life": true, "loaf": true, "self": true, "sheaf": true, "shelf": true,
+	"thief": true, "wife": true, "wolf": true,
+}
+
+// oExceptionWords contains words ending in -o that just take -s (not -es).
+var oExceptionWords = map[string]bool{
+	"alto": true, "auto": true, "basso": true, "canto": true, "casino": true,
+	"combo": true, "contralto": true, "disco": true, "dynamo": true,
+	"embryo": true, "espresso": true, "euro": true, "fiasco": true,
+	"ghetto": true, "inferno": true, "kilo": true, "limo": true,
+	"maestro": true, "memo": true, "metro": true, "piano": true,
+	"photo": true, "pimento": true, "polo": true, "poncho": true,
+	"pro": true, "ratio": true, "rhino": true, "silo": true, "solo": true,
+	"soprano": true, "stiletto": true, "studio": true, "taco": true,
+	"tattoo": true, "tempo": true, "tornado": true, "torso": true,
+	"tuxedo": true, "video": true, "virtuoso": true, "zero": true,
+	"albino": true, "archipelago": true, "armadillo": true, "commando": true,
+	"dodo": true, "flamingo": true, "grotto": true, "magneto": true,
+	"manifesto": true, "mosquito": true, "motto": true, "otto": true,
+	"placebo": true, "portfolio": true, "quarto": true, "stucco": true,
+	"tobacco": true, "volcano": true,
+}
+
+// unchangedPlurals contains words that don't change in plural form.
+var unchangedPlurals = map[string]bool{
+	"aircraft": true, "bison": true, "buffalo": true, "cod": true,
+	"deer": true, "fish": true, "moose": true, "offspring": true,
+	"pike": true, "salmon": true, "series": true, "sheep": true,
+	"shrimp": true, "species": true, "squid": true, "swine": true,
+	"trout": true, "tuna": true,
+}
+
+// feWordBases contains base words whose singular ends in -fe (plural is -ves).
+var feWordBases = map[string]bool{
+	"kni": true, "wi": true, "li": true,
+}
+
+// doubleConsonantWords contains multi-syllable words that double the final consonant.
+var doubleConsonantWords = map[string]bool{
+	"admit": true, "begin": true, "commit": true, "compel": true,
+	"confer": true, "control": true, "defer": true, "deter": true,
+	"equip": true, "excel": true, "expel": true, "forget": true,
+	"incur": true, "occur": true, "omit": true, "patrol": true,
+	"permit": true, "prefer": true, "propel": true, "rebel": true,
+	"recur": true, "refer": true, "regret": true, "repel": true,
+	"submit": true, "transfer": true, "transmit": true, "upset": true,
+}
+
+// isAllUpper checks if all letters in a word are uppercase.
+func isAllUpper(word string) bool {
+	for _, r := range word {
+		if unicode.IsLetter(r) && !unicode.IsUpper(r) {
+			return false
+		}
+	}
+	return true
+}
+
 // An returns the word prefixed with the appropriate indefinite article ("a" or "an").
 //
 // The selection follows standard English rules:
@@ -74,8 +147,7 @@ func needsAn(text string) bool {
 	lower := strings.ToLower(firstWord)
 
 	// Check for silent 'h' words that take "an"
-	silentH := []string{"honest", "heir", "heiress", "heirloom", "honor", "honour", "hour", "hourly"}
-	for _, h := range silentH {
+	for h := range silentHWords {
 		if strings.HasPrefix(lower, h) {
 			return true
 		}
@@ -87,11 +159,8 @@ func needsAn(text string) bool {
 	}
 
 	// Check for known lowercase abbreviations pronounced letter-by-letter
-	lowercaseAbbrevs := []string{"mpeg", "jpeg", "gif", "sql", "html", "xml", "fbi", "cia", "nsa"}
-	for _, abbr := range lowercaseAbbrevs {
-		if lower == abbr {
-			return abbreviationNeedsAn(strings.ToUpper(abbr))
-		}
+	if lowercaseAbbrevs[lower] {
+		return abbreviationNeedsAn(strings.ToUpper(lower))
 	}
 
 	// Check for special vowel patterns that sound like consonants (take "a")
@@ -130,16 +199,7 @@ func isAbbreviation(word string) bool {
 	if len(word) < 2 {
 		return false
 	}
-
-	// Check if all letters are uppercase
-	allUpper := true
-	for _, r := range word {
-		if unicode.IsLetter(r) && !unicode.IsUpper(r) {
-			allUpper = false
-			break
-		}
-	}
-	return allUpper
+	return isAllUpper(word)
 }
 
 // abbreviationNeedsAn checks if an abbreviation should take "an".
@@ -336,10 +396,8 @@ func Plural(word string) string {
 	}
 
 	// Check for uncountable/unchanged words
-	for _, unchanged := range unchangedPlurals {
-		if lower == unchanged {
-			return word
-		}
+	if unchangedPlurals[lower] {
+		return word
 	}
 
 	// Check for words ending in -ese, -ois (nationalities that don't change)
@@ -404,14 +462,7 @@ func applySuffixRules(word, lower string) string {
 
 // matchSuffix returns the suffix in uppercase if the word is all uppercase.
 func matchSuffix(word, suffix string) string {
-	allUpper := true
-	for _, r := range word {
-		if unicode.IsLetter(r) && !unicode.IsUpper(r) {
-			allUpper = false
-			break
-		}
-	}
-	if allUpper {
+	if isAllUpper(word) {
 		return strings.ToUpper(suffix)
 	}
 	return suffix
@@ -424,39 +475,12 @@ func isVowel(r rune) bool {
 
 // shouldChangeF determines if a word ending in -f/-fe should change to -ves.
 func shouldChangeF(lower string) bool {
-	// Words that change -f/-fe to -ves
-	changeToVes := []string{
-		"calf", "elf", "half", "knife", "leaf", "life", "loaf",
-		"self", "sheaf", "shelf", "thief", "wife", "wolf",
-	}
-	for _, w := range changeToVes {
-		if lower == w {
-			return true
-		}
-	}
-	return false
+	return changeToVesWords[lower]
 }
 
 // oExceptionTakesS returns true if a word ending in -o just takes -s.
 func oExceptionTakesS(lower string) bool {
-	// Musical terms, abbreviations, and other exceptions
-	exceptions := []string{
-		"alto", "auto", "basso", "canto", "casino", "combo", "contralto",
-		"disco", "dynamo", "embryo", "espresso", "euro", "fiasco", "ghetto",
-		"inferno", "kilo", "limo", "maestro", "memo", "metro", "piano",
-		"photo", "pimento", "polo", "poncho", "pro", "ratio", "rhino",
-		"silo", "solo", "soprano", "stiletto", "studio", "taco", "tattoo",
-		"tempo", "tornado", "torso", "tuxedo", "video", "virtuoso", "zero",
-		"albino", "archipelago", "armadillo", "commando", "dodo", "flamingo",
-		"grotto", "magneto", "manifesto", "mosquito", "motto", "otto",
-		"placebo", "portfolio", "quarto", "stucco", "tobacco", "volcano",
-	}
-	for _, w := range exceptions {
-		if lower == w {
-			return true
-		}
-	}
-	return false
+	return oExceptionWords[lower]
 }
 
 // matchCase adjusts the replacement to match the case pattern of the original.
@@ -466,14 +490,7 @@ func matchCase(original, replacement string) string {
 	}
 
 	// Check if original is all uppercase
-	allUpper := true
-	for _, r := range original {
-		if unicode.IsLetter(r) && !unicode.IsUpper(r) {
-			allUpper = false
-			break
-		}
-	}
-	if allUpper {
+	if isAllUpper(original) {
 		return strings.ToUpper(replacement)
 	}
 
@@ -538,13 +555,6 @@ var defaultIrregularPlurals = map[string]string{
 
 // irregularPlurals maps singular forms to their irregular plural forms.
 var irregularPlurals = copyMap(defaultIrregularPlurals)
-
-// unchangedPlurals lists words that don't change in plural form.
-var unchangedPlurals = []string{
-	"aircraft", "bison", "buffalo", "cod", "deer", "fish", "moose",
-	"offspring", "pike", "salmon", "series", "sheep", "shrimp",
-	"species", "squid", "swine", "trout", "tuna",
-}
 
 // singularIrregulars maps plural forms to their singular forms (reverse of irregularPlurals).
 var singularIrregulars = buildSingularIrregulars()
@@ -772,10 +782,8 @@ func Singular(word string) string {
 	}
 
 	// Check for uncountable/unchanged words
-	for _, unchanged := range unchangedPlurals {
-		if lower == unchanged {
-			return word
-		}
+	if unchangedPlurals[lower] {
+		return word
 	}
 
 	// Check for words ending in -ese, -ois (nationalities that don't change)
@@ -868,14 +876,7 @@ func applySingularSuffixRules(word, lower string) string {
 
 // singularEndsInFe checks if a base word's singular form ends in -fe.
 func singularEndsInFe(base string) bool {
-	// Words whose singular ends in -fe (and plural is -ves)
-	feWords := []string{"kni", "wi", "li"}
-	for _, w := range feWords {
-		if base == w {
-			return true
-		}
-	}
-	return false
+	return feWordBases[base]
 }
 
 // Ordinal converts an integer to its ordinal string representation.
@@ -1245,19 +1246,7 @@ func shouldDoubleConsonant(lower string) bool {
 
 	// For multi-syllable words, check for common patterns that double
 	// Words ending in stressed syllables typically double
-	doublePatterns := []string{
-		"admit", "begin", "commit", "compel", "confer", "control", "defer",
-		"deter", "equip", "excel", "expel", "forget", "incur", "occur",
-		"omit", "patrol", "permit", "prefer", "propel", "rebel", "recur",
-		"refer", "regret", "repel", "submit", "transfer", "transmit", "upset",
-	}
-	for _, pat := range doublePatterns {
-		if lower == pat {
-			return true
-		}
-	}
-
-	return false
+	return doubleConsonantWords[lower]
 }
 
 // countVowels counts the number of vowels in a string.
