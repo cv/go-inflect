@@ -1076,3 +1076,27 @@ func CompareAdjs(adj1, adj2 string) string {
 	// TODO: Implement adjective comparison
 	return ""
 }
+
+// No returns a count and noun phrase in English, using "no" for zero counts.
+//
+// The function handles pluralization automatically:
+//   - For count 0: returns "no" + plural form
+//   - For count 1: returns "1" + singular form
+//   - For count > 1: returns count + plural form
+//
+// Examples:
+//   - No("error", 0) returns "no errors"
+//   - No("error", 1) returns "1 error"
+//   - No("error", 2) returns "2 errors"
+//   - No("child", 0) returns "no children"
+//   - No("child", 1) returns "1 child"
+//   - No("child", 3) returns "3 children"
+func No(word string, count int) string {
+	if count == 0 {
+		return "no " + Plural(word)
+	}
+	if count == 1 || count == -1 {
+		return fmt.Sprintf("%d %s", count, word)
+	}
+	return fmt.Sprintf("%d %s", count, Plural(word))
+}

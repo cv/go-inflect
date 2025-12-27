@@ -979,3 +979,63 @@ func TestCompareAdjs(t *testing.T) {
 		})
 	}
 }
+
+func TestNo(t *testing.T) {
+	tests := []struct {
+		name  string
+		word  string
+		count int
+		want  string
+	}{
+		// Zero count - uses "no" with plural
+		{name: "zero errors", word: "error", count: 0, want: "no errors"},
+		{name: "zero cats", word: "cat", count: 0, want: "no cats"},
+		{name: "zero children", word: "child", count: 0, want: "no children"},
+		{name: "zero mice", word: "mouse", count: 0, want: "no mice"},
+		{name: "zero sheep", word: "sheep", count: 0, want: "no sheep"},
+		{name: "zero boxes", word: "box", count: 0, want: "no boxes"},
+
+		// Count of 1 - singular
+		{name: "one error", word: "error", count: 1, want: "1 error"},
+		{name: "one cat", word: "cat", count: 1, want: "1 cat"},
+		{name: "one child", word: "child", count: 1, want: "1 child"},
+		{name: "one mouse", word: "mouse", count: 1, want: "1 mouse"},
+		{name: "one sheep", word: "sheep", count: 1, want: "1 sheep"},
+		{name: "one box", word: "box", count: 1, want: "1 box"},
+
+		// Count > 1 - plural
+		{name: "two errors", word: "error", count: 2, want: "2 errors"},
+		{name: "five cats", word: "cat", count: 5, want: "5 cats"},
+		{name: "three children", word: "child", count: 3, want: "3 children"},
+		{name: "ten mice", word: "mouse", count: 10, want: "10 mice"},
+		{name: "hundred sheep", word: "sheep", count: 100, want: "100 sheep"},
+		{name: "twenty boxes", word: "box", count: 20, want: "20 boxes"},
+
+		// Large counts
+		{name: "thousand errors", word: "error", count: 1000, want: "1000 errors"},
+		{name: "million items", word: "item", count: 1000000, want: "1000000 items"},
+
+		// Negative counts
+		{name: "negative one error", word: "error", count: -1, want: "-1 error"},
+		{name: "negative two errors", word: "error", count: -2, want: "-2 errors"},
+		{name: "negative five cats", word: "cat", count: -5, want: "-5 cats"},
+
+		// Empty word
+		{name: "zero empty", word: "", count: 0, want: "no "},
+		{name: "one empty", word: "", count: 1, want: "1 "},
+
+		// Case preservation
+		{name: "zero Errors titlecase", word: "Error", count: 0, want: "no Errors"},
+		{name: "zero ERRORS uppercase", word: "ERROR", count: 0, want: "no ERRORS"},
+		{name: "two Children titlecase", word: "Child", count: 2, want: "2 Children"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.No(tt.word, tt.count)
+			if got != tt.want {
+				t.Errorf("No(%q, %d) = %q, want %q", tt.word, tt.count, got, tt.want)
+			}
+		})
+	}
+}
