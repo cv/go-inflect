@@ -1044,3 +1044,35 @@ func Compare(word1, word2 string) string {
 func CompareNouns(noun1, noun2 string) string {
 	return Compare(noun1, noun2)
 }
+
+// CompareVerbs compares two verbs for conjugation equality.
+//
+// NOTE: This is a placeholder stub for future implementation.
+// Verb conjugation comparison is not yet implemented.
+//
+// Currently always returns an empty string.
+//
+// Future implementation will return:
+//   - "eq" if the verbs are equal (case-insensitive)
+//   - Comparison codes for different conjugation relationships
+//   - "" if the verbs are not related
+func CompareVerbs(verb1, verb2 string) string {
+	// TODO: Implement verb conjugation comparison
+	return ""
+}
+
+// CompareAdjs compares two adjectives for comparative/superlative equality.
+//
+// NOTE: This is a placeholder stub for future implementation.
+// Adjective comparison is not yet implemented.
+//
+// Currently always returns an empty string.
+//
+// Future implementation will return:
+//   - "eq" if the adjectives are equal (case-insensitive)
+//   - Comparison codes for different adjective relationships (e.g., base/comparative/superlative)
+//   - "" if the adjectives are not related
+func CompareAdjs(adj1, adj2 string) string {
+	// TODO: Implement adjective comparison
+	return ""
+}

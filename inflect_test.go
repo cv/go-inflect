@@ -925,3 +925,57 @@ func TestPlural(t *testing.T) {
 		})
 	}
 }
+
+func TestCompareVerbs(t *testing.T) {
+	// CompareVerbs is a placeholder stub that always returns empty string.
+	// These tests verify the function exists and returns "" for any input.
+	tests := []struct {
+		name  string
+		verb1 string
+		verb2 string
+		want  string
+	}{
+		{name: "empty strings", verb1: "", verb2: "", want: ""},
+		{name: "same verb", verb1: "run", verb2: "run", want: ""},
+		{name: "different verbs", verb1: "run", verb2: "walk", want: ""},
+		{name: "conjugated forms", verb1: "run", verb2: "running", want: ""},
+		{name: "past tense", verb1: "walk", verb2: "walked", want: ""},
+		{name: "irregular verb", verb1: "go", verb2: "went", want: ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.CompareVerbs(tt.verb1, tt.verb2)
+			if got != tt.want {
+				t.Errorf("CompareVerbs(%q, %q) = %q, want %q", tt.verb1, tt.verb2, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCompareAdjs(t *testing.T) {
+	// CompareAdjs is a placeholder stub that always returns empty string.
+	// These tests verify the function exists and returns "" for any input.
+	tests := []struct {
+		name string
+		adj1 string
+		adj2 string
+		want string
+	}{
+		{name: "empty strings", adj1: "", adj2: "", want: ""},
+		{name: "same adjective", adj1: "big", adj2: "big", want: ""},
+		{name: "different adjectives", adj1: "big", adj2: "small", want: ""},
+		{name: "comparative form", adj1: "big", adj2: "bigger", want: ""},
+		{name: "superlative form", adj1: "big", adj2: "biggest", want: ""},
+		{name: "irregular adjective", adj1: "good", adj2: "better", want: ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.CompareAdjs(tt.adj1, tt.adj2)
+			if got != tt.want {
+				t.Errorf("CompareAdjs(%q, %q) = %q, want %q", tt.adj1, tt.adj2, got, tt.want)
+			}
+		})
+	}
+}
