@@ -157,3 +157,229 @@ func isVowelSound(r rune) bool {
 func A(word string) string {
 	return An(word)
 }
+
+// Plural returns the plural form of an English noun.
+//
+// Examples:
+//   - Plural("cat") returns "cats"
+//   - Plural("box") returns "boxes"
+//   - Plural("child") returns "children"
+//   - Plural("sheep") returns "sheep"
+func Plural(word string) string {
+	if word == "" {
+		return ""
+	}
+
+	lower := strings.ToLower(word)
+
+	// Check for irregular plurals first
+	if plural, ok := irregularPlurals[lower]; ok {
+		return matchCase(word, plural)
+	}
+
+	// Check for uncountable/unchanged words
+	for _, unchanged := range unchangedPlurals {
+		if lower == unchanged {
+			return word
+		}
+	}
+
+	// Check for words ending in -ese, -ois (nationalities that don't change)
+	if strings.HasSuffix(lower, "ese") || strings.HasSuffix(lower, "ois") {
+		return word
+	}
+
+	// Apply suffix rules
+	return applySuffixRules(word, lower)
+}
+
+// applySuffixRules applies standard English pluralization suffix rules.
+func applySuffixRules(word, lower string) string {
+	// Words ending in -man -> -men
+	if strings.HasSuffix(lower, "man") && !strings.HasSuffix(lower, "human") {
+		return word[:len(word)-3] + matchCase(word[len(word)-3:], "men")
+	}
+
+	// Words ending in -s, -ss, -sh, -ch, -x, -z -> add -es
+	if strings.HasSuffix(lower, "s") || strings.HasSuffix(lower, "ss") ||
+		strings.HasSuffix(lower, "sh") || strings.HasSuffix(lower, "ch") ||
+		strings.HasSuffix(lower, "x") || strings.HasSuffix(lower, "z") {
+		return word + matchSuffix(word, "es")
+	}
+
+	// Words ending in consonant + y -> -ies
+	if strings.HasSuffix(lower, "y") && len(lower) > 1 {
+		beforeY := lower[len(lower)-2]
+		if !isVowel(rune(beforeY)) {
+			return word[:len(word)-1] + matchSuffix(word, "ies")
+		}
+	}
+
+	// Words ending in -f or -fe -> -ves (with exceptions)
+	if strings.HasSuffix(lower, "fe") {
+		if shouldChangeF(lower) {
+			return word[:len(word)-2] + matchSuffix(word, "ves")
+		}
+	} else if strings.HasSuffix(lower, "f") && !strings.HasSuffix(lower, "ff") {
+		if shouldChangeF(lower) {
+			return word[:len(word)-1] + matchSuffix(word, "ves")
+		}
+	}
+
+	// Words ending in -o -> -oes (with exceptions)
+	if strings.HasSuffix(lower, "o") && len(lower) > 1 {
+		beforeO := lower[len(lower)-2]
+		// Vowel + o -> just add s (radio, studio, zoo)
+		if isVowel(rune(beforeO)) {
+			return word + matchSuffix(word, "s")
+		}
+		// Check if it's an exception that just takes -s
+		if oExceptionTakesS(lower) {
+			return word + matchSuffix(word, "s")
+		}
+		return word + matchSuffix(word, "es")
+	}
+
+	// Default: add -s
+	return word + matchSuffix(word, "s")
+}
+
+// matchSuffix returns the suffix in uppercase if the word is all uppercase.
+func matchSuffix(word, suffix string) string {
+	allUpper := true
+	for _, r := range word {
+		if unicode.IsLetter(r) && !unicode.IsUpper(r) {
+			allUpper = false
+			break
+		}
+	}
+	if allUpper {
+		return strings.ToUpper(suffix)
+	}
+	return suffix
+}
+
+// isVowel checks if a rune is a vowel.
+func isVowel(r rune) bool {
+	return strings.ContainsRune("aeiouAEIOU", r)
+}
+
+// shouldChangeF determines if a word ending in -f/-fe should change to -ves.
+func shouldChangeF(lower string) bool {
+	// Words that change -f/-fe to -ves
+	changeToVes := []string{
+		"calf", "elf", "half", "knife", "leaf", "life", "loaf",
+		"self", "sheaf", "shelf", "thief", "wife", "wolf",
+	}
+	for _, w := range changeToVes {
+		if lower == w {
+			return true
+		}
+	}
+	return false
+}
+
+// oExceptionTakesS returns true if a word ending in -o just takes -s.
+func oExceptionTakesS(lower string) bool {
+	// Musical terms, abbreviations, and other exceptions
+	exceptions := []string{
+		"alto", "auto", "basso", "canto", "casino", "combo", "contralto",
+		"disco", "dynamo", "embryo", "espresso", "euro", "fiasco", "ghetto",
+		"inferno", "kilo", "limo", "maestro", "memo", "metro", "piano",
+		"photo", "pimento", "polo", "poncho", "pro", "ratio", "rhino",
+		"silo", "solo", "soprano", "stiletto", "studio", "taco", "tattoo",
+		"tempo", "tornado", "torso", "tuxedo", "video", "virtuoso", "zero",
+		"albino", "archipelago", "armadillo", "commando", "dodo", "flamingo",
+		"grotto", "magneto", "manifesto", "mosquito", "motto", "otto",
+		"placebo", "portfolio", "quarto", "stucco", "tobacco", "volcano",
+	}
+	for _, w := range exceptions {
+		if lower == w {
+			return true
+		}
+	}
+	return false
+}
+
+// matchCase adjusts the replacement to match the case pattern of the original.
+func matchCase(original, replacement string) string {
+	if len(original) == 0 || len(replacement) == 0 {
+		return replacement
+	}
+
+	// Check if original is all uppercase
+	allUpper := true
+	for _, r := range original {
+		if unicode.IsLetter(r) && !unicode.IsUpper(r) {
+			allUpper = false
+			break
+		}
+	}
+	if allUpper {
+		return strings.ToUpper(replacement)
+	}
+
+	// Check if original starts with uppercase
+	firstRune := []rune(original)[0]
+	if unicode.IsUpper(firstRune) {
+		runes := []rune(replacement)
+		runes[0] = unicode.ToUpper(runes[0])
+		return string(runes)
+	}
+
+	return replacement
+}
+
+// irregularPlurals maps singular forms to their irregular plural forms.
+var irregularPlurals = map[string]string{
+	"child":       "children",
+	"foot":        "feet",
+	"goose":       "geese",
+	"louse":       "lice",
+	"man":         "men",
+	"mouse":       "mice",
+	"ox":          "oxen",
+	"person":      "people",
+	"tooth":       "teeth",
+	"woman":       "women",
+	"die":         "dice",
+	"criterion":   "criteria",
+	"phenomenon":  "phenomena",
+	"analysis":    "analyses",
+	"basis":       "bases",
+	"crisis":      "crises",
+	"diagnosis":   "diagnoses",
+	"hypothesis":  "hypotheses",
+	"oasis":       "oases",
+	"parenthesis": "parentheses",
+	"synopsis":    "synopses",
+	"thesis":      "theses",
+	"alumnus":     "alumni",
+	"cactus":      "cacti",
+	"focus":       "foci",
+	"fungus":      "fungi",
+	"nucleus":     "nuclei",
+	"radius":      "radii",
+	"stimulus":    "stimuli",
+	"syllabus":    "syllabi",
+	"bacterium":   "bacteria",
+	"curriculum":  "curricula",
+	"datum":       "data",
+	"medium":      "media",
+	"memorandum":  "memoranda",
+	"millennium":  "millennia",
+	"stadium":     "stadia",
+	"stratum":     "strata",
+	"appendix":    "appendices",
+	"index":       "indices",
+	"matrix":      "matrices",
+	"vertex":      "vertices",
+	"apex":        "apices",
+}
+
+// unchangedPlurals lists words that don't change in plural form.
+var unchangedPlurals = []string{
+	"aircraft", "bison", "buffalo", "cod", "deer", "fish", "moose",
+	"offspring", "pike", "salmon", "series", "sheep", "shrimp",
+	"species", "squid", "swine", "trout", "tuna",
+}
