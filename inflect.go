@@ -425,3 +425,156 @@ func ordinalSuffix(n int) string {
 		return "th"
 	}
 }
+
+// OrdinalWord converts an integer to its ordinal word representation.
+//
+// Examples:
+//   - OrdinalWord(1) returns "first"
+//   - OrdinalWord(2) returns "second"
+//   - OrdinalWord(11) returns "eleventh"
+//   - OrdinalWord(21) returns "twenty-first"
+//   - OrdinalWord(100) returns "one hundredth"
+//   - OrdinalWord(101) returns "one hundred first"
+//   - OrdinalWord(-1) returns "negative first"
+func OrdinalWord(n int) string {
+	if n == 0 {
+		return "zeroth"
+	}
+
+	if n < 0 {
+		return "negative " + OrdinalWord(-n)
+	}
+
+	return convertToOrdinalWord(n)
+}
+
+// convertToOrdinalWord converts a positive integer to its ordinal word form.
+func convertToOrdinalWord(n int) string {
+	// Handle numbers 1-19 with direct lookup
+	if n <= 19 {
+		return onesOrdinal[n]
+	}
+
+	// Handle exact tens (20, 30, 40, ...)
+	if n < 100 && n%10 == 0 {
+		return tensOrdinal[n/10]
+	}
+
+	// Handle 20-99 with compound form (twenty-first, etc.)
+	if n < 100 {
+		return tensCardinal[n/10] + "-" + onesOrdinal[n%10]
+	}
+
+	// Handle exact hundreds (100, 200, ...)
+	if n < 1000 && n%100 == 0 {
+		return onesCardinal[n/100] + " hundredth"
+	}
+
+	// Handle 100-999
+	if n < 1000 {
+		return onesCardinal[n/100] + " hundred " + convertToOrdinalWord(n%100)
+	}
+
+	// Handle exact thousands (1000, 2000, ...)
+	if n < 1000000 && n%1000 == 0 {
+		return cardinalWord(n/1000) + " thousandth"
+	}
+
+	// Handle 1000-999999
+	if n < 1000000 {
+		return cardinalWord(n/1000) + " thousand " + convertToOrdinalWord(n%1000)
+	}
+
+	// Handle exact millions (1000000, 2000000, ...)
+	if n < 1000000000 && n%1000000 == 0 {
+		return cardinalWord(n/1000000) + " millionth"
+	}
+
+	// Handle 1000000-999999999
+	if n < 1000000000 {
+		return cardinalWord(n/1000000) + " million " + convertToOrdinalWord(n%1000000)
+	}
+
+	// Handle exact billions
+	if n%1000000000 == 0 {
+		return cardinalWord(n/1000000000) + " billionth"
+	}
+
+	// Handle billions and above
+	return cardinalWord(n/1000000000) + " billion " + convertToOrdinalWord(n%1000000000)
+}
+
+// cardinalWord converts a positive integer to its cardinal word form.
+func cardinalWord(n int) string {
+	if n == 0 {
+		return "zero"
+	}
+
+	if n <= 19 {
+		return onesCardinal[n]
+	}
+
+	if n < 100 && n%10 == 0 {
+		return tensCardinal[n/10]
+	}
+
+	if n < 100 {
+		return tensCardinal[n/10] + "-" + onesCardinal[n%10]
+	}
+
+	if n < 1000 && n%100 == 0 {
+		return onesCardinal[n/100] + " hundred"
+	}
+
+	if n < 1000 {
+		return onesCardinal[n/100] + " hundred " + cardinalWord(n%100)
+	}
+
+	if n < 1000000 && n%1000 == 0 {
+		return cardinalWord(n/1000) + " thousand"
+	}
+
+	if n < 1000000 {
+		return cardinalWord(n/1000) + " thousand " + cardinalWord(n%1000)
+	}
+
+	if n < 1000000000 && n%1000000 == 0 {
+		return cardinalWord(n/1000000) + " million"
+	}
+
+	if n < 1000000000 {
+		return cardinalWord(n/1000000) + " million " + cardinalWord(n%1000000)
+	}
+
+	if n%1000000000 == 0 {
+		return cardinalWord(n/1000000000) + " billion"
+	}
+
+	return cardinalWord(n/1000000000) + " billion " + cardinalWord(n%1000000000)
+}
+
+// onesCardinal maps 1-19 to their cardinal word forms.
+var onesCardinal = []string{
+	"", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+	"ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
+	"seventeen", "eighteen", "nineteen",
+}
+
+// onesOrdinal maps 1-19 to their ordinal word forms.
+var onesOrdinal = []string{
+	"", "first", "second", "third", "fourth", "fifth", "sixth", "seventh",
+	"eighth", "ninth", "tenth", "eleventh", "twelfth", "thirteenth",
+	"fourteenth", "fifteenth", "sixteenth", "seventeenth", "eighteenth",
+	"nineteenth",
+}
+
+// tensCardinal maps tens (2-9 representing 20-90) to their cardinal word forms.
+var tensCardinal = []string{
+	"", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety",
+}
+
+// tensOrdinal maps tens (2-9 representing 20-90) to their ordinal word forms.
+var tensOrdinal = []string{
+	"", "", "twentieth", "thirtieth", "fortieth", "fiftieth", "sixtieth",
+	"seventieth", "eightieth", "ninetieth",
+}
