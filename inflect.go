@@ -554,6 +554,43 @@ func IsClassicalAncient() bool {
 	return classicalAncient
 }
 
+// ClassicalZero enables or disables classical zero count pluralization.
+//
+// This controls the classicalZero flag independently of other classical
+// options like classicalHerd, classicalNames, classicalAncient, and classicalPersons.
+//
+// When enabled (true), No() uses singular form for zero count:
+//   - No("cat", 0) -> "no cat"
+//
+// When disabled (false, the default), No() uses plural form for zero count:
+//   - No("cat", 0) -> "no cats"
+//
+// Examples:
+//
+//	ClassicalZero(true)
+//	No("cat", 0) // returns "no cat"
+//	ClassicalZero(false)
+//	No("cat", 0) // returns "no cats"
+func ClassicalZero(enabled bool) {
+	classicalZero = enabled
+}
+
+// IsClassicalZero returns whether classical zero count pluralization is enabled.
+//
+// Returns true if ClassicalZero(true) or ClassicalAll(true) was called,
+// false otherwise.
+//
+// Examples:
+//
+//	IsClassicalZero() // returns false (default)
+//	ClassicalZero(true)
+//	IsClassicalZero() // returns true
+//	ClassicalZero(false)
+//	IsClassicalZero() // returns false
+func IsClassicalZero() bool {
+	return classicalZero
+}
+
 // ClassicalPersons enables or disables classical person/persons pluralization.
 //
 // This controls the classicalPersons flag independently of other classical
@@ -1685,19 +1722,27 @@ func GetNum() int {
 // No returns a count and noun phrase in English, using "no" for zero counts.
 //
 // The function handles pluralization automatically:
-//   - For count 0: returns "no" + plural form
+//   - For count 0 with classicalZero=false (default): returns "no" + plural form
+//   - For count 0 with classicalZero=true: returns "no" + singular form
 //   - For count 1: returns "1" + singular form
 //   - For count > 1: returns count + plural form
 //
 // Examples:
-//   - No("error", 0) returns "no errors"
+//   - No("error", 0) returns "no errors" (default)
 //   - No("error", 1) returns "1 error"
 //   - No("error", 2) returns "2 errors"
-//   - No("child", 0) returns "no children"
+//   - No("child", 0) returns "no children" (default)
 //   - No("child", 1) returns "1 child"
 //   - No("child", 3) returns "3 children"
+//
+// With ClassicalZero(true):
+//   - No("error", 0) returns "no error"
+//   - No("child", 0) returns "no child"
 func No(word string, count int) string {
 	if count == 0 {
+		if classicalZero {
+			return "no " + word
+		}
 		return "no " + Plural(word)
 	}
 	if count == 1 || count == -1 {
