@@ -639,6 +639,22 @@ func convertToOrdinalWord(n int) string {
 	return cardinalWord(n/1000000000) + " billion " + convertToOrdinalWord(n%1000000000)
 }
 
+// NumberToWords converts an integer to its English word representation.
+//
+// Examples:
+//   - NumberToWords(0) returns "zero"
+//   - NumberToWords(1) returns "one"
+//   - NumberToWords(42) returns "forty-two"
+//   - NumberToWords(100) returns "one hundred"
+//   - NumberToWords(1000) returns "one thousand"
+//   - NumberToWords(-5) returns "negative five"
+func NumberToWords(n int) string {
+	if n < 0 {
+		return "negative " + cardinalWord(-n)
+	}
+	return cardinalWord(n)
+}
+
 // cardinalWord converts a positive integer to its cardinal word form.
 func cardinalWord(n int) string {
 	if n == 0 {

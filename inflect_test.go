@@ -145,6 +145,115 @@ func TestJoinWithSep(t *testing.T) {
 	}
 }
 
+func TestNumberToWords(t *testing.T) {
+	tests := []struct {
+		name  string
+		input int
+		want  string
+	}{
+		// Zero
+		{name: "zero", input: 0, want: "zero"},
+
+		// Basic numbers (1-9)
+		{name: "one", input: 1, want: "one"},
+		{name: "two", input: 2, want: "two"},
+		{name: "three", input: 3, want: "three"},
+		{name: "four", input: 4, want: "four"},
+		{name: "five", input: 5, want: "five"},
+		{name: "six", input: 6, want: "six"},
+		{name: "seven", input: 7, want: "seven"},
+		{name: "eight", input: 8, want: "eight"},
+		{name: "nine", input: 9, want: "nine"},
+
+		// Teens (10-19)
+		{name: "ten", input: 10, want: "ten"},
+		{name: "eleven", input: 11, want: "eleven"},
+		{name: "twelve", input: 12, want: "twelve"},
+		{name: "thirteen", input: 13, want: "thirteen"},
+		{name: "fourteen", input: 14, want: "fourteen"},
+		{name: "fifteen", input: 15, want: "fifteen"},
+		{name: "sixteen", input: 16, want: "sixteen"},
+		{name: "seventeen", input: 17, want: "seventeen"},
+		{name: "eighteen", input: 18, want: "eighteen"},
+		{name: "nineteen", input: 19, want: "nineteen"},
+
+		// Tens (20, 30, ...)
+		{name: "twenty", input: 20, want: "twenty"},
+		{name: "thirty", input: 30, want: "thirty"},
+		{name: "forty", input: 40, want: "forty"},
+		{name: "fifty", input: 50, want: "fifty"},
+		{name: "sixty", input: 60, want: "sixty"},
+		{name: "seventy", input: 70, want: "seventy"},
+		{name: "eighty", input: 80, want: "eighty"},
+		{name: "ninety", input: 90, want: "ninety"},
+
+		// Compound tens (21-99)
+		{name: "twenty-one", input: 21, want: "twenty-one"},
+		{name: "thirty-two", input: 32, want: "thirty-two"},
+		{name: "forty-two", input: 42, want: "forty-two"},
+		{name: "fifty-five", input: 55, want: "fifty-five"},
+		{name: "sixty-seven", input: 67, want: "sixty-seven"},
+		{name: "seventy-eight", input: 78, want: "seventy-eight"},
+		{name: "eighty-nine", input: 89, want: "eighty-nine"},
+		{name: "ninety-nine", input: 99, want: "ninety-nine"},
+
+		// Hundreds
+		{name: "one hundred", input: 100, want: "one hundred"},
+		{name: "two hundred", input: 200, want: "two hundred"},
+		{name: "one hundred one", input: 101, want: "one hundred one"},
+		{name: "one hundred ten", input: 110, want: "one hundred ten"},
+		{name: "one hundred eleven", input: 111, want: "one hundred eleven"},
+		{name: "one hundred twenty", input: 120, want: "one hundred twenty"},
+		{name: "one hundred twenty-one", input: 121, want: "one hundred twenty-one"},
+		{name: "five hundred fifty-five", input: 555, want: "five hundred fifty-five"},
+		{name: "nine hundred ninety-nine", input: 999, want: "nine hundred ninety-nine"},
+
+		// Thousands
+		{name: "one thousand", input: 1000, want: "one thousand"},
+		{name: "two thousand", input: 2000, want: "two thousand"},
+		{name: "one thousand one", input: 1001, want: "one thousand one"},
+		{name: "one thousand ten", input: 1010, want: "one thousand ten"},
+		{name: "one thousand one hundred", input: 1100, want: "one thousand one hundred"},
+		{name: "one thousand two hundred thirty-four", input: 1234, want: "one thousand two hundred thirty-four"},
+		{name: "twelve thousand", input: 12000, want: "twelve thousand"},
+		{name: "twelve thousand three hundred forty-five", input: 12345, want: "twelve thousand three hundred forty-five"},
+		{name: "twenty-one thousand", input: 21000, want: "twenty-one thousand"},
+		{name: "one hundred twenty-three thousand four hundred fifty-six", input: 123456, want: "one hundred twenty-three thousand four hundred fifty-six"},
+
+		// Millions
+		{name: "one million", input: 1000000, want: "one million"},
+		{name: "two million", input: 2000000, want: "two million"},
+		{name: "one million one", input: 1000001, want: "one million one"},
+		{name: "one million two hundred thirty-four thousand five hundred sixty-seven", input: 1234567, want: "one million two hundred thirty-four thousand five hundred sixty-seven"},
+		{name: "twelve million three hundred forty-five thousand six hundred seventy-eight", input: 12345678, want: "twelve million three hundred forty-five thousand six hundred seventy-eight"},
+		{name: "one hundred twenty-three million four hundred fifty-six thousand seven hundred eighty-nine", input: 123456789, want: "one hundred twenty-three million four hundred fifty-six thousand seven hundred eighty-nine"},
+
+		// Billions
+		{name: "one billion", input: 1000000000, want: "one billion"},
+		{name: "two billion", input: 2000000000, want: "two billion"},
+		{name: "one billion one", input: 1000000001, want: "one billion one"},
+
+		// Negative numbers
+		{name: "negative one", input: -1, want: "negative one"},
+		{name: "negative five", input: -5, want: "negative five"},
+		{name: "negative eleven", input: -11, want: "negative eleven"},
+		{name: "negative twenty-one", input: -21, want: "negative twenty-one"},
+		{name: "negative forty-two", input: -42, want: "negative forty-two"},
+		{name: "negative one hundred", input: -100, want: "negative one hundred"},
+		{name: "negative one thousand", input: -1000, want: "negative one thousand"},
+		{name: "negative one million", input: -1000000, want: "negative one million"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.NumberToWords(tt.input)
+			if got != tt.want {
+				t.Errorf("NumberToWords(%d) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestOrdinalWord(t *testing.T) {
 	tests := []struct {
 		name  string
