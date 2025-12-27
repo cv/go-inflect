@@ -198,6 +198,41 @@ func isAllUpper(word string) bool {
 	return true
 }
 
+// isProperName checks if a word is a proper name.
+// A proper name is detected by having a capitalized first letter and not being
+// all uppercase. Examples: "Jones", "Mary", "Smith".
+func isProperName(word string) bool {
+	if len(word) < 2 {
+		return false
+	}
+
+	// Check if the first letter is uppercase (proper name indicator)
+	firstRune := []rune(word)[0]
+	if !unicode.IsUpper(firstRune) {
+		return false
+	}
+
+	// If all uppercase, it's likely an acronym, not a proper name
+	if isAllUpper(word) {
+		return false
+	}
+
+	return true
+}
+
+// isProperNameEndingInS checks if a word is a proper name ending in 's'.
+// A proper name is detected by having a capitalized first letter and not being
+// all uppercase. Examples: "Jones", "Williams", "Hastings".
+func isProperNameEndingInS(word string) bool {
+	if !isProperName(word) {
+		return false
+	}
+
+	// Check if the word ends in 's' or 'S'
+	lastRune := rune(word[len(word)-1])
+	return unicode.ToLower(lastRune) == 's'
+}
+
 // An returns the word prefixed with the appropriate indefinite article ("a" or "an").
 //
 // The selection follows standard English rules:
@@ -689,6 +724,50 @@ func IsClassicalHerd() bool {
 	return classicalHerd
 }
 
+// ClassicalNames enables or disables classical proper name pluralization.
+//
+// This controls the classicalNames flag independently of other classical
+// options like classicalZero, classicalHerd, classicalAncient, and classicalPersons.
+//
+// When enabled (true), Plural() leaves proper names ending in 's' unchanged:
+//   - Jones -> Jones (unchanged)
+//   - Williams -> Williams (unchanged)
+//   - Hastings -> Hastings (unchanged)
+//
+// When disabled (false, the default), regular pluralization rules apply:
+//   - Jones -> Joneses
+//   - Williams -> Williamses
+//   - Hastings -> Hastingses
+//
+// Note: This only affects capitalized words ending in 's'. Other proper names
+// like "Mary" still pluralize normally (Mary -> Marys).
+//
+// Examples:
+//
+//	ClassicalNames(true)
+//	Plural("Jones") // returns "Jones"
+//	ClassicalNames(false)
+//	Plural("Jones") // returns "Joneses"
+func ClassicalNames(enabled bool) {
+	classicalNames = enabled
+}
+
+// IsClassicalNames returns whether classical proper name pluralization is enabled.
+//
+// Returns true if ClassicalNames(true) or ClassicalAll(true) was called,
+// false otherwise.
+//
+// Examples:
+//
+//	IsClassicalNames() // returns false (default)
+//	ClassicalNames(true)
+//	IsClassicalNames() // returns true
+//	ClassicalNames(false)
+//	IsClassicalNames() // returns false
+func IsClassicalNames() bool {
+	return classicalNames
+}
+
 // Plural returns the plural form of an English noun.
 //
 // Examples:
@@ -702,6 +781,13 @@ func Plural(word string) string {
 	}
 
 	lower := strings.ToLower(word)
+
+	// Check for classical proper name handling when classicalNames is enabled.
+	// Proper names (capitalized words) ending in 's' remain unchanged.
+	// Examples: Jones -> Jones, Williams -> Williams
+	if classicalNames && isProperNameEndingInS(word) {
+		return word
+	}
 
 	// Check for classical Latin/Greek plurals when classicalAncient is enabled
 	if classicalAncient || classicalMode {
@@ -758,9 +844,14 @@ func applySuffixRules(word, lower string) string {
 	}
 
 	// Words ending in consonant + y -> -ies
+	// Exception: proper names (capitalized words like "Mary") just add -s
 	if strings.HasSuffix(lower, "y") && len(lower) > 1 {
 		beforeY := lower[len(lower)-2]
 		if !isVowel(rune(beforeY)) {
+			// Proper names just add -s: Mary -> Marys, not Maries
+			if isProperName(word) {
+				return word + matchSuffix(word, "s")
+			}
 			return word[:len(word)-1] + matchSuffix(word, "ies")
 		}
 	}

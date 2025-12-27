@@ -3033,3 +3033,133 @@ func TestClassicalPersonsIntegration(t *testing.T) {
 		}
 	})
 }
+
+func TestClassicalNames(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.ClassicalAll(false)
+
+	tests := []struct {
+		name       string
+		enabled    bool
+		input      string
+		want       string
+		wantGetter bool
+	}{
+		// ClassicalNames(false) - regular pluralization for names ending in 's'
+		{name: "Jones regular", enabled: false, input: "Jones", want: "Joneses", wantGetter: false},
+		{name: "Williams regular", enabled: false, input: "Williams", want: "Williamses", wantGetter: false},
+		{name: "Hastings regular", enabled: false, input: "Hastings", want: "Hastingses", wantGetter: false},
+		{name: "Ross regular", enabled: false, input: "Ross", want: "Rosses", wantGetter: false},
+		{name: "Burns regular", enabled: false, input: "Burns", want: "Burnses", wantGetter: false},
+
+		// ClassicalNames(true) - proper names ending in 's' remain unchanged
+		{name: "Jones classical", enabled: true, input: "Jones", want: "Jones", wantGetter: true},
+		{name: "Williams classical", enabled: true, input: "Williams", want: "Williams", wantGetter: true},
+		{name: "Hastings classical", enabled: true, input: "Hastings", want: "Hastings", wantGetter: true},
+		{name: "Ross classical", enabled: true, input: "Ross", want: "Ross", wantGetter: true},
+		{name: "Burns classical", enabled: true, input: "Burns", want: "Burns", wantGetter: true},
+
+		// Names not ending in 's' should still pluralize normally
+		{name: "Mary classical", enabled: true, input: "Mary", want: "Marys", wantGetter: true},
+		{name: "Smith classical", enabled: true, input: "Smith", want: "Smiths", wantGetter: true},
+		{name: "Johnson classical", enabled: true, input: "Johnson", want: "Johnsons", wantGetter: true},
+		{name: "Mary regular", enabled: false, input: "Mary", want: "Marys", wantGetter: false},
+		{name: "Smith regular", enabled: false, input: "Smith", want: "Smiths", wantGetter: false},
+
+		// Lowercase words ending in 's' should NOT be treated as proper names
+		{name: "bus classical", enabled: true, input: "bus", want: "buses", wantGetter: true},
+		{name: "class classical", enabled: true, input: "class", want: "classes", wantGetter: true},
+		{name: "boss classical", enabled: true, input: "boss", want: "bosses", wantGetter: true},
+
+		// All uppercase words (acronyms) should NOT be treated as proper names
+		{name: "CBS classical", enabled: true, input: "CBS", want: "CBSES", wantGetter: true},
+		{name: "GPS classical", enabled: true, input: "GPS", want: "GPSES", wantGetter: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.ClassicalNames(tt.enabled)
+
+			// Test the getter function
+			if got := inflect.IsClassicalNames(); got != tt.wantGetter {
+				t.Errorf("IsClassicalNames() = %v, want %v", got, tt.wantGetter)
+			}
+
+			// Test pluralization
+			got := inflect.Plural(tt.input)
+			if got != tt.want {
+				t.Errorf("Plural(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestClassicalNamesIntegration(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.ClassicalAll(false)
+
+	t.Run("complete workflow", func(t *testing.T) {
+		// 1. Start with default (modern) pluralization
+		inflect.ClassicalAll(false)
+		if got := inflect.Plural("Jones"); got != "Joneses" {
+			t.Errorf("Default: Plural(Jones) = %q, want %q", got, "Joneses")
+		}
+		if inflect.IsClassicalNames() {
+			t.Error("Default: IsClassicalNames() should be false")
+		}
+
+		// 2. Enable classical names only
+		inflect.ClassicalNames(true)
+		if got := inflect.Plural("Jones"); got != "Jones" {
+			t.Errorf("ClassicalNames: Plural(Jones) = %q, want %q", got, "Jones")
+		}
+		if !inflect.IsClassicalNames() {
+			t.Error("ClassicalNames: IsClassicalNames() should be true")
+		}
+
+		// 3. Verify classical ancient is still false
+		if inflect.IsClassicalAncient() {
+			t.Error("ClassicalNames only: IsClassicalAncient() should be false")
+		}
+		if got := inflect.Plural("formula"); got != "formulas" {
+			t.Errorf("ClassicalNames only: Plural(formula) = %q, want %q", got, "formulas")
+		}
+
+		// 4. Regular nouns ending in 's' should still pluralize normally
+		if got := inflect.Plural("bus"); got != "buses" {
+			t.Errorf("ClassicalNames: Plural(bus) = %q, want %q", got, "buses")
+		}
+
+		// 5. Proper names NOT ending in 's' should still pluralize normally
+		if got := inflect.Plural("Smith"); got != "Smiths" {
+			t.Errorf("ClassicalNames: Plural(Smith) = %q, want %q", got, "Smiths")
+		}
+
+		// 6. Enable ClassicalAll
+		inflect.ClassicalAll(true)
+		if got := inflect.Plural("Jones"); got != "Jones" {
+			t.Errorf("ClassicalAll: Plural(Jones) = %q, want %q", got, "Jones")
+		}
+		if got := inflect.Plural("formula"); got != "formulae" {
+			t.Errorf("ClassicalAll: Plural(formula) = %q, want %q", got, "formulae")
+		}
+
+		// 7. Disable names but keep ancient
+		inflect.ClassicalNames(false)
+		if got := inflect.Plural("Jones"); got != "Joneses" {
+			t.Errorf("Names off, Ancient on: Plural(Jones) = %q, want %q", got, "Joneses")
+		}
+		if got := inflect.Plural("formula"); got != "formulae" {
+			t.Errorf("Names off, Ancient on: Plural(formula) = %q, want %q", got, "formulae")
+		}
+
+		// 8. Reset all
+		inflect.ClassicalAll(false)
+		if got := inflect.Plural("Jones"); got != "Joneses" {
+			t.Errorf("After reset: Plural(Jones) = %q, want %q", got, "Joneses")
+		}
+		if got := inflect.Plural("formula"); got != "formulas" {
+			t.Errorf("After reset: Plural(formula) = %q, want %q", got, "formulas")
+		}
+	})
+}
