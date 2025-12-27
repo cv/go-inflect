@@ -592,6 +592,122 @@ func DefNounReset() {
 	singularIrregulars = buildSingularIrregulars()
 }
 
+// customVerbs stores custom verb conjugation rules (singular -> plural).
+// This is a placeholder map for future verb conjugation support.
+var customVerbs = make(map[string]string)
+
+// customVerbsReverse stores reverse verb conjugation rules (plural -> singular).
+var customVerbsReverse = make(map[string]string)
+
+// DefVerb defines a custom verb conjugation rule.
+//
+// NOTE: This is a placeholder stub for future implementation.
+// Full verb conjugation is not yet implemented; this function only stores
+// the singular/plural pair in internal maps for future use.
+//
+// The singular and plural forms are stored in lowercase.
+//
+// Examples:
+//
+//	DefVerb("run", "runs")
+//	DefVerb("be", "are")
+func DefVerb(singular, plural string) {
+	lower := strings.ToLower(singular)
+	lowerPlural := strings.ToLower(plural)
+	customVerbs[lower] = lowerPlural
+	customVerbsReverse[lowerPlural] = lower
+}
+
+// UndefVerb removes a custom verb conjugation rule.
+//
+// NOTE: This is a placeholder stub for future implementation.
+//
+// Returns true if the rule was removed, false if it didn't exist.
+//
+// Examples:
+//
+//	DefVerb("run", "runs")
+//	UndefVerb("run") // returns true
+//	UndefVerb("walk") // returns false (not defined)
+func UndefVerb(singular string) bool {
+	lower := strings.ToLower(singular)
+	plural, exists := customVerbs[lower]
+	if !exists {
+		return false
+	}
+	delete(customVerbs, lower)
+	delete(customVerbsReverse, plural)
+	return true
+}
+
+// DefVerbReset resets all custom verb conjugation rules.
+//
+// NOTE: This is a placeholder stub for future implementation.
+//
+// This removes all custom rules added via DefVerb().
+func DefVerbReset() {
+	customVerbs = make(map[string]string)
+	customVerbsReverse = make(map[string]string)
+}
+
+// customAdjs stores custom adjective pluralization rules (singular -> plural).
+// This is a placeholder map for future adjective pluralization support.
+var customAdjs = make(map[string]string)
+
+// customAdjsReverse stores reverse adjective rules (plural -> singular).
+var customAdjsReverse = make(map[string]string)
+
+// DefAdj defines a custom adjective pluralization rule.
+//
+// NOTE: This is a placeholder stub for future implementation.
+// Full adjective pluralization is not yet implemented; this function only stores
+// the singular/plural pair in internal maps for future use.
+//
+// The singular and plural forms are stored in lowercase.
+//
+// Examples:
+//
+//	DefAdj("big", "bigs")
+//	DefAdj("happy", "happies")
+func DefAdj(singular, plural string) {
+	lower := strings.ToLower(singular)
+	lowerPlural := strings.ToLower(plural)
+	customAdjs[lower] = lowerPlural
+	customAdjsReverse[lowerPlural] = lower
+}
+
+// UndefAdj removes a custom adjective pluralization rule.
+//
+// NOTE: This is a placeholder stub for future implementation.
+//
+// Returns true if the rule was removed, false if it didn't exist.
+//
+// Examples:
+//
+//	DefAdj("big", "bigs")
+//	UndefAdj("big") // returns true
+//	UndefAdj("small") // returns false (not defined)
+func UndefAdj(singular string) bool {
+	lower := strings.ToLower(singular)
+	plural, exists := customAdjs[lower]
+	if !exists {
+		return false
+	}
+	delete(customAdjs, lower)
+	delete(customAdjsReverse, plural)
+	return true
+}
+
+// DefAdjReset resets all custom adjective pluralization rules.
+//
+// NOTE: This is a placeholder stub for future implementation.
+//
+// This removes all custom rules added via DefAdj().
+func DefAdjReset() {
+	customAdjs = make(map[string]string)
+	customAdjsReverse = make(map[string]string)
+}
+
 // Singular returns the singular form of an English noun.
 //
 // Examples:
