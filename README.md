@@ -520,6 +520,27 @@ inflect.CompareAdjs("these", "this")    // "p:s"
 - `"p:p"` - Both words are different plural forms of the same word
 - `""` - Words are not related
 
+### Utility Functions
+
+Helper functions for common text operations.
+
+```go
+// Check if a word is plural or singular
+inflect.IsPlural("cats")      // true
+inflect.IsPlural("cat")       // false
+inflect.IsSingular("cat")     // true
+inflect.IsSingular("cats")    // false
+
+// Count words
+inflect.WordCount("hello world")      // 2
+inflect.WordCount("one two three")    // 3
+
+// Capitalize and titleize
+inflect.Capitalize("hello world")     // "Hello world"
+inflect.Titleize("hello world")       // "Hello World"
+inflect.Titleize("the quick brown")   // "The Quick Brown"
+```
+
 ## API Reference
 
 ### Core Functions
@@ -588,6 +609,16 @@ inflect.CompareAdjs("these", "this")    // "p:s"
 | `CompareNouns(noun1, noun2 string) string` | Alias for `Compare()` |
 | `CompareVerbs(verb1, verb2 string) string` | Compares verb forms (3rd person vs base) |
 | `CompareAdjs(adj1, adj2 string) string` | Compares adjective forms (this/these, a/some) |
+
+### Utility Functions
+
+| Function | Description |
+|----------|-------------|
+| `IsPlural(word string) bool` | Checks if a word is in plural form |
+| `IsSingular(word string) bool` | Checks if a word is in singular form |
+| `WordCount(text string) int` | Counts words in a string |
+| `Capitalize(s string) string` | Capitalizes first letter |
+| `Titleize(s string) string` | Converts to title case |
 
 ## Features
 
