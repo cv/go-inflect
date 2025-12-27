@@ -2316,6 +2316,151 @@ func TestClassicalIntegration(t *testing.T) {
 	})
 }
 
+func TestClassicalAncient(t *testing.T) {
+	// Clean up after test
+	defer inflect.ClassicalAncient(false)
+
+	tests := []struct {
+		name    string
+		enabled bool
+		input   string
+		want    string
+	}{
+		{
+			name:    "enabled formula becomes formulae",
+			enabled: true,
+			input:   "formula",
+			want:    "formulae",
+		},
+		{
+			name:    "disabled formula becomes formulas",
+			enabled: false,
+			input:   "formula",
+			want:    "formulas",
+		},
+		{
+			name:    "enabled antenna becomes antennae",
+			enabled: true,
+			input:   "antenna",
+			want:    "antennae",
+		},
+		{
+			name:    "disabled antenna becomes antennas",
+			enabled: false,
+			input:   "antenna",
+			want:    "antennas",
+		},
+		{
+			name:    "enabled nebula becomes nebulae",
+			enabled: true,
+			input:   "nebula",
+			want:    "nebulae",
+		},
+		{
+			name:    "disabled nebula becomes nebulas",
+			enabled: false,
+			input:   "nebula",
+			want:    "nebulas",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.ClassicalAncient(tt.enabled)
+			got := inflect.Plural(tt.input)
+			if got != tt.want {
+				t.Errorf("ClassicalAncient(%v): Plural(%q) = %q, want %q", tt.enabled, tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsClassicalAncient(t *testing.T) {
+	// Clean up after test
+	defer inflect.ClassicalAncient(false)
+
+	tests := []struct {
+		name  string
+		setup func()
+		want  bool
+	}{
+		{
+			name:  "default is false",
+			setup: func() { inflect.ClassicalAncient(false) },
+			want:  false,
+		},
+		{
+			name:  "true after enabling",
+			setup: func() { inflect.ClassicalAncient(true) },
+			want:  true,
+		},
+		{
+			name:  "false after disabling",
+			setup: func() { inflect.ClassicalAncient(true); inflect.ClassicalAncient(false) },
+			want:  false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setup()
+			got := inflect.IsClassicalAncient()
+			if got != tt.want {
+				t.Errorf("IsClassicalAncient() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestClassicalAncientIndependentOfClassicalAll(t *testing.T) {
+	// Clean up after test
+	defer func() {
+		inflect.ClassicalAll(false)
+		inflect.ClassicalAncient(false)
+	}()
+
+	t.Run("ClassicalAncient works independently of ClassicalAll", func(t *testing.T) {
+		// Start with ClassicalAll disabled
+		inflect.ClassicalAll(false)
+
+		// Enable only ClassicalAncient
+		inflect.ClassicalAncient(true)
+
+		// Verify ClassicalAncient is enabled
+		if !inflect.IsClassicalAncient() {
+			t.Error("IsClassicalAncient() should be true after ClassicalAncient(true)")
+		}
+
+		// Verify formula -> formulae
+		if got := inflect.Plural("formula"); got != "formulae" {
+			t.Errorf("Plural(\"formula\") = %q, want \"formulae\"", got)
+		}
+	})
+
+	t.Run("ClassicalAncient can be disabled while ClassicalAll was enabled", func(t *testing.T) {
+		// Enable all classical options
+		inflect.ClassicalAll(true)
+
+		// Verify it's enabled
+		if !inflect.IsClassicalAncient() {
+			t.Error("IsClassicalAncient() should be true after ClassicalAll(true)")
+		}
+
+		// Disable only ClassicalAncient
+		inflect.ClassicalAncient(false)
+
+		// Verify ClassicalAncient is now disabled
+		if inflect.IsClassicalAncient() {
+			t.Error("IsClassicalAncient() should be false after ClassicalAncient(false)")
+		}
+
+		// Verify formula -> formulas (modern form)
+		if got := inflect.Plural("formula"); got != "formulas" {
+			t.Errorf("Plural(\"formula\") = %q, want \"formulas\"", got)
+		}
+	})
+}
+
 // =============================================================================
 // Benchmarks
 // =============================================================================

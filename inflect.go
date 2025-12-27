@@ -510,6 +510,50 @@ func IsClassical() bool {
 	return classicalAncient || classicalMode
 }
 
+// ClassicalAncient enables or disables classical Latin/Greek plural forms.
+//
+// This controls the classicalAncient flag independently of other classical
+// options like classicalZero, classicalHerd, classicalNames, and classicalPersons.
+//
+// When enabled (true), Plural() prefers classical Latin/Greek plural forms:
+//   - formula -> formulae (instead of formulas)
+//   - antenna -> antennae (instead of antennas)
+//   - vertebra -> vertebrae (instead of vertebras)
+//   - alumna -> alumnae (instead of alumnas)
+//
+// When disabled (false, the default), modern English plurals are used.
+//
+// Note: This also controls the legacy classicalMode flag, since both affect
+// Latin/Greek plural forms.
+//
+// Examples:
+//
+//	ClassicalAncient(true)
+//	Plural("formula") // returns "formulae"
+//	ClassicalAncient(false)
+//	Plural("formula") // returns "formulas"
+func ClassicalAncient(enabled bool) {
+	classicalAncient = enabled
+	// Also set the legacy classicalMode to keep them in sync
+	classicalMode = enabled
+}
+
+// IsClassicalAncient returns whether classical Latin/Greek plural forms are enabled.
+//
+// Returns true if ClassicalAncient(true), Classical(true), or ClassicalAll(true)
+// was called, false otherwise.
+//
+// Examples:
+//
+//	IsClassicalAncient() // returns false (default)
+//	ClassicalAncient(true)
+//	IsClassicalAncient() // returns true
+//	ClassicalAncient(false)
+//	IsClassicalAncient() // returns false
+func IsClassicalAncient() bool {
+	return classicalAncient
+}
+
 // Plural returns the plural form of an English noun.
 //
 // Examples:
