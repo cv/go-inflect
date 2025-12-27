@@ -1,6 +1,7 @@
 package inflect_test
 
 import (
+	"fmt"
 	"testing"
 
 	inflect "github.com/cv/go-inflect"
@@ -297,6 +298,284 @@ func TestNumberToWords(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.NumberToWords(tt.input)
+			if got != tt.want {
+				t.Errorf("NumberToWords(%d) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+// TestNumberToWordsComprehensive provides extensive coverage for NumberToWords
+// with 100+ test cases covering all number ranges and edge cases.
+func TestNumberToWordsComprehensive(t *testing.T) {
+	tests := []struct {
+		input int
+		want  string
+	}{
+		// ===== SECTION 1: All numbers 0-20 (unique word forms) =====
+		{0, "zero"},
+		{1, "one"},
+		{2, "two"},
+		{3, "three"},
+		{4, "four"},
+		{5, "five"},
+		{6, "six"},
+		{7, "seven"},
+		{8, "eight"},
+		{9, "nine"},
+		{10, "ten"},
+		{11, "eleven"},
+		{12, "twelve"},
+		{13, "thirteen"},
+		{14, "fourteen"},
+		{15, "fifteen"},
+		{16, "sixteen"},
+		{17, "seventeen"},
+		{18, "eighteen"},
+		{19, "nineteen"},
+		{20, "twenty"},
+
+		// ===== SECTION 2: All tens (20-90) =====
+		{20, "twenty"},
+		{30, "thirty"},
+		{40, "forty"},
+		{50, "fifty"},
+		{60, "sixty"},
+		{70, "seventy"},
+		{80, "eighty"},
+		{90, "ninety"},
+
+		// ===== SECTION 3: Compound numbers 21-29 =====
+		{21, "twenty-one"},
+		{22, "twenty-two"},
+		{23, "twenty-three"},
+		{24, "twenty-four"},
+		{25, "twenty-five"},
+		{26, "twenty-six"},
+		{27, "twenty-seven"},
+		{28, "twenty-eight"},
+		{29, "twenty-nine"},
+
+		// ===== SECTION 4: Representative compounds from each decade =====
+		// 30s
+		{31, "thirty-one"},
+		{33, "thirty-three"},
+		{35, "thirty-five"},
+		{37, "thirty-seven"},
+		{39, "thirty-nine"},
+		// 40s
+		{41, "forty-one"},
+		{42, "forty-two"},
+		{44, "forty-four"},
+		{46, "forty-six"},
+		{48, "forty-eight"},
+		// 50s
+		{51, "fifty-one"},
+		{53, "fifty-three"},
+		{55, "fifty-five"},
+		{57, "fifty-seven"},
+		{59, "fifty-nine"},
+		// 60s
+		{61, "sixty-one"},
+		{63, "sixty-three"},
+		{65, "sixty-five"},
+		{67, "sixty-seven"},
+		{69, "sixty-nine"},
+		// 70s
+		{71, "seventy-one"},
+		{73, "seventy-three"},
+		{75, "seventy-five"},
+		{77, "seventy-seven"},
+		{79, "seventy-nine"},
+		// 80s
+		{81, "eighty-one"},
+		{83, "eighty-three"},
+		{85, "eighty-five"},
+		{87, "eighty-seven"},
+		{89, "eighty-nine"},
+		// 90s
+		{91, "ninety-one"},
+		{93, "ninety-three"},
+		{95, "ninety-five"},
+		{97, "ninety-seven"},
+		{99, "ninety-nine"},
+
+		// ===== SECTION 5: Boundary values =====
+		{99, "ninety-nine"},
+		{100, "one hundred"},
+		{101, "one hundred one"},
+		{110, "one hundred ten"},
+		{111, "one hundred eleven"},
+		{119, "one hundred nineteen"},
+		{120, "one hundred twenty"},
+		{121, "one hundred twenty-one"},
+		{199, "one hundred ninety-nine"},
+		{200, "two hundred"},
+		{500, "five hundred"},
+		{900, "nine hundred"},
+		{999, "nine hundred ninety-nine"},
+		{1000, "one thousand"},
+		{1001, "one thousand one"},
+		{1010, "one thousand ten"},
+		{1011, "one thousand eleven"},
+		{1100, "one thousand one hundred"},
+		{1111, "one thousand one hundred eleven"},
+		{1234, "one thousand two hundred thirty-four"},
+		{1999, "one thousand nine hundred ninety-nine"},
+		{2000, "two thousand"},
+		{9999, "nine thousand nine hundred ninety-nine"},
+		{10000, "ten thousand"},
+		{10001, "ten thousand one"},
+		{99999, "ninety-nine thousand nine hundred ninety-nine"},
+		{100000, "one hundred thousand"},
+		{100001, "one hundred thousand one"},
+		{999999, "nine hundred ninety-nine thousand nine hundred ninety-nine"},
+		{1000000, "one million"},
+		{1000001, "one million one"},
+
+		// ===== SECTION 6: Large numbers - Thousands =====
+		{2000, "two thousand"},
+		{3000, "three thousand"},
+		{10000, "ten thousand"},
+		{11000, "eleven thousand"},
+		{12000, "twelve thousand"},
+		{15000, "fifteen thousand"},
+		{20000, "twenty thousand"},
+		{21000, "twenty-one thousand"},
+		{50000, "fifty thousand"},
+		{99000, "ninety-nine thousand"},
+		{100000, "one hundred thousand"},
+		{123000, "one hundred twenty-three thousand"},
+		{500000, "five hundred thousand"},
+		{999000, "nine hundred ninety-nine thousand"},
+
+		// ===== SECTION 7: Large numbers - Thousands with remainders =====
+		{12345, "twelve thousand three hundred forty-five"},
+		{23456, "twenty-three thousand four hundred fifty-six"},
+		{54321, "fifty-four thousand three hundred twenty-one"},
+		{100100, "one hundred thousand one hundred"},
+		{100101, "one hundred thousand one hundred one"},
+		{123456, "one hundred twenty-three thousand four hundred fifty-six"},
+		{500500, "five hundred thousand five hundred"},
+		{999999, "nine hundred ninety-nine thousand nine hundred ninety-nine"},
+
+		// ===== SECTION 8: Large numbers - Millions =====
+		{1000000, "one million"},
+		{2000000, "two million"},
+		{10000000, "ten million"},
+		{12000000, "twelve million"},
+		{20000000, "twenty million"},
+		{100000000, "one hundred million"},
+		{123000000, "one hundred twenty-three million"},
+		{500000000, "five hundred million"},
+		{999000000, "nine hundred ninety-nine million"},
+
+		// ===== SECTION 9: Large numbers - Millions with remainders =====
+		{1000001, "one million one"},
+		{1001000, "one million one thousand"},
+		{1001001, "one million one thousand one"},
+		{1234567, "one million two hundred thirty-four thousand five hundred sixty-seven"},
+		{12345678, "twelve million three hundred forty-five thousand six hundred seventy-eight"},
+		{123456789, "one hundred twenty-three million four hundred fifty-six thousand seven hundred eighty-nine"},
+
+		// ===== SECTION 10: Large numbers - Billions =====
+		{1000000000, "one billion"},
+		{2000000000, "two billion"},
+		{1000000001, "one billion one"},
+		{1000001000, "one billion one thousand"},
+		{1001000000, "one billion one million"},
+		{1234567890, "one billion two hundred thirty-four million five hundred sixty-seven thousand eight hundred ninety"},
+
+		// ===== SECTION 11: Negative numbers =====
+		{-1, "negative one"},
+		{-2, "negative two"},
+		{-5, "negative five"},
+		{-9, "negative nine"},
+		{-10, "negative ten"},
+		{-11, "negative eleven"},
+		{-12, "negative twelve"},
+		{-13, "negative thirteen"},
+		{-19, "negative nineteen"},
+		{-20, "negative twenty"},
+		{-21, "negative twenty-one"},
+		{-29, "negative twenty-nine"},
+		{-42, "negative forty-two"},
+		{-50, "negative fifty"},
+		{-99, "negative ninety-nine"},
+		{-100, "negative one hundred"},
+		{-101, "negative one hundred one"},
+		{-111, "negative one hundred eleven"},
+		{-999, "negative nine hundred ninety-nine"},
+		{-1000, "negative one thousand"},
+		{-1001, "negative one thousand one"},
+		{-1234, "negative one thousand two hundred thirty-four"},
+		{-10000, "negative ten thousand"},
+		{-100000, "negative one hundred thousand"},
+		{-1000000, "negative one million"},
+		{-1000000000, "negative one billion"},
+
+		// ===== SECTION 12: Edge cases - Special patterns =====
+		// Numbers with zeros in different positions
+		{101, "one hundred one"},
+		{110, "one hundred ten"},
+		{1001, "one thousand one"},
+		{1010, "one thousand ten"},
+		{1100, "one thousand one hundred"},
+		{10001, "ten thousand one"},
+		{10010, "ten thousand ten"},
+		{10100, "ten thousand one hundred"},
+		{100001, "one hundred thousand one"},
+		{100010, "one hundred thousand ten"},
+		{100100, "one hundred thousand one hundred"},
+		{1000001, "one million one"},
+		{1000010, "one million ten"},
+		{1000100, "one million one hundred"},
+		{1001000, "one million one thousand"},
+		{1010000, "one million ten thousand"},
+		{1100000, "one million one hundred thousand"},
+
+		// Numbers that look like repeating patterns
+		{111, "one hundred eleven"},
+		{222, "two hundred twenty-two"},
+		{333, "three hundred thirty-three"},
+		{444, "four hundred forty-four"},
+		{555, "five hundred fifty-five"},
+		{666, "six hundred sixty-six"},
+		{777, "seven hundred seventy-seven"},
+		{888, "eight hundred eighty-eight"},
+		{999, "nine hundred ninety-nine"},
+		{1111, "one thousand one hundred eleven"},
+		{2222, "two thousand two hundred twenty-two"},
+		{11111, "eleven thousand one hundred eleven"},
+		{111111, "one hundred eleven thousand one hundred eleven"},
+
+		// Powers of 10
+		{1, "one"},
+		{10, "ten"},
+		{100, "one hundred"},
+		{1000, "one thousand"},
+		{10000, "ten thousand"},
+		{100000, "one hundred thousand"},
+		{1000000, "one million"},
+		{10000000, "ten million"},
+		{100000000, "one hundred million"},
+		{1000000000, "one billion"},
+
+		// Just under powers of 10
+		{9, "nine"},
+		{99, "ninety-nine"},
+		{999, "nine hundred ninety-nine"},
+		{9999, "nine thousand nine hundred ninety-nine"},
+		{99999, "ninety-nine thousand nine hundred ninety-nine"},
+		{999999, "nine hundred ninety-nine thousand nine hundred ninety-nine"},
+		{9999999, "nine million nine hundred ninety-nine thousand nine hundred ninety-nine"},
+		{99999999, "ninety-nine million nine hundred ninety-nine thousand nine hundred ninety-nine"},
+		{999999999, "nine hundred ninety-nine million nine hundred ninety-nine thousand nine hundred ninety-nine"},
+	}
+
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("input_%d", tt.input), func(t *testing.T) {
 			got := inflect.NumberToWords(tt.input)
 			if got != tt.want {
 				t.Errorf("NumberToWords(%d) = %q, want %q", tt.input, got, tt.want)
