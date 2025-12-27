@@ -110,20 +110,51 @@ func TestCompareNouns(t *testing.T) {
 }
 
 func TestCompareVerbs(t *testing.T) {
-	// CompareVerbs is a placeholder stub that always returns empty string.
-	// These tests verify the function exists and returns "" for any input.
 	tests := []struct {
 		name  string
 		verb1 string
 		verb2 string
 		want  string
 	}{
-		{name: "empty strings", verb1: "", verb2: "", want: ""},
-		{name: "same verb", verb1: "run", verb2: "run", want: ""},
+		// Empty strings
+		{name: "empty strings", verb1: "", verb2: "", want: "eq"},
+		{name: "empty and word", verb1: "", verb2: "run", want: ""},
+		{name: "word and empty", verb1: "run", verb2: "", want: ""},
+
+		// Equal verbs
+		{name: "same verb", verb1: "run", verb2: "run", want: "eq"},
+		{name: "same verb uppercase", verb1: "RUN", verb2: "run", want: "eq"},
+
+		// 3rd person singular to base form (s:p)
+		{name: "runs to run", verb1: "runs", verb2: "run", want: "s:p"},
+		{name: "walks to walk", verb1: "walks", verb2: "walk", want: "s:p"},
+		{name: "watches to watch", verb1: "watches", verb2: "watch", want: "s:p"},
+		{name: "tries to try", verb1: "tries", verb2: "try", want: "s:p"},
+		{name: "goes to go", verb1: "goes", verb2: "go", want: "s:p"},
+		{name: "does to do", verb1: "does", verb2: "do", want: "s:p"},
+		{name: "has to have", verb1: "has", verb2: "have", want: "s:p"},
+		{name: "is to are", verb1: "is", verb2: "are", want: "s:p"},
+		{name: "was to were", verb1: "was", verb2: "were", want: "s:p"},
+
+		// Base form to 3rd person singular (p:s)
+		{name: "run to runs", verb1: "run", verb2: "runs", want: "p:s"},
+		{name: "walk to walks", verb1: "walk", verb2: "walks", want: "p:s"},
+		{name: "watch to watches", verb1: "watch", verb2: "watches", want: "p:s"},
+		{name: "try to tries", verb1: "try", verb2: "tries", want: "p:s"},
+		{name: "go to goes", verb1: "go", verb2: "goes", want: "p:s"},
+		{name: "do to does", verb1: "do", verb2: "does", want: "p:s"},
+		{name: "have to has", verb1: "have", verb2: "has", want: "p:s"},
+		{name: "are to is", verb1: "are", verb2: "is", want: "p:s"},
+		{name: "were to was", verb1: "were", verb2: "was", want: "p:s"},
+
+		// Contractions
+		{name: "isn't to aren't", verb1: "isn't", verb2: "aren't", want: "s:p"},
+		{name: "doesn't to don't", verb1: "doesn't", verb2: "don't", want: "s:p"},
+		{name: "hasn't to haven't", verb1: "hasn't", verb2: "haven't", want: "s:p"},
+
+		// Unrelated verbs
 		{name: "different verbs", verb1: "run", verb2: "walk", want: ""},
-		{name: "conjugated forms", verb1: "run", verb2: "running", want: ""},
-		{name: "past tense", verb1: "walk", verb2: "walked", want: ""},
-		{name: "irregular verb", verb1: "go", verb2: "went", want: ""},
+		{name: "runs to walking", verb1: "runs", verb2: "walking", want: ""},
 	}
 
 	for _, tt := range tests {
@@ -137,20 +168,43 @@ func TestCompareVerbs(t *testing.T) {
 }
 
 func TestCompareAdjs(t *testing.T) {
-	// CompareAdjs is a placeholder stub that always returns empty string.
-	// These tests verify the function exists and returns "" for any input.
 	tests := []struct {
 		name string
 		adj1 string
 		adj2 string
 		want string
 	}{
-		{name: "empty strings", adj1: "", adj2: "", want: ""},
-		{name: "same adjective", adj1: "big", adj2: "big", want: ""},
+		// Empty strings
+		{name: "empty strings", adj1: "", adj2: "", want: "eq"},
+		{name: "empty and word", adj1: "", adj2: "this", want: ""},
+		{name: "word and empty", adj1: "this", adj2: "", want: ""},
+
+		// Equal adjectives
+		{name: "same adjective", adj1: "this", adj2: "this", want: "eq"},
+		{name: "same adjective uppercase", adj1: "THIS", adj2: "this", want: "eq"},
+
+		// Demonstrative adjectives (s:p)
+		{name: "this to these", adj1: "this", adj2: "these", want: "s:p"},
+		{name: "that to those", adj1: "that", adj2: "those", want: "s:p"},
+
+		// Demonstrative adjectives (p:s)
+		{name: "these to this", adj1: "these", adj2: "this", want: "p:s"},
+		{name: "those to that", adj1: "those", adj2: "that", want: "p:s"},
+
+		// Articles
+		{name: "a to some", adj1: "a", adj2: "some", want: "s:p"},
+		{name: "an to some", adj1: "an", adj2: "some", want: "s:p"},
+		{name: "some to a", adj1: "some", adj2: "a", want: "p:s"},
+
+		// Possessive adjectives
+		{name: "my to our", adj1: "my", adj2: "our", want: "s:p"},
+		{name: "his to their", adj1: "his", adj2: "their", want: "s:p"},
+		{name: "her to their", adj1: "her", adj2: "their", want: "s:p"},
+		{name: "our to my", adj1: "our", adj2: "my", want: "p:s"},
+
+		// Unrelated adjectives
 		{name: "different adjectives", adj1: "big", adj2: "small", want: ""},
-		{name: "comparative form", adj1: "big", adj2: "bigger", want: ""},
-		{name: "superlative form", adj1: "big", adj2: "biggest", want: ""},
-		{name: "irregular adjective", adj1: "good", adj2: "better", want: ""},
+		{name: "this to that", adj1: "this", adj2: "that", want: ""},
 	}
 
 	for _, tt := range tests {

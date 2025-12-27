@@ -86,34 +86,95 @@ func CompareNouns(noun1, noun2 string) string {
 	return Compare(noun1, noun2)
 }
 
-// CompareVerbs compares two verbs for conjugation equality.
+// CompareVerbs compares two verbs for singular/plural equality.
 //
-// NOTE: This is a placeholder stub for future implementation.
-// Verb conjugation comparison is not yet implemented.
+// This compares verbs using verb pluralization rules (3rd person singular vs base form).
 //
-// Currently always returns an empty string.
-//
-// Future implementation will return:
+// It returns:
 //   - "eq" if the verbs are equal (case-insensitive)
-//   - Comparison codes for different conjugation relationships
+//   - "s:p" if verb1 is singular (3rd person) and verb2 is its plural (base form)
+//   - "p:s" if verb1 is plural (base form) and verb2 is its singular (3rd person)
 //   - "" if the verbs are not related
-func CompareVerbs(_, _ string) string {
-	// TODO: Implement verb conjugation comparison
+//
+// Examples:
+//   - CompareVerbs("runs", "run") returns "s:p" (3rd person to base)
+//   - CompareVerbs("run", "runs") returns "p:s" (base to 3rd person)
+//   - CompareVerbs("is", "are") returns "s:p"
+//   - CompareVerbs("has", "have") returns "s:p"
+func CompareVerbs(verb1, verb2 string) string {
+	// Handle empty strings
+	if verb1 == "" || verb2 == "" {
+		if verb1 == "" && verb2 == "" {
+			return "eq"
+		}
+		return ""
+	}
+
+	// Normalize for comparison
+	lower1 := strings.ToLower(verb1)
+	lower2 := strings.ToLower(verb2)
+
+	// Same verb
+	if lower1 == lower2 {
+		return "eq"
+	}
+
+	// Check if verb1 is singular (3rd person) and verb2 is its plural (base form)
+	// PluralVerb converts 3rd person singular to base form
+	if strings.ToLower(PluralVerb(verb1)) == lower2 {
+		return "s:p"
+	}
+
+	// Check if verb2 is singular and verb1 is its plural
+	if strings.ToLower(PluralVerb(verb2)) == lower1 {
+		return "p:s"
+	}
+
 	return ""
 }
 
-// CompareAdjs compares two adjectives for comparative/superlative equality.
+// CompareAdjs compares two adjectives for singular/plural equality.
 //
-// NOTE: This is a placeholder stub for future implementation.
-// Adjective comparison is not yet implemented.
+// This compares adjectives using adjective pluralization rules (demonstratives, articles, possessives).
 //
-// Currently always returns an empty string.
-//
-// Future implementation will return:
+// It returns:
 //   - "eq" if the adjectives are equal (case-insensitive)
-//   - Comparison codes for different adjective relationships (e.g., base/comparative/superlative)
+//   - "s:p" if adj1 is singular and adj2 is its plural form
+//   - "p:s" if adj1 is plural and adj2 is its singular form
 //   - "" if the adjectives are not related
-func CompareAdjs(_, _ string) string {
-	// TODO: Implement adjective comparison
+//
+// Examples:
+//   - CompareAdjs("this", "these") returns "s:p"
+//   - CompareAdjs("that", "those") returns "s:p"
+//   - CompareAdjs("these", "this") returns "p:s"
+//   - CompareAdjs("a", "some") returns "s:p"
+func CompareAdjs(adj1, adj2 string) string {
+	// Handle empty strings
+	if adj1 == "" || adj2 == "" {
+		if adj1 == "" && adj2 == "" {
+			return "eq"
+		}
+		return ""
+	}
+
+	// Normalize for comparison
+	lower1 := strings.ToLower(adj1)
+	lower2 := strings.ToLower(adj2)
+
+	// Same adjective
+	if lower1 == lower2 {
+		return "eq"
+	}
+
+	// Check if adj1 is singular and adj2 is its plural form
+	if strings.ToLower(PluralAdj(adj1)) == lower2 {
+		return "s:p"
+	}
+
+	// Check if adj2 is singular and adj1 is its plural form
+	if strings.ToLower(PluralAdj(adj2)) == lower1 {
+		return "p:s"
+	}
+
 	return ""
 }

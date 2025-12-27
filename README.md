@@ -497,6 +497,20 @@ inflect.Compare("cat", "dog")       // ""
 
 // CompareNouns is an alias for Compare
 inflect.CompareNouns("dog", "dogs") // "s:p"
+
+// Compare verbs (3rd person singular vs base form)
+inflect.CompareVerbs("runs", "run")     // "s:p"
+inflect.CompareVerbs("is", "are")       // "s:p"
+inflect.CompareVerbs("has", "have")     // "s:p"
+inflect.CompareVerbs("run", "runs")     // "p:s"
+inflect.CompareVerbs("doesn't", "don't") // "s:p"
+
+// Compare adjectives (demonstratives, articles, possessives)
+inflect.CompareAdjs("this", "these")    // "s:p"
+inflect.CompareAdjs("that", "those")    // "s:p"
+inflect.CompareAdjs("a", "some")        // "s:p"
+inflect.CompareAdjs("my", "our")        // "s:p"
+inflect.CompareAdjs("these", "this")    // "p:s"
 ```
 
 **Return values:**
@@ -572,6 +586,8 @@ inflect.CompareNouns("dog", "dogs") // "s:p"
 |----------|-------------|
 | `Compare(word1, word2 string) string` | Compares singular/plural relationship |
 | `CompareNouns(noun1, noun2 string) string` | Alias for `Compare()` |
+| `CompareVerbs(verb1, verb2 string) string` | Compares verb forms (3rd person vs base) |
+| `CompareAdjs(adj1, adj2 string) string` | Compares adjective forms (this/these, a/some) |
 
 ## Features
 
