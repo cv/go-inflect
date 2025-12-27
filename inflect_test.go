@@ -2052,6 +2052,303 @@ func TestDefAIntegration(t *testing.T) {
 	})
 }
 
+func TestDefAPattern(t *testing.T) {
+	defer inflect.DefAReset()
+
+	tests := []struct {
+		name    string
+		pattern string
+		inputs  []string
+		want    string // "a" for all matches
+	}{
+		{
+			name:    "euro prefix pattern",
+			pattern: "euro.*",
+			inputs:  []string{"euro", "european", "eurozone", "eurocentric"},
+			want:    "a",
+		},
+		{
+			name:    "uni prefix pattern",
+			pattern: "uni.*",
+			inputs:  []string{"unit", "uniform", "universe"},
+			want:    "a",
+		},
+		{
+			name:    "exact match pattern",
+			pattern: "apple",
+			inputs:  []string{"apple"},
+			want:    "a",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.DefAReset()
+
+			err := inflect.DefAPattern(tt.pattern)
+			if err != nil {
+				t.Fatalf("DefAPattern(%q) returned error: %v", tt.pattern, err)
+			}
+
+			for _, input := range tt.inputs {
+				got := inflect.An(input)
+				want := tt.want + " " + input
+				if got != want {
+					t.Errorf("An(%q) = %q, want %q", input, got, want)
+				}
+			}
+		})
+	}
+}
+
+func TestDefAnPattern(t *testing.T) {
+	defer inflect.DefAReset()
+
+	tests := []struct {
+		name    string
+		pattern string
+		inputs  []string
+		want    string // "an" for all matches
+	}{
+		{
+			name:    "honor prefix pattern",
+			pattern: "honor.*",
+			inputs:  []string{"honor", "honorable", "honorary", "honored"},
+			want:    "an",
+		},
+		{
+			name:    "heir prefix pattern",
+			pattern: "heir.*",
+			inputs:  []string{"heir", "heirloom", "heiress"},
+			want:    "an",
+		},
+		{
+			name:    "exact match pattern",
+			pattern: "cat",
+			inputs:  []string{"cat"},
+			want:    "an",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.DefAReset()
+
+			err := inflect.DefAnPattern(tt.pattern)
+			if err != nil {
+				t.Fatalf("DefAnPattern(%q) returned error: %v", tt.pattern, err)
+			}
+
+			for _, input := range tt.inputs {
+				got := inflect.An(input)
+				want := tt.want + " " + input
+				if got != want {
+					t.Errorf("An(%q) = %q, want %q", input, got, want)
+				}
+			}
+		})
+	}
+}
+
+func TestDefAPatternInvalidRegex(t *testing.T) {
+	defer inflect.DefAReset()
+
+	err := inflect.DefAPattern("[invalid")
+	if err == nil {
+		t.Error("DefAPattern with invalid regex should return error")
+	}
+
+	err = inflect.DefAnPattern("[invalid")
+	if err == nil {
+		t.Error("DefAnPattern with invalid regex should return error")
+	}
+}
+
+func TestUndefAPattern(t *testing.T) {
+	defer inflect.DefAReset()
+
+	t.Run("remove existing pattern", func(t *testing.T) {
+		inflect.DefAReset()
+
+		// Use "apple" which normally takes "an" but pattern forces "a"
+		if err := inflect.DefAPattern("apple.*"); err != nil {
+			t.Fatalf("DefAPattern failed: %v", err)
+		}
+		if got := inflect.An("appleton"); got != "a appleton" {
+			t.Errorf("Before UndefAPattern: An(appleton) = %q, want %q", got, "a appleton")
+		}
+
+		// Remove pattern
+		if removed := inflect.UndefAPattern("apple.*"); !removed {
+			t.Error("UndefAPattern should return true for existing pattern")
+		}
+
+		// Verify default behavior restored (words starting with vowel get "an")
+		if got := inflect.An("appleton"); got != "an appleton" {
+			t.Errorf("After UndefAPattern: An(appleton) = %q, want %q", got, "an appleton")
+		}
+	})
+
+	t.Run("remove non-existing pattern", func(t *testing.T) {
+		inflect.DefAReset()
+
+		if removed := inflect.UndefAPattern("nonexistent.*"); removed {
+			t.Error("UndefAPattern should return false for non-existing pattern")
+		}
+	})
+}
+
+func TestUndefAnPattern(t *testing.T) {
+	defer inflect.DefAReset()
+
+	t.Run("remove existing pattern", func(t *testing.T) {
+		inflect.DefAReset()
+
+		// Add pattern and verify it works
+		if err := inflect.DefAnPattern("hero.*"); err != nil {
+			t.Fatalf("DefAnPattern failed: %v", err)
+		}
+		if got := inflect.An("heroic"); got != "an heroic" {
+			t.Errorf("Before UndefAnPattern: An(heroic) = %q, want %q", got, "an heroic")
+		}
+
+		// Remove pattern
+		if removed := inflect.UndefAnPattern("hero.*"); !removed {
+			t.Error("UndefAnPattern should return true for existing pattern")
+		}
+
+		// Verify default behavior restored
+		if got := inflect.An("heroic"); got != "a heroic" {
+			t.Errorf("After UndefAnPattern: An(heroic) = %q, want %q", got, "a heroic")
+		}
+	})
+
+	t.Run("remove non-existing pattern", func(t *testing.T) {
+		inflect.DefAReset()
+
+		if removed := inflect.UndefAnPattern("nonexistent.*"); removed {
+			t.Error("UndefAnPattern should return false for non-existing pattern")
+		}
+	})
+}
+
+func TestDefAResetClearsPatterns(t *testing.T) {
+	defer inflect.DefAReset()
+
+	// Add both exact matches and patterns
+	inflect.DefA("apple")
+	inflect.DefAn("cat")
+	if err := inflect.DefAPattern("euro.*"); err != nil {
+		t.Fatalf("DefAPattern failed: %v", err)
+	}
+	if err := inflect.DefAnPattern("honor.*"); err != nil {
+		t.Fatalf("DefAnPattern failed: %v", err)
+	}
+
+	// Verify patterns are working
+	if got := inflect.An("apple"); got != "a apple" {
+		t.Errorf("Before reset: An(apple) = %q, want %q", got, "a apple")
+	}
+	if got := inflect.An("european"); got != "a european" {
+		t.Errorf("Before reset: An(european) = %q, want %q", got, "a european")
+	}
+	if got := inflect.An("honorable"); got != "an honorable" {
+		t.Errorf("Before reset: An(honorable) = %q, want %q", got, "an honorable")
+	}
+
+	// Reset
+	inflect.DefAReset()
+
+	// Verify all patterns are cleared (back to defaults)
+	if got := inflect.An("apple"); got != "an apple" {
+		t.Errorf("After reset: An(apple) = %q, want %q", got, "an apple")
+	}
+	// "european" defaults to "a" because "eu" sounds like "you"
+	if got := inflect.An("european"); got != "a european" {
+		t.Errorf("After reset: An(european) = %q, want %q", got, "a european")
+	}
+	// "honorable" defaults to "an" because the "h" is silent
+	if got := inflect.An("honorable"); got != "an honorable" {
+		t.Errorf("After reset: An(honorable) = %q, want %q", got, "an honorable")
+	}
+}
+
+func TestPatternPrecedence(t *testing.T) {
+	defer inflect.DefAReset()
+
+	t.Run("exact word takes precedence over pattern", func(t *testing.T) {
+		inflect.DefAReset()
+
+		// Add pattern first
+		if err := inflect.DefAnPattern("euro.*"); err != nil {
+			t.Fatalf("DefAnPattern failed: %v", err)
+		}
+		if got := inflect.An("euro"); got != "an euro" {
+			t.Errorf("With pattern only: An(euro) = %q, want %q", got, "an euro")
+		}
+
+		// Add exact word match - should take precedence
+		inflect.DefA("euro")
+		if got := inflect.An("euro"); got != "a euro" {
+			t.Errorf("With exact word override: An(euro) = %q, want %q", got, "a euro")
+		}
+
+		// Other words matching pattern still work
+		if got := inflect.An("european"); got != "an european" {
+			t.Errorf("Pattern still matches: An(european) = %q, want %q", got, "an european")
+		}
+	})
+
+	t.Run("DefAPattern takes precedence over DefAnPattern", func(t *testing.T) {
+		inflect.DefAReset()
+
+		// Both patterns match "european"
+		if err := inflect.DefAnPattern("euro.*"); err != nil {
+			t.Fatalf("DefAnPattern failed: %v", err)
+		}
+		if err := inflect.DefAPattern("europ.*"); err != nil {
+			t.Fatalf("DefAPattern failed: %v", err)
+		}
+
+		// DefAPattern should take precedence
+		if got := inflect.An("european"); got != "a european" {
+			t.Errorf("An(european) = %q, want %q", got, "a european")
+		}
+
+		// "euro" only matches DefAnPattern
+		if got := inflect.An("euro"); got != "an euro" {
+			t.Errorf("An(euro) = %q, want %q", got, "an euro")
+		}
+	})
+}
+
+func TestPatternCaseInsensitive(t *testing.T) {
+	defer inflect.DefAReset()
+
+	if err := inflect.DefAPattern("euro.*"); err != nil {
+		t.Fatalf("DefAPattern failed: %v", err)
+	}
+
+	// Pattern should match regardless of case
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{"euro", "a euro"},
+		{"Euro", "a Euro"},
+		{"EURO", "a EURO"},
+		{"european", "a european"},
+		{"European", "a European"},
+		{"EUROPEAN", "a EUROPEAN"},
+	}
+
+	for _, tt := range tests {
+		if got := inflect.An(tt.input); got != tt.want {
+			t.Errorf("An(%q) = %q, want %q", tt.input, got, tt.want)
+		}
+	}
+}
+
 func TestDefVerb(t *testing.T) {
 	// Reset to defaults after this test
 	defer inflect.DefVerbReset()

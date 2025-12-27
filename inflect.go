@@ -66,6 +66,14 @@ var customAWords = make(map[string]bool)
 // The keys are lowercase versions of the words/patterns.
 var customAnWords = make(map[string]bool)
 
+// customAPatterns stores regex patterns that force "a" instead of "an".
+// Patterns are matched against the lowercase first word.
+var customAPatterns []*regexp.Regexp
+
+// customAnPatterns stores regex patterns that force "an" instead of "a".
+// Patterns are matched against the lowercase first word.
+var customAnPatterns []*regexp.Regexp
+
 // silentHWords contains words starting with silent 'h' that take "an".
 var silentHWords = map[string]bool{
 	"honest": true, "heir": true, "heiress": true, "heirloom": true,
@@ -252,7 +260,8 @@ func isProperNameEndingInS(word string) bool {
 //   - Vowels with consonant sounds: "a Ukrainian", "a unanimous decision"
 //   - Abbreviations: "a YAML file", "a JSON object"
 //
-// Custom patterns defined via DefA() and DefAn() take precedence over default rules.
+// Custom patterns defined via DefA(), DefAn(), DefAPattern(), and DefAnPattern()
+// take precedence over default rules.
 func An(word string) string {
 	if word == "" {
 		return ""
@@ -262,14 +271,28 @@ func An(word string) string {
 	firstWord := strings.Fields(word)[0]
 	lowerFirst := strings.ToLower(firstWord)
 
-	// Check custom "a" patterns first (highest priority)
+	// Check custom "a" exact words first (highest priority)
 	if customAWords[lowerFirst] {
 		return "a " + word
 	}
 
-	// Check custom "an" patterns second
+	// Check custom "an" exact words second
 	if customAnWords[lowerFirst] {
 		return "an " + word
+	}
+
+	// Check custom "a" regex patterns third
+	for _, pat := range customAPatterns {
+		if pat.MatchString(lowerFirst) {
+			return "a " + word
+		}
+	}
+
+	// Check custom "an" regex patterns fourth
+	for _, pat := range customAnPatterns {
+		if pat.MatchString(lowerFirst) {
+			return "an " + word
+		}
 	}
 
 	// Fall back to default rules
@@ -464,20 +487,135 @@ func UndefAn(word string) bool {
 	return false
 }
 
+// DefAPattern defines a regex pattern that forces "a" instead of "an".
+//
+// The pattern is matched against the lowercase first word of the input.
+// The pattern must be a valid Go regex. Patterns are matched with full-string
+// matching (automatically anchored with ^ and $).
+//
+// Pattern priorities (highest to lowest):
+//  1. Exact word matches (DefA)
+//  2. Exact word matches (DefAn)
+//  3. Regex patterns (DefAPattern)
+//  4. Regex patterns (DefAnPattern)
+//  5. Default rules
+//
+// Returns an error if the pattern is invalid.
+//
+// Examples:
+//
+//	DefAPattern("euro.*")
+//	An("euro")     // returns "a euro"
+//	An("european") // returns "a european"
+//	An("eurozone") // returns "a eurozone"
+func DefAPattern(pattern string) error {
+	// Anchor the pattern to match the full word
+	anchored := "^(?:" + pattern + ")$"
+	re, err := regexp.Compile(anchored)
+	if err != nil {
+		return err
+	}
+	customAPatterns = append(customAPatterns, re)
+	return nil
+}
+
+// DefAnPattern defines a regex pattern that forces "an" instead of "a".
+//
+// The pattern is matched against the lowercase first word of the input.
+// The pattern must be a valid Go regex. Patterns are matched with full-string
+// matching (automatically anchored with ^ and $).
+//
+// Pattern priorities (highest to lowest):
+//  1. Exact word matches (DefA)
+//  2. Exact word matches (DefAn)
+//  3. Regex patterns (DefAPattern)
+//  4. Regex patterns (DefAnPattern)
+//  5. Default rules
+//
+// Returns an error if the pattern is invalid.
+//
+// Examples:
+//
+//	DefAnPattern("honor.*")
+//	An("honor")     // returns "an honor"
+//	An("honorable") // returns "an honorable"
+//	An("honorary")  // returns "an honorary"
+func DefAnPattern(pattern string) error {
+	// Anchor the pattern to match the full word
+	anchored := "^(?:" + pattern + ")$"
+	re, err := regexp.Compile(anchored)
+	if err != nil {
+		return err
+	}
+	customAnPatterns = append(customAnPatterns, re)
+	return nil
+}
+
+// UndefAPattern removes a regex pattern from the "a" patterns list.
+//
+// The pattern string must match exactly as it was defined (before anchoring).
+// Returns true if the pattern was found and removed, false otherwise.
+//
+// Examples:
+//
+//	DefAPattern("euro.*")
+//	An("european") // returns "a european"
+//	UndefAPattern("euro.*")
+//	An("european") // returns "an european" (default rule)
+func UndefAPattern(pattern string) bool {
+	anchored := "^(?:" + pattern + ")$"
+	for i, re := range customAPatterns {
+		if re.String() == anchored {
+			customAPatterns = append(customAPatterns[:i], customAPatterns[i+1:]...)
+			return true
+		}
+	}
+	return false
+}
+
+// UndefAnPattern removes a regex pattern from the "an" patterns list.
+//
+// The pattern string must match exactly as it was defined (before anchoring).
+// Returns true if the pattern was found and removed, false otherwise.
+//
+// Examples:
+//
+//	DefAnPattern("honor.*")
+//	An("honorable") // returns "an honorable"
+//	UndefAnPattern("honor.*")
+//	An("honorable") // returns "a honorable" (default rule)
+func UndefAnPattern(pattern string) bool {
+	anchored := "^(?:" + pattern + ")$"
+	for i, re := range customAnPatterns {
+		if re.String() == anchored {
+			customAnPatterns = append(customAnPatterns[:i], customAnPatterns[i+1:]...)
+			return true
+		}
+	}
+	return false
+}
+
 // DefAReset resets all custom a/an patterns to defaults (empty).
 //
-// This removes all custom patterns added via DefA() and DefAn().
+// This removes all custom patterns added via DefA(), DefAn(), DefAPattern(),
+// and DefAnPattern().
 //
 // Example:
 //
 //	DefA("ape")
 //	DefAn("hero")
+//	DefAPattern("euro.*")
+//	DefAnPattern("honor.*")
 //	DefAReset()
-//	An("ape")  // returns "an ape" (default rule)
-//	An("hero") // returns "a hero" (default rule)
+//	An("ape")       // returns "an ape" (default rule)
+//	An("hero")      // returns "a hero" (default rule)
+//	An("european")  // returns "an european" (default rule)
+//	An("honorable") // returns "a honorable" (default rule)
 func DefAReset() {
 	customAWords = make(map[string]bool)
 	customAnWords = make(map[string]bool)
+	customAPatterns = nil
+	customAnPatterns = nil
 }
 
 // ClassicalAll enables or disables all classical pluralization options at once.
