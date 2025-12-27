@@ -1,6 +1,11 @@
 package inflect
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+	"strings"
+	"unicode"
+)
 
 // Ordinal converts an integer to its ordinal string representation.
 //
@@ -119,4 +124,171 @@ func convertToOrdinalWord(n int) string {
 
 	// Handle billions and above
 	return cardinalWord(n/1000000000) + " billion " + convertToOrdinalWord(n%1000000000)
+}
+
+// cardinalToOrdinal maps cardinal word forms to ordinal word forms.
+var cardinalToOrdinal = map[string]string{
+	"zero":      "zeroth",
+	"one":       "first",
+	"two":       "second",
+	"three":     "third",
+	"four":      "fourth",
+	"five":      "fifth",
+	"six":       "sixth",
+	"seven":     "seventh",
+	"eight":     "eighth",
+	"nine":      "ninth",
+	"ten":       "tenth",
+	"eleven":    "eleventh",
+	"twelve":    "twelfth",
+	"thirteen":  "thirteenth",
+	"fourteen":  "fourteenth",
+	"fifteen":   "fifteenth",
+	"sixteen":   "sixteenth",
+	"seventeen": "seventeenth",
+	"eighteen":  "eighteenth",
+	"nineteen":  "nineteenth",
+	"twenty":    "twentieth",
+	"thirty":    "thirtieth",
+	"forty":     "fortieth",
+	"fifty":     "fiftieth",
+	"sixty":     "sixtieth",
+	"seventy":   "seventieth",
+	"eighty":    "eightieth",
+	"ninety":    "ninetieth",
+}
+
+// WordToOrdinal converts a number word or numeric string to its ordinal form.
+//
+// If the input is a numeric string (e.g., "42"), it returns the numeric ordinal (e.g., "42nd").
+// If the input is a word number (e.g., "forty-two"), it returns the word ordinal (e.g., "forty-second").
+//
+// The function preserves the case pattern of the input:
+//   - "one" → "first"
+//   - "One" → "First"
+//   - "ONE" → "FIRST"
+//   - "Twenty-One" → "Twenty-First"
+//
+// Examples:
+//   - WordToOrdinal("1") returns "1st"
+//   - WordToOrdinal("one") returns "first"
+//   - WordToOrdinal("twenty-one") returns "twenty-first"
+//   - WordToOrdinal("One") returns "First"
+//   - WordToOrdinal("TWENTY") returns "TWENTIETH"
+func WordToOrdinal(s string) string {
+	// Try to parse as a number first
+	if n, err := strconv.Atoi(s); err == nil {
+		return Ordinal(n)
+	}
+
+	// Detect case pattern
+	casePattern := detectCase(s)
+
+	// Convert to lowercase for lookup
+	lower := strings.ToLower(s)
+
+	// Handle compound numbers (e.g., "twenty-one" → "twenty-first")
+	if idx := strings.LastIndex(lower, "-"); idx >= 0 {
+		prefix := lower[:idx]
+		suffix := lower[idx+1:]
+
+		// Check if suffix is already ordinal
+		if strings.HasSuffix(suffix, "th") || strings.HasSuffix(suffix, "st") ||
+			strings.HasSuffix(suffix, "nd") || strings.HasSuffix(suffix, "rd") {
+			return s // Already ordinal
+		}
+
+		// Convert the suffix to ordinal
+		if ordinal, ok := cardinalToOrdinal[suffix]; ok {
+			result := prefix + "-" + ordinal
+			return applyCase(result, casePattern)
+		}
+	}
+
+	// Direct lookup for simple words
+	if ordinal, ok := cardinalToOrdinal[lower]; ok {
+		return applyCase(ordinal, casePattern)
+	}
+
+	// Return unchanged if not recognized
+	return s
+}
+
+// casePattern represents the case pattern of a string.
+type casePattern int
+
+const (
+	caseLower casePattern = iota
+	caseUpper
+	caseTitle
+	caseMixed
+)
+
+// detectCase detects the case pattern of a string.
+func detectCase(s string) casePattern {
+	if s == "" {
+		return caseLower
+	}
+
+	// Check if all uppercase
+	allUpper := true
+	allLower := true
+
+	for _, r := range s {
+		if unicode.IsLetter(r) {
+			if !unicode.IsUpper(r) {
+				allUpper = false
+			}
+			if !unicode.IsLower(r) {
+				allLower = false
+			}
+		}
+	}
+
+	if allUpper {
+		return caseUpper
+	}
+	if allLower {
+		return caseLower
+	}
+
+	// Check for title case (first letter uppercase, rest lowercase per word)
+	runes := []rune(s)
+	if unicode.IsUpper(runes[0]) {
+		return caseTitle
+	}
+
+	return caseMixed
+}
+
+// applyCase applies a case pattern to a string.
+func applyCase(s string, pattern casePattern) string {
+	switch pattern {
+	case caseUpper:
+		return strings.ToUpper(s)
+	case caseTitle:
+		return toTitleCase(s)
+	default:
+		return s
+	}
+}
+
+// toTitleCase converts a string to title case (first letter of each word uppercase).
+func toTitleCase(s string) string {
+	runes := []rune(s)
+	if len(runes) == 0 {
+		return s
+	}
+
+	// Capitalize first letter
+	runes[0] = unicode.ToUpper(runes[0])
+
+	// Handle hyphenated words
+	for i := 1; i < len(runes); i++ {
+		if i > 0 && runes[i-1] == '-' {
+			runes[i] = unicode.ToUpper(runes[i])
+		}
+	}
+
+	return string(runes)
 }

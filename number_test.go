@@ -904,3 +904,180 @@ func BenchmarkNumberToWords(b *testing.B) {
 		})
 	}
 }
+
+func TestNumberToWordsWithAnd(t *testing.T) {
+	tests := []struct {
+		name  string
+		input int
+		want  string
+	}{
+		// Basic numbers (no "and" needed)
+		{name: "zero", input: 0, want: "zero"},
+		{name: "one", input: 1, want: "one"},
+		{name: "twelve", input: 12, want: "twelve"},
+		{name: "twenty", input: 20, want: "twenty"},
+		{name: "ninety-nine", input: 99, want: "ninety-nine"},
+
+		// Hundreds with remainder need "and"
+		{name: "one hundred and one", input: 101, want: "one hundred and one"},
+		{name: "one hundred and ten", input: 110, want: "one hundred and ten"},
+		{name: "one hundred and eleven", input: 111, want: "one hundred and eleven"},
+		{name: "one hundred and twenty", input: 120, want: "one hundred and twenty"},
+		{name: "one hundred and twenty-one", input: 121, want: "one hundred and twenty-one"},
+		{name: "two hundred and fifty-six", input: 256, want: "two hundred and fifty-six"},
+		{name: "nine hundred and ninety-nine", input: 999, want: "nine hundred and ninety-nine"},
+
+		// Exact hundreds (no "and")
+		{name: "one hundred", input: 100, want: "one hundred"},
+		{name: "two hundred", input: 200, want: "two hundred"},
+		{name: "nine hundred", input: 900, want: "nine hundred"},
+
+		// Thousands
+		{name: "one thousand", input: 1000, want: "one thousand"},
+		{name: "one thousand and one", input: 1001, want: "one thousand and one"},
+		{name: "one thousand and ten", input: 1010, want: "one thousand and ten"},
+		{name: "one thousand one hundred", input: 1100, want: "one thousand one hundred"},
+		{name: "one thousand one hundred and one", input: 1101, want: "one thousand one hundred and one"},
+		{name: "one thousand two hundred and thirty-four", input: 1234, want: "one thousand two hundred and thirty-four"},
+		{name: "two thousand and forty-two", input: 2042, want: "two thousand and forty-two"},
+		{name: "ten thousand and one", input: 10001, want: "ten thousand and one"},
+		{name: "twelve thousand three hundred and forty-five", input: 12345, want: "twelve thousand three hundred and forty-five"},
+
+		// Millions
+		{name: "one million", input: 1000000, want: "one million"},
+		{name: "one million and one", input: 1000001, want: "one million and one"},
+		{name: "one million one hundred", input: 1000100, want: "one million one hundred"},
+		{name: "one million one thousand and one", input: 1001001, want: "one million one thousand and one"},
+		{name: "one million two hundred and thirty-four thousand five hundred and sixty-seven", input: 1234567, want: "one million two hundred and thirty-four thousand five hundred and sixty-seven"},
+
+		// Billions
+		{name: "one billion", input: 1000000000, want: "one billion"},
+		{name: "one billion and one", input: 1000000001, want: "one billion and one"},
+		{name: "one billion one million and one", input: 1001000001, want: "one billion one million and one"},
+
+		// Negative numbers
+		{name: "negative one hundred and one", input: -101, want: "negative one hundred and one"},
+		{name: "negative one thousand and one", input: -1001, want: "negative one thousand and one"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.NumberToWordsWithAnd(tt.input)
+			if got != tt.want {
+				t.Errorf("NumberToWordsWithAnd(%d) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestWordToOrdinal(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		// Basic word numbers
+		{name: "one to first", input: "one", want: "first"},
+		{name: "two to second", input: "two", want: "second"},
+		{name: "three to third", input: "three", want: "third"},
+		{name: "four to fourth", input: "four", want: "fourth"},
+		{name: "five to fifth", input: "five", want: "fifth"},
+		{name: "six to sixth", input: "six", want: "sixth"},
+		{name: "seven to seventh", input: "seven", want: "seventh"},
+		{name: "eight to eighth", input: "eight", want: "eighth"},
+		{name: "nine to ninth", input: "nine", want: "ninth"},
+		{name: "ten to tenth", input: "ten", want: "tenth"},
+		{name: "eleven to eleventh", input: "eleven", want: "eleventh"},
+		{name: "twelve to twelfth", input: "twelve", want: "twelfth"},
+		{name: "thirteen to thirteenth", input: "thirteen", want: "thirteenth"},
+		{name: "fourteen to fourteenth", input: "fourteen", want: "fourteenth"},
+		{name: "fifteen to fifteenth", input: "fifteen", want: "fifteenth"},
+		{name: "sixteen to sixteenth", input: "sixteen", want: "sixteenth"},
+		{name: "seventeen to seventeenth", input: "seventeen", want: "seventeenth"},
+		{name: "eighteen to eighteenth", input: "eighteen", want: "eighteenth"},
+		{name: "nineteen to nineteenth", input: "nineteen", want: "nineteenth"},
+
+		// Tens
+		{name: "twenty to twentieth", input: "twenty", want: "twentieth"},
+		{name: "thirty to thirtieth", input: "thirty", want: "thirtieth"},
+		{name: "forty to fortieth", input: "forty", want: "fortieth"},
+		{name: "fifty to fiftieth", input: "fifty", want: "fiftieth"},
+		{name: "sixty to sixtieth", input: "sixty", want: "sixtieth"},
+		{name: "seventy to seventieth", input: "seventy", want: "seventieth"},
+		{name: "eighty to eightieth", input: "eighty", want: "eightieth"},
+		{name: "ninety to ninetieth", input: "ninety", want: "ninetieth"},
+
+		// Compound numbers
+		{name: "twenty-one to twenty-first", input: "twenty-one", want: "twenty-first"},
+		{name: "thirty-two to thirty-second", input: "thirty-two", want: "thirty-second"},
+		{name: "forty-three to forty-third", input: "forty-third", want: "forty-third"},
+		{name: "ninety-nine to ninety-ninth", input: "ninety-nine", want: "ninety-ninth"},
+
+		// Special cases
+		{name: "zero to zeroth", input: "zero", want: "zeroth"},
+
+		// Case preservation
+		{name: "One to First", input: "One", want: "First"},
+		{name: "TWO to SECOND", input: "TWO", want: "SECOND"},
+		{name: "Twenty-One to Twenty-First", input: "Twenty-One", want: "Twenty-First"},
+
+		// Numeric strings should still work
+		{name: "1 to 1st", input: "1", want: "1st"},
+		{name: "2 to 2nd", input: "2", want: "2nd"},
+		{name: "3 to 3rd", input: "3", want: "3rd"},
+		{name: "11 to 11th", input: "11", want: "11th"},
+		{name: "21 to 21st", input: "21", want: "21st"},
+		{name: "100 to 100th", input: "100", want: "100th"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.WordToOrdinal(tt.input)
+			if got != tt.want {
+				t.Errorf("WordToOrdinal(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func BenchmarkNumberToWordsWithAnd(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		input int
+	}{
+		{"zero", 0},
+		{"single_digit", 7},
+		{"hundred_and", 101},
+		{"thousand_and", 1001},
+		{"million_and", 1000001},
+		{"complex", 1234567},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.NumberToWordsWithAnd(bm.input)
+			}
+		})
+	}
+}
+
+func BenchmarkWordToOrdinal(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		input string
+	}{
+		{"numeric", "42"},
+		{"simple_word", "five"},
+		{"compound_word", "twenty-one"},
+		{"uppercase", "TWENTY"},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.WordToOrdinal(bm.input)
+			}
+		})
+	}
+}

@@ -49,6 +49,94 @@ func NumberToWords(n int) string {
 	return cardinalWord(n)
 }
 
+// NumberToWordsWithAnd converts an integer to its English word representation
+// using British English style with "and" before the final part.
+//
+// This style inserts "and" after hundreds when followed by tens or ones,
+// and after thousands/millions/billions when followed by a number less than 100.
+//
+// Examples:
+//   - NumberToWordsWithAnd(101) returns "one hundred and one"
+//   - NumberToWordsWithAnd(121) returns "one hundred and twenty-one"
+//   - NumberToWordsWithAnd(1001) returns "one thousand and one"
+//   - NumberToWordsWithAnd(1101) returns "one thousand one hundred and one"
+//   - NumberToWordsWithAnd(-101) returns "negative one hundred and one"
+func NumberToWordsWithAnd(n int) string {
+	if n < 0 {
+		return "negative " + cardinalWordWithAnd(-n)
+	}
+	return cardinalWordWithAnd(n)
+}
+
+// cardinalWordWithAnd converts a positive integer to its cardinal word form
+// using British English style with "and".
+func cardinalWordWithAnd(n int) string {
+	if n == 0 {
+		return "zero"
+	}
+
+	if n <= 19 {
+		return onesCardinal[n]
+	}
+
+	if n < 100 && n%10 == 0 {
+		return tensCardinal[n/10]
+	}
+
+	if n < 100 {
+		return tensCardinal[n/10] + "-" + onesCardinal[n%10]
+	}
+
+	if n < 1000 && n%100 == 0 {
+		return onesCardinal[n/100] + " hundred"
+	}
+
+	if n < 1000 {
+		// Insert "and" after hundreds
+		return onesCardinal[n/100] + " hundred and " + cardinalWordWithAnd(n%100)
+	}
+
+	if n < 1000000 && n%1000 == 0 {
+		return cardinalWordWithAnd(n/1000) + " thousand"
+	}
+
+	if n < 1000000 {
+		remainder := n % 1000
+		prefix := cardinalWordWithAnd(n/1000) + " thousand"
+		// If remainder is less than 100, add "and"
+		if remainder < 100 {
+			return prefix + " and " + cardinalWordWithAnd(remainder)
+		}
+		return prefix + " " + cardinalWordWithAnd(remainder)
+	}
+
+	if n < 1000000000 && n%1000000 == 0 {
+		return cardinalWordWithAnd(n/1000000) + " million"
+	}
+
+	if n < 1000000000 {
+		remainder := n % 1000000
+		prefix := cardinalWordWithAnd(n/1000000) + " million"
+		// If remainder is less than 100, add "and"
+		if remainder < 100 {
+			return prefix + " and " + cardinalWordWithAnd(remainder)
+		}
+		return prefix + " " + cardinalWordWithAnd(remainder)
+	}
+
+	if n%1000000000 == 0 {
+		return cardinalWordWithAnd(n/1000000000) + " billion"
+	}
+
+	remainder := n % 1000000000
+	prefix := cardinalWordWithAnd(n/1000000000) + " billion"
+	// If remainder is less than 100, add "and"
+	if remainder < 100 {
+		return prefix + " and " + cardinalWordWithAnd(remainder)
+	}
+	return prefix + " " + cardinalWordWithAnd(remainder)
+}
+
 // NumberToWordsFloat converts a floating-point number to its English word representation.
 //
 // The integer part is converted using NumberToWords, followed by "point",

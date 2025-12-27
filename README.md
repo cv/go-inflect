@@ -307,6 +307,16 @@ inflect.OrdinalWord(21)  // "twenty-first"
 inflect.OrdinalWord(100) // "one hundredth"
 inflect.OrdinalWord(101) // "one hundred first"
 inflect.OrdinalWord(-5)  // "negative fifth"
+
+// Convert word numbers to ordinals
+inflect.WordToOrdinal("one")         // "first"
+inflect.WordToOrdinal("twenty-one")  // "twenty-first"
+inflect.WordToOrdinal("One")         // "First" (preserves case)
+inflect.WordToOrdinal("TWENTY")      // "TWENTIETH"
+
+// Numeric strings also work
+inflect.WordToOrdinal("1")    // "1st"
+inflect.WordToOrdinal("21")   // "21st"
 ```
 
 ### Number to Words
@@ -324,6 +334,12 @@ inflect.NumberToWords(1000)     // "one thousand"
 inflect.NumberToWords(1234)     // "one thousand two hundred thirty-four"
 inflect.NumberToWords(1000000)  // "one million"
 inflect.NumberToWords(-5)       // "negative five"
+
+// British English style with "and"
+inflect.NumberToWordsWithAnd(101)   // "one hundred and one"
+inflect.NumberToWordsWithAnd(1001)  // "one thousand and one"
+inflect.NumberToWordsWithAnd(1101)  // "one thousand one hundred and one"
+inflect.NumberToWordsWithAnd(1234)  // "one thousand two hundred and thirty-four"
 ```
 
 ### List Joining
@@ -456,7 +472,9 @@ inflect.CompareNouns("dog", "dogs") // "s:p"
 |----------|-------------|
 | `Ordinal(n int) string` | Returns numeric ordinal (1st, 2nd, 3rd, ...) |
 | `OrdinalWord(n int) string` | Returns ordinal as word (first, second, ...) |
+| `WordToOrdinal(s string) string` | Converts word/numeric string to ordinal |
 | `NumberToWords(n int) string` | Converts integer to English words |
+| `NumberToWordsWithAnd(n int) string` | Converts integer to words (British style with "and") |
 
 ### List Functions
 
