@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	inflect "github.com/cv/go-inflect"
 )
 
@@ -109,9 +111,7 @@ func TestNumberToWords(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.NumberToWords(tt.input)
-			if got != tt.want {
-				t.Errorf("NumberToWords(%d) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "NumberToWords(%d)", tt.input)
 		})
 	}
 }
@@ -385,9 +385,7 @@ func TestNumberToWordsComprehensive(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("input_%d", tt.input), func(t *testing.T) {
 			got := inflect.NumberToWords(tt.input)
-			if got != tt.want {
-				t.Errorf("NumberToWords(%d) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "NumberToWords(%d)", tt.input)
 		})
 	}
 }
@@ -426,9 +424,7 @@ func TestNumberToWordsFloat(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.NumberToWordsFloat(tt.input)
-			if got != tt.want {
-				t.Errorf("NumberToWordsFloat(%v) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "NumberToWordsFloat(%v)", tt.input)
 		})
 	}
 }
@@ -471,9 +467,7 @@ func TestNumberToWordsFloatWithDecimal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.NumberToWordsFloatWithDecimal(tt.input, tt.decimal)
-			if got != tt.want {
-				t.Errorf("NumberToWordsFloatWithDecimal(%v, %q) = %q, want %q", tt.input, tt.decimal, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "NumberToWordsFloatWithDecimal(%v, %q)", tt.input, tt.decimal)
 		})
 	}
 }
@@ -527,9 +521,7 @@ func TestNumberToWordsThreshold(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.NumberToWordsThreshold(tt.n, tt.threshold)
-			if got != tt.want {
-				t.Errorf("NumberToWordsThreshold(%d, %d) = %q, want %q", tt.n, tt.threshold, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "NumberToWordsThreshold(%d, %d)", tt.n, tt.threshold)
 		})
 	}
 }
@@ -595,9 +587,7 @@ func TestNumberToWordsGrouped(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.NumberToWordsGrouped(tt.n, tt.groupSize)
-			if got != tt.want {
-				t.Errorf("NumberToWordsGrouped(%d, %d) = %q, want %q", tt.n, tt.groupSize, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "NumberToWordsGrouped(%d, %d)", tt.n, tt.groupSize)
 		})
 	}
 }
@@ -658,9 +648,7 @@ func TestFormatNumber(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.FormatNumber(tt.input)
-			if got != tt.want {
-				t.Errorf("FormatNumber(%d) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "FormatNumber(%d)", tt.input)
 		})
 	}
 }
@@ -718,9 +706,7 @@ func TestNo(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.No(tt.word, tt.count)
-			if got != tt.want {
-				t.Errorf("No(%q, %d) = %q, want %q", tt.word, tt.count, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "No(%q, %d)", tt.word, tt.count)
 		})
 	}
 }
@@ -766,14 +752,8 @@ func TestNum(t *testing.T) {
 				got = inflect.Num(tt.args[0])
 			}
 
-			if got != tt.wantReturn {
-				t.Errorf("Num(%v) = %d, want %d", tt.args, got, tt.wantReturn)
-			}
-
-			gotNum := inflect.GetNum()
-			if gotNum != tt.wantGetNum {
-				t.Errorf("After Num(%v): GetNum() = %d, want %d", tt.args, gotNum, tt.wantGetNum)
-			}
+			assert.Equal(t, tt.wantReturn, got, "Num(%v)", tt.args)
+			assert.Equal(t, tt.wantGetNum, inflect.GetNum(), "After Num(%v): GetNum()", tt.args)
 		})
 	}
 }
@@ -822,9 +802,7 @@ func TestGetNum(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup()
 			got := inflect.GetNum()
-			if got != tt.wantNum {
-				t.Errorf("GetNum() = %d, want %d", got, tt.wantNum)
-			}
+			assert.Equal(t, tt.wantNum, got, "GetNum()")
 		})
 	}
 }
@@ -836,46 +814,28 @@ func TestNumIntegration(t *testing.T) {
 	t.Run("complete workflow", func(t *testing.T) {
 		// 1. Initial state should be 0
 		inflect.Num(0)
-		if got := inflect.GetNum(); got != 0 {
-			t.Errorf("Initial GetNum() = %d, want 0", got)
-		}
+		assert.Equal(t, 0, inflect.GetNum(), "Initial GetNum()")
 
 		// 2. Store a value
 		ret := inflect.Num(5)
-		if ret != 5 {
-			t.Errorf("Num(5) = %d, want 5", ret)
-		}
-		if got := inflect.GetNum(); got != 5 {
-			t.Errorf("After Num(5): GetNum() = %d, want 5", got)
-		}
+		assert.Equal(t, 5, ret, "Num(5)")
+		assert.Equal(t, 5, inflect.GetNum(), "After Num(5): GetNum()")
 
 		// 3. Update the value
 		ret = inflect.Num(10)
-		if ret != 10 {
-			t.Errorf("Num(10) = %d, want 10", ret)
-		}
-		if got := inflect.GetNum(); got != 10 {
-			t.Errorf("After Num(10): GetNum() = %d, want 10", got)
-		}
+		assert.Equal(t, 10, ret, "Num(10)")
+		assert.Equal(t, 10, inflect.GetNum(), "After Num(10): GetNum()")
 
 		// 4. Clear with 0
 		ret = inflect.Num(0)
-		if ret != 0 {
-			t.Errorf("Num(0) = %d, want 0", ret)
-		}
-		if got := inflect.GetNum(); got != 0 {
-			t.Errorf("After Num(0): GetNum() = %d, want 0", got)
-		}
+		assert.Equal(t, 0, ret, "Num(0)")
+		assert.Equal(t, 0, inflect.GetNum(), "After Num(0): GetNum()")
 
 		// 5. Store again and clear with no args
 		inflect.Num(7)
 		ret = inflect.Num()
-		if ret != 0 {
-			t.Errorf("Num() = %d, want 0", ret)
-		}
-		if got := inflect.GetNum(); got != 0 {
-			t.Errorf("After Num(): GetNum() = %d, want 0", got)
-		}
+		assert.Equal(t, 0, ret, "Num()")
+		assert.Equal(t, 0, inflect.GetNum(), "After Num(): GetNum()")
 	})
 }
 
@@ -963,9 +923,7 @@ func TestNumberToWordsWithAnd(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.NumberToWordsWithAnd(tt.input)
-			if got != tt.want {
-				t.Errorf("NumberToWordsWithAnd(%d) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "NumberToWordsWithAnd(%d)", tt.input)
 		})
 	}
 }
@@ -1033,9 +991,7 @@ func TestWordToOrdinal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.WordToOrdinal(tt.input)
-			if got != tt.want {
-				t.Errorf("WordToOrdinal(%q) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "WordToOrdinal(%q)", tt.input)
 		})
 	}
 }

@@ -3,6 +3,8 @@ package inflect_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	inflect "github.com/cv/go-inflect"
 )
 
@@ -41,9 +43,7 @@ func TestJoin(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Join(tt.input)
-			if got != tt.want {
-				t.Errorf("Join(%q) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "Join(%q)", tt.input)
 		})
 	}
 }
@@ -89,9 +89,7 @@ func TestJoinWithConj(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.JoinWithConj(tt.input, tt.conj)
-			if got != tt.want {
-				t.Errorf("JoinWithConj(%q, %q) = %q, want %q", tt.input, tt.conj, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "JoinWithConj(%q, %q)", tt.input, tt.conj)
 		})
 	}
 }
@@ -138,9 +136,7 @@ func TestJoinWithSep(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.JoinWithSep(tt.input, tt.conj, tt.sep)
-			if got != tt.want {
-				t.Errorf("JoinWithSep(%q, %q, %q) = %q, want %q", tt.input, tt.conj, tt.sep, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "JoinWithSep(%q, %q, %q)", tt.input, tt.conj, tt.sep)
 		})
 	}
 }
@@ -189,9 +185,7 @@ func TestJoinWithAutoSep(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.JoinWithAutoSep(tt.input, tt.conj)
-			if got != tt.want {
-				t.Errorf("JoinWithAutoSep(%q, %q) = %q, want %q", tt.input, tt.conj, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "JoinWithAutoSep(%q, %q)", tt.input, tt.conj)
 		})
 	}
 }
@@ -252,9 +246,7 @@ func TestJoinWithFinalSep(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.JoinWithFinalSep(tt.input, tt.conj, tt.sep, tt.finalSep)
-			if got != tt.want {
-				t.Errorf("JoinWithFinalSep(%q, %q, %q, %q) = %q, want %q", tt.input, tt.conj, tt.sep, tt.finalSep, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "JoinWithFinalSep(%q, %q, %q, %q)", tt.input, tt.conj, tt.sep, tt.finalSep)
 		})
 	}
 }
@@ -281,9 +273,7 @@ func TestJoinNoOxford(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.JoinNoOxford(tt.input)
-			if got != tt.want {
-				t.Errorf("JoinNoOxford(%q) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "JoinNoOxford(%q)", tt.input)
 		})
 	}
 }
@@ -311,9 +301,7 @@ func TestJoinNoOxfordWithConj(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.JoinNoOxfordWithConj(tt.input, tt.conj)
-			if got != tt.want {
-				t.Errorf("JoinNoOxfordWithConj(%q, %q) = %q, want %q", tt.input, tt.conj, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "JoinNoOxfordWithConj(%q, %q)", tt.input, tt.conj)
 		})
 	}
 }
