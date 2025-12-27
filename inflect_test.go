@@ -2879,3 +2879,157 @@ func TestClassicalAllIntegration(t *testing.T) {
 		}
 	})
 }
+
+func TestClassicalPersons(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.ClassicalPersons(false)
+
+	tests := []struct {
+		name    string
+		enabled bool
+		input   string
+		want    string
+	}{
+		// Classical persons enabled: person -> persons
+		{name: "persons enabled lowercase", enabled: true, input: "person", want: "persons"},
+		{name: "persons enabled titlecase", enabled: true, input: "Person", want: "Persons"},
+		{name: "persons enabled uppercase", enabled: true, input: "PERSON", want: "PERSONS"},
+
+		// Classical persons disabled: person -> people (default)
+		{name: "people default lowercase", enabled: false, input: "person", want: "people"},
+		{name: "people default titlecase", enabled: false, input: "Person", want: "People"},
+		{name: "people default uppercase", enabled: false, input: "PERSON", want: "PEOPLE"},
+
+		// Other words should not be affected
+		{name: "cat unaffected enabled", enabled: true, input: "cat", want: "cats"},
+		{name: "cat unaffected disabled", enabled: false, input: "cat", want: "cats"},
+		{name: "child unaffected enabled", enabled: true, input: "child", want: "children"},
+		{name: "child unaffected disabled", enabled: false, input: "child", want: "children"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.ClassicalPersons(tt.enabled)
+			got := inflect.Plural(tt.input)
+			if got != tt.want {
+				t.Errorf("ClassicalPersons(%v): Plural(%q) = %q, want %q",
+					tt.enabled, tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsClassicalPersons(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.ClassicalPersons(false)
+
+	tests := []struct {
+		name  string
+		setup func()
+		want  bool
+	}{
+		{
+			name:  "default is false",
+			setup: func() { inflect.ClassicalPersons(false) },
+			want:  false,
+		},
+		{
+			name:  "enabled via ClassicalPersons",
+			setup: func() { inflect.ClassicalPersons(true) },
+			want:  true,
+		},
+		{
+			name:  "enabled via ClassicalAll",
+			setup: func() { inflect.ClassicalAll(true) },
+			want:  true,
+		},
+		{
+			name: "disabled after being enabled",
+			setup: func() {
+				inflect.ClassicalPersons(true)
+				inflect.ClassicalPersons(false)
+			},
+			want: false,
+		},
+		{
+			name: "independent of ClassicalAncient",
+			setup: func() {
+				inflect.ClassicalAncient(true)
+				inflect.ClassicalPersons(false)
+			},
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Reset all classical flags before each test
+			inflect.ClassicalAll(false)
+			tt.setup()
+			got := inflect.IsClassicalPersons()
+			if got != tt.want {
+				t.Errorf("IsClassicalPersons() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestClassicalPersonsIntegration(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.ClassicalAll(false)
+
+	t.Run("complete workflow", func(t *testing.T) {
+		// 1. Start with default (modern) pluralization
+		inflect.ClassicalAll(false)
+		if got := inflect.Plural("person"); got != "people" {
+			t.Errorf("Default: Plural(person) = %q, want %q", got, "people")
+		}
+		if inflect.IsClassicalPersons() {
+			t.Error("Default: IsClassicalPersons() should be false")
+		}
+
+		// 2. Enable classical persons only
+		inflect.ClassicalPersons(true)
+		if got := inflect.Plural("person"); got != "persons" {
+			t.Errorf("ClassicalPersons: Plural(person) = %q, want %q", got, "persons")
+		}
+		if !inflect.IsClassicalPersons() {
+			t.Error("ClassicalPersons: IsClassicalPersons() should be true")
+		}
+
+		// 3. Verify classical ancient is still false
+		if inflect.IsClassicalAncient() {
+			t.Error("ClassicalPersons only: IsClassicalAncient() should be false")
+		}
+		if got := inflect.Plural("formula"); got != "formulas" {
+			t.Errorf("ClassicalPersons only: Plural(formula) = %q, want %q", got, "formulas")
+		}
+
+		// 4. Enable ClassicalAll
+		inflect.ClassicalAll(true)
+		if got := inflect.Plural("person"); got != "persons" {
+			t.Errorf("ClassicalAll: Plural(person) = %q, want %q", got, "persons")
+		}
+		if got := inflect.Plural("formula"); got != "formulae" {
+			t.Errorf("ClassicalAll: Plural(formula) = %q, want %q", got, "formulae")
+		}
+
+		// 5. Disable persons but keep ancient
+		inflect.ClassicalPersons(false)
+		if got := inflect.Plural("person"); got != "people" {
+			t.Errorf("Persons off, Ancient on: Plural(person) = %q, want %q", got, "people")
+		}
+		if got := inflect.Plural("formula"); got != "formulae" {
+			t.Errorf("Persons off, Ancient on: Plural(formula) = %q, want %q", got, "formulae")
+		}
+
+		// 6. Reset all
+		inflect.ClassicalAll(false)
+		if got := inflect.Plural("person"); got != "people" {
+			t.Errorf("After reset: Plural(person) = %q, want %q", got, "people")
+		}
+		if got := inflect.Plural("formula"); got != "formulas" {
+			t.Errorf("After reset: Plural(formula) = %q, want %q", got, "formulas")
+		}
+	})
+}

@@ -554,6 +554,43 @@ func IsClassicalAncient() bool {
 	return classicalAncient
 }
 
+// ClassicalPersons enables or disables classical person/persons pluralization.
+//
+// This controls the classicalPersons flag independently of other classical
+// options like classicalZero, classicalHerd, classicalNames, and classicalAncient.
+//
+// When enabled (true), Plural() uses "persons" as the plural of "person":
+//   - person -> persons
+//
+// When disabled (false, the default), the irregular plural "people" is used:
+//   - person -> people
+//
+// Examples:
+//
+//	ClassicalPersons(true)
+//	Plural("person") // returns "persons"
+//	ClassicalPersons(false)
+//	Plural("person") // returns "people"
+func ClassicalPersons(enabled bool) {
+	classicalPersons = enabled
+}
+
+// IsClassicalPersons returns whether classical person/persons pluralization is enabled.
+//
+// Returns true if ClassicalPersons(true) or ClassicalAll(true) was called,
+// false otherwise.
+//
+// Examples:
+//
+//	IsClassicalPersons() // returns false (default)
+//	ClassicalPersons(true)
+//	IsClassicalPersons() // returns true
+//	ClassicalPersons(false)
+//	IsClassicalPersons() // returns false
+func IsClassicalPersons() bool {
+	return classicalPersons
+}
+
 // Plural returns the plural form of an English noun.
 //
 // Examples:
@@ -573,6 +610,11 @@ func Plural(word string) string {
 		if plural, ok := classicalLatinPlurals[lower]; ok {
 			return matchCase(word, plural)
 		}
+	}
+
+	// Handle classicalPersons: person -> persons (instead of people)
+	if classicalPersons && lower == "person" {
+		return matchCase(word, "persons")
 	}
 
 	// Check for irregular plurals first
