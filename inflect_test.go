@@ -1354,3 +1354,372 @@ func TestDefNounIntegration(t *testing.T) {
 		}
 	})
 }
+
+func TestDefA(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.DefAReset()
+
+	tests := []struct {
+		name  string
+		word  string
+		input string
+		want  string
+	}{
+		// Force "a" on words that normally take "an"
+		{name: "ape forced a", word: "ape", input: "ape", want: "a ape"},
+		{name: "apple forced a", word: "apple", input: "apple", want: "a apple"},
+		{name: "eagle forced a", word: "eagle", input: "eagle", want: "a eagle"},
+		{name: "hour forced a", word: "hour", input: "hour", want: "a hour"},
+
+		// Case insensitive matching
+		{name: "Ape titlecase", word: "ape", input: "Ape", want: "a Ape"},
+		{name: "APE uppercase", word: "ape", input: "APE", want: "a APE"},
+		{name: "define uppercase match lowercase", word: "APE", input: "ape", want: "a ape"},
+
+		// Multi-word input (match first word)
+		{name: "ape in phrase", word: "ape", input: "ape costume", want: "a ape costume"},
+		{name: "eagle in phrase", word: "eagle", input: "eagle scout", want: "a eagle scout"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.DefAReset()
+			inflect.DefA(tt.word)
+
+			got := inflect.An(tt.input)
+			if got != tt.want {
+				t.Errorf("After DefA(%q): An(%q) = %q, want %q", tt.word, tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDefAn(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.DefAReset()
+
+	tests := []struct {
+		name  string
+		word  string
+		input string
+		want  string
+	}{
+		// Force "an" on words that normally take "a"
+		{name: "hero forced an", word: "hero", input: "hero", want: "an hero"},
+		{name: "historic forced an", word: "historic", input: "historic", want: "an historic"},
+		{name: "unicorn forced an", word: "unicorn", input: "unicorn", want: "an unicorn"},
+		{name: "cat forced an", word: "cat", input: "cat", want: "an cat"},
+
+		// Case insensitive matching
+		{name: "Hero titlecase", word: "hero", input: "Hero", want: "an Hero"},
+		{name: "HERO uppercase", word: "hero", input: "HERO", want: "an HERO"},
+		{name: "define uppercase match lowercase", word: "HERO", input: "hero", want: "an hero"},
+
+		// Multi-word input (match first word)
+		{name: "hero in phrase", word: "hero", input: "hero complex", want: "an hero complex"},
+		{name: "historic in phrase", word: "historic", input: "historic event", want: "an historic event"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.DefAReset()
+			inflect.DefAn(tt.word)
+
+			got := inflect.An(tt.input)
+			if got != tt.want {
+				t.Errorf("After DefAn(%q): An(%q) = %q, want %q", tt.word, tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUndefA(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.DefAReset()
+
+	tests := []struct {
+		name        string
+		setupWord   string
+		undefWord   string
+		wantRemoved bool
+		checkInput  string
+		wantAfter   string
+	}{
+		{
+			name:        "remove custom a rule",
+			setupWord:   "ape",
+			undefWord:   "ape",
+			wantRemoved: true,
+			checkInput:  "ape",
+			wantAfter:   "an ape", // default rule restored
+		},
+		{
+			name:        "remove nonexistent rule",
+			setupWord:   "",
+			undefWord:   "notdefined",
+			wantRemoved: false,
+			checkInput:  "ape",
+			wantAfter:   "an ape",
+		},
+		{
+			name:        "case insensitive removal",
+			setupWord:   "ape",
+			undefWord:   "APE",
+			wantRemoved: true,
+			checkInput:  "ape",
+			wantAfter:   "an ape",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.DefAReset()
+
+			if tt.setupWord != "" {
+				inflect.DefA(tt.setupWord)
+			}
+
+			removed := inflect.UndefA(tt.undefWord)
+			if removed != tt.wantRemoved {
+				t.Errorf("UndefA(%q) = %v, want %v", tt.undefWord, removed, tt.wantRemoved)
+			}
+
+			got := inflect.An(tt.checkInput)
+			if got != tt.wantAfter {
+				t.Errorf("After UndefA: An(%q) = %q, want %q", tt.checkInput, got, tt.wantAfter)
+			}
+		})
+	}
+}
+
+func TestUndefAn(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.DefAReset()
+
+	tests := []struct {
+		name        string
+		setupWord   string
+		undefWord   string
+		wantRemoved bool
+		checkInput  string
+		wantAfter   string
+	}{
+		{
+			name:        "remove custom an rule",
+			setupWord:   "hero",
+			undefWord:   "hero",
+			wantRemoved: true,
+			checkInput:  "hero",
+			wantAfter:   "a hero", // default rule restored
+		},
+		{
+			name:        "remove nonexistent rule",
+			setupWord:   "",
+			undefWord:   "notdefined",
+			wantRemoved: false,
+			checkInput:  "hero",
+			wantAfter:   "a hero",
+		},
+		{
+			name:        "case insensitive removal",
+			setupWord:   "hero",
+			undefWord:   "HERO",
+			wantRemoved: true,
+			checkInput:  "hero",
+			wantAfter:   "a hero",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.DefAReset()
+
+			if tt.setupWord != "" {
+				inflect.DefAn(tt.setupWord)
+			}
+
+			removed := inflect.UndefAn(tt.undefWord)
+			if removed != tt.wantRemoved {
+				t.Errorf("UndefAn(%q) = %v, want %v", tt.undefWord, removed, tt.wantRemoved)
+			}
+
+			got := inflect.An(tt.checkInput)
+			if got != tt.wantAfter {
+				t.Errorf("After UndefAn: An(%q) = %q, want %q", tt.checkInput, got, tt.wantAfter)
+			}
+		})
+	}
+}
+
+func TestDefAReset(t *testing.T) {
+	tests := []struct {
+		name        string
+		customA     []string // words to force "a"
+		customAn    []string // words to force "an"
+		checkInputs map[string]string
+	}{
+		{
+			name:     "reset custom a rules",
+			customA:  []string{"ape", "apple", "eagle"},
+			customAn: nil,
+			checkInputs: map[string]string{
+				"ape":   "an ape",   // restored to default
+				"apple": "an apple", // restored to default
+				"eagle": "an eagle", // restored to default
+				"cat":   "a cat",    // unchanged
+			},
+		},
+		{
+			name:     "reset custom an rules",
+			customA:  nil,
+			customAn: []string{"hero", "cat", "dog"},
+			checkInputs: map[string]string{
+				"hero": "a hero", // restored to default
+				"cat":  "a cat",  // restored to default
+				"dog":  "a dog",  // restored to default
+				"ape":  "an ape", // unchanged
+			},
+		},
+		{
+			name:     "reset mixed custom rules",
+			customA:  []string{"ape", "eagle"},
+			customAn: []string{"hero", "cat"},
+			checkInputs: map[string]string{
+				"ape":   "an ape",   // restored to default
+				"eagle": "an eagle", // restored to default
+				"hero":  "a hero",   // restored to default
+				"cat":   "a cat",    // restored to default
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.DefAReset()
+
+			// Add custom "a" rules
+			for _, word := range tt.customA {
+				inflect.DefA(word)
+			}
+
+			// Add custom "an" rules
+			for _, word := range tt.customAn {
+				inflect.DefAn(word)
+			}
+
+			// Reset
+			inflect.DefAReset()
+
+			// Check results
+			for input, want := range tt.checkInputs {
+				got := inflect.An(input)
+				if got != want {
+					t.Errorf("After reset: An(%q) = %q, want %q", input, got, want)
+				}
+			}
+		})
+	}
+}
+
+func TestDefADefAnPrecedence(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.DefAReset()
+
+	t.Run("DefA takes precedence over DefAn for same word", func(t *testing.T) {
+		inflect.DefAReset()
+
+		// First define as "an"
+		inflect.DefAn("test")
+		if got := inflect.An("test"); got != "an test" {
+			t.Errorf("After DefAn: An(test) = %q, want %q", got, "an test")
+		}
+
+		// Then override with "a"
+		inflect.DefA("test")
+		if got := inflect.An("test"); got != "a test" {
+			t.Errorf("After DefA override: An(test) = %q, want %q", got, "a test")
+		}
+	})
+
+	t.Run("DefAn overrides previous DefA", func(t *testing.T) {
+		inflect.DefAReset()
+
+		// First define as "a"
+		inflect.DefA("test")
+		if got := inflect.An("test"); got != "a test" {
+			t.Errorf("After DefA: An(test) = %q, want %q", got, "a test")
+		}
+
+		// Then override with "an"
+		inflect.DefAn("test")
+		if got := inflect.An("test"); got != "an test" {
+			t.Errorf("After DefAn override: An(test) = %q, want %q", got, "an test")
+		}
+	})
+}
+
+func TestDefAIntegration(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.DefAReset()
+
+	t.Run("complete workflow", func(t *testing.T) {
+		inflect.DefAReset()
+
+		// 1. Verify default behavior
+		if got := inflect.An("ape"); got != "an ape" {
+			t.Errorf("Default: An(ape) = %q, want %q", got, "an ape")
+		}
+		if got := inflect.An("hero"); got != "a hero" {
+			t.Errorf("Default: An(hero) = %q, want %q", got, "a hero")
+		}
+
+		// 2. Add custom "a" rule
+		inflect.DefA("ape")
+		if got := inflect.An("ape"); got != "a ape" {
+			t.Errorf("After DefA: An(ape) = %q, want %q", got, "a ape")
+		}
+
+		// 3. Add custom "an" rule
+		inflect.DefAn("hero")
+		if got := inflect.An("hero"); got != "an hero" {
+			t.Errorf("After DefAn: An(hero) = %q, want %q", got, "an hero")
+		}
+
+		// 4. Remove custom "a" rule
+		if removed := inflect.UndefA("ape"); !removed {
+			t.Error("UndefA(ape) should return true")
+		}
+		if got := inflect.An("ape"); got != "an ape" {
+			t.Errorf("After UndefA: An(ape) = %q, want %q", got, "an ape")
+		}
+
+		// 5. Remove custom "an" rule
+		if removed := inflect.UndefAn("hero"); !removed {
+			t.Error("UndefAn(hero) should return true")
+		}
+		if got := inflect.An("hero"); got != "a hero" {
+			t.Errorf("After UndefAn: An(hero) = %q, want %q", got, "a hero")
+		}
+
+		// 6. Add multiple rules and reset
+		inflect.DefA("ape")
+		inflect.DefA("eagle")
+		inflect.DefAn("hero")
+		inflect.DefAn("cat")
+
+		inflect.DefAReset()
+
+		if got := inflect.An("ape"); got != "an ape" {
+			t.Errorf("After reset: An(ape) = %q, want %q", got, "an ape")
+		}
+		if got := inflect.An("eagle"); got != "an eagle" {
+			t.Errorf("After reset: An(eagle) = %q, want %q", got, "an eagle")
+		}
+		if got := inflect.An("hero"); got != "a hero" {
+			t.Errorf("After reset: An(hero) = %q, want %q", got, "a hero")
+		}
+		if got := inflect.An("cat"); got != "a cat" {
+			t.Errorf("After reset: An(cat) = %q, want %q", got, "a cat")
+		}
+	})
+}

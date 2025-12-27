@@ -12,6 +12,14 @@ import (
 	"unicode"
 )
 
+// customAWords stores words that should be forced to use "a" instead of "an".
+// The keys are lowercase versions of the words/patterns.
+var customAWords = make(map[string]bool)
+
+// customAnWords stores words that should be forced to use "an" instead of "a".
+// The keys are lowercase versions of the words/patterns.
+var customAnWords = make(map[string]bool)
+
 // An returns the word prefixed with the appropriate indefinite article ("a" or "an").
 //
 // The selection follows standard English rules:
@@ -22,11 +30,28 @@ import (
 //   - Silent 'h': "an honest person"
 //   - Vowels with consonant sounds: "a Ukrainian", "a unanimous decision"
 //   - Abbreviations: "a YAML file", "a JSON object"
+//
+// Custom patterns defined via DefA() and DefAn() take precedence over default rules.
 func An(word string) string {
 	if word == "" {
 		return ""
 	}
 
+	// Get the first word for pattern matching
+	firstWord := strings.Fields(word)[0]
+	lowerFirst := strings.ToLower(firstWord)
+
+	// Check custom "a" patterns first (highest priority)
+	if customAWords[lowerFirst] {
+		return "a " + word
+	}
+
+	// Check custom "an" patterns second
+	if customAnWords[lowerFirst] {
+		return "an " + word
+	}
+
+	// Fall back to default rules
 	if needsAn(word) {
 		return "an " + word
 	}
@@ -157,6 +182,94 @@ func isVowelSound(r rune) bool {
 // A is an alias for An - returns word prefixed with appropriate indefinite article.
 func A(word string) string {
 	return An(word)
+}
+
+// DefA defines a custom pattern that forces "a" instead of "an" for a word.
+//
+// The pattern is matched against the first word of the input (case-insensitive).
+// Custom "a" patterns take precedence over custom "an" patterns and default rules.
+//
+// Examples:
+//
+//	DefA("ape")
+//	An("ape") // returns "a ape" instead of "an ape"
+//	An("Ape") // returns "a Ape" (case-insensitive matching)
+func DefA(word string) {
+	lower := strings.ToLower(word)
+	customAWords[lower] = true
+	// Remove from customAnWords if present to avoid conflicts
+	delete(customAnWords, lower)
+}
+
+// DefAn defines a custom pattern that forces "an" instead of "a" for a word.
+//
+// The pattern is matched against the first word of the input (case-insensitive).
+// Custom "an" patterns take precedence over default rules but not custom "a" patterns.
+//
+// Examples:
+//
+//	DefAn("hero")
+//	An("hero") // returns "an hero" instead of "a hero"
+//	An("Hero") // returns "an Hero" (case-insensitive matching)
+func DefAn(word string) {
+	lower := strings.ToLower(word)
+	customAnWords[lower] = true
+	// Remove from customAWords if present to avoid conflicts
+	delete(customAWords, lower)
+}
+
+// UndefA removes a custom "a" pattern.
+//
+// Returns true if the pattern was removed, false if it didn't exist.
+//
+// Examples:
+//
+//	DefA("ape")
+//	An("ape") // returns "a ape"
+//	UndefA("ape")
+//	An("ape") // returns "an ape" (default rule)
+func UndefA(word string) bool {
+	lower := strings.ToLower(word)
+	if customAWords[lower] {
+		delete(customAWords, lower)
+		return true
+	}
+	return false
+}
+
+// UndefAn removes a custom "an" pattern.
+//
+// Returns true if the pattern was removed, false if it didn't exist.
+//
+// Examples:
+//
+//	DefAn("hero")
+//	An("hero") // returns "an hero"
+//	UndefAn("hero")
+//	An("hero") // returns "a hero" (default rule)
+func UndefAn(word string) bool {
+	lower := strings.ToLower(word)
+	if customAnWords[lower] {
+		delete(customAnWords, lower)
+		return true
+	}
+	return false
+}
+
+// DefAReset resets all custom a/an patterns to defaults (empty).
+//
+// This removes all custom patterns added via DefA() and DefAn().
+//
+// Example:
+//
+//	DefA("ape")
+//	DefAn("hero")
+//	DefAReset()
+//	An("ape")  // returns "an ape" (default rule)
+//	An("hero") // returns "a hero" (default rule)
+func DefAReset() {
+	customAWords = make(map[string]bool)
+	customAnWords = make(map[string]bool)
 }
 
 // Plural returns the plural form of an English noun.
