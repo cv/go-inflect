@@ -2539,3 +2539,198 @@ func BenchmarkCompare(b *testing.B) {
 		})
 	}
 }
+
+func TestClassicalAll(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.ClassicalAll(false)
+
+	tests := []struct {
+		name    string
+		enabled bool
+		word    string
+		want    string
+	}{
+		// Classical mode enabled - Latin/Greek plurals
+		{name: "formula classical", enabled: true, word: "formula", want: "formulae"},
+		{name: "antenna classical", enabled: true, word: "antenna", want: "antennae"},
+		{name: "vertebra classical", enabled: true, word: "vertebra", want: "vertebrae"},
+		{name: "alumna classical", enabled: true, word: "alumna", want: "alumnae"},
+		{name: "larva classical", enabled: true, word: "larva", want: "larvae"},
+		{name: "nebula classical", enabled: true, word: "nebula", want: "nebulae"},
+		{name: "nova classical", enabled: true, word: "nova", want: "novae"},
+		{name: "supernova classical", enabled: true, word: "supernova", want: "supernovae"},
+		{name: "octopus classical", enabled: true, word: "octopus", want: "octopodes"},
+		{name: "opus classical", enabled: true, word: "opus", want: "opera"},
+		{name: "corpus classical", enabled: true, word: "corpus", want: "corpora"},
+		{name: "genus classical", enabled: true, word: "genus", want: "genera"},
+
+		// Classical mode disabled - modern English plurals
+		{name: "formula modern", enabled: false, word: "formula", want: "formulas"},
+		{name: "antenna modern", enabled: false, word: "antenna", want: "antennas"},
+		{name: "vertebra modern", enabled: false, word: "vertebra", want: "vertebras"},
+		{name: "alumna modern", enabled: false, word: "alumna", want: "alumnas"},
+		{name: "larva modern", enabled: false, word: "larva", want: "larvas"},
+		{name: "nebula modern", enabled: false, word: "nebula", want: "nebulas"},
+		{name: "nova modern", enabled: false, word: "nova", want: "novas"},
+
+		// Regular words should not be affected
+		{name: "cat classical", enabled: true, word: "cat", want: "cats"},
+		{name: "cat modern", enabled: false, word: "cat", want: "cats"},
+		{name: "box classical", enabled: true, word: "box", want: "boxes"},
+		{name: "box modern", enabled: false, word: "box", want: "boxes"},
+
+		// Irregular plurals should still work
+		{name: "child classical", enabled: true, word: "child", want: "children"},
+		{name: "child modern", enabled: false, word: "child", want: "children"},
+		{name: "mouse classical", enabled: true, word: "mouse", want: "mice"},
+		{name: "mouse modern", enabled: false, word: "mouse", want: "mice"},
+
+		// Case preservation
+		{name: "Formula titlecase classical", enabled: true, word: "Formula", want: "Formulae"},
+		{name: "FORMULA uppercase classical", enabled: true, word: "FORMULA", want: "FORMULAE"},
+		{name: "Formula titlecase modern", enabled: false, word: "Formula", want: "Formulas"},
+		{name: "FORMULA uppercase modern", enabled: false, word: "FORMULA", want: "FORMULAS"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.ClassicalAll(tt.enabled)
+			got := inflect.Plural(tt.word)
+			if got != tt.want {
+				t.Errorf("ClassicalAll(%v): Plural(%q) = %q, want %q", tt.enabled, tt.word, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestClassicalAliasForClassicalAll(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.ClassicalAll(false)
+
+	// Verify Classical() is an alias for ClassicalAll()
+	tests := []struct {
+		name    string
+		enabled bool
+		word    string
+		want    string
+	}{
+		{name: "formula classical via Classical()", enabled: true, word: "formula", want: "formulae"},
+		{name: "formula modern via Classical()", enabled: false, word: "formula", want: "formulas"},
+		{name: "antenna classical via Classical()", enabled: true, word: "antenna", want: "antennae"},
+		{name: "antenna modern via Classical()", enabled: false, word: "antenna", want: "antennas"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.Classical(tt.enabled) // Use Classical(), not ClassicalAll()
+			got := inflect.Plural(tt.word)
+			if got != tt.want {
+				t.Errorf("Classical(%v): Plural(%q) = %q, want %q", tt.enabled, tt.word, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsClassicalAll(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.ClassicalAll(false)
+
+	tests := []struct {
+		name  string
+		setup func()
+		want  bool
+	}{
+		{
+			name:  "default is false",
+			setup: func() { inflect.ClassicalAll(false) },
+			want:  false,
+		},
+		{
+			name:  "enabled via ClassicalAll",
+			setup: func() { inflect.ClassicalAll(true) },
+			want:  true,
+		},
+		{
+			name:  "enabled via Classical alias",
+			setup: func() { inflect.Classical(true) },
+			want:  true,
+		},
+		{
+			name: "disabled after being enabled",
+			setup: func() {
+				inflect.ClassicalAll(true)
+				inflect.ClassicalAll(false)
+			},
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setup()
+			got := inflect.IsClassicalAll()
+			if got != tt.want {
+				t.Errorf("IsClassicalAll() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestClassicalAllIntegration(t *testing.T) {
+	// Reset to defaults after this test
+	defer inflect.ClassicalAll(false)
+
+	t.Run("complete workflow", func(t *testing.T) {
+		// 1. Start with default (modern) pluralization
+		inflect.ClassicalAll(false)
+		if got := inflect.Plural("formula"); got != "formulas" {
+			t.Errorf("Default: Plural(formula) = %q, want %q", got, "formulas")
+		}
+		if inflect.IsClassicalAll() {
+			t.Error("Default: IsClassicalAll() should be false")
+		}
+		if inflect.IsClassical() {
+			t.Error("Default: IsClassical() should be false")
+		}
+
+		// 2. Enable classical mode
+		inflect.ClassicalAll(true)
+		if got := inflect.Plural("formula"); got != "formulae" {
+			t.Errorf("Classical: Plural(formula) = %q, want %q", got, "formulae")
+		}
+		if !inflect.IsClassicalAll() {
+			t.Error("Classical: IsClassicalAll() should be true")
+		}
+		if !inflect.IsClassical() {
+			t.Error("Classical: IsClassical() should be true")
+		}
+
+		// 3. Verify regular words still work
+		if got := inflect.Plural("cat"); got != "cats" {
+			t.Errorf("Classical: Plural(cat) = %q, want %q", got, "cats")
+		}
+
+		// 4. Verify irregular words still work
+		if got := inflect.Plural("child"); got != "children" {
+			t.Errorf("Classical: Plural(child) = %q, want %q", got, "children")
+		}
+
+		// 5. Disable classical mode
+		inflect.ClassicalAll(false)
+		if got := inflect.Plural("formula"); got != "formulas" {
+			t.Errorf("After disable: Plural(formula) = %q, want %q", got, "formulas")
+		}
+		if inflect.IsClassicalAll() {
+			t.Error("After disable: IsClassicalAll() should be false")
+		}
+
+		// 6. Use Classical() alias
+		inflect.Classical(true)
+		if got := inflect.Plural("antenna"); got != "antennae" {
+			t.Errorf("Via alias: Plural(antenna) = %q, want %q", got, "antennae")
+		}
+		if !inflect.IsClassicalAll() {
+			t.Error("Via alias: IsClassicalAll() should be true")
+		}
+	})
+}
