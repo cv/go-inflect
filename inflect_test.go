@@ -2309,3 +2309,227 @@ func TestClassicalIntegration(t *testing.T) {
 		}
 	})
 }
+
+// =============================================================================
+// Benchmarks
+// =============================================================================
+
+func BenchmarkPlural(b *testing.B) {
+	// Test with representative inputs covering different pluralization rules
+	benchmarks := []struct {
+		name  string
+		input string
+	}{
+		{"regular", "cat"},        // Simple: add -s
+		{"sibilant", "box"},       // Add -es (ends in x)
+		{"consonant_y", "city"},   // Change y to ies
+		{"irregular", "child"},    // Irregular: children
+		{"latin", "analysis"},     // Latin: -is to -es
+		{"unchanged", "sheep"},    // Unchanged plural
+		{"f_to_ves", "knife"},     // f/fe to ves
+		{"man_to_men", "fireman"}, // -man to -men
+		{"o_adds_es", "hero"},     // consonant + o adds -es
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				inflect.Plural(bm.input)
+			}
+		})
+	}
+}
+
+func BenchmarkSingular(b *testing.B) {
+	// Test with representative inputs covering different singularization rules
+	benchmarks := []struct {
+		name  string
+		input string
+	}{
+		{"regular", "cats"},       // Simple: remove -s
+		{"sibilant", "boxes"},     // Remove -es
+		{"ies_to_y", "cities"},    // Change ies to y
+		{"irregular", "children"}, // Irregular: child
+		{"latin", "analyses"},     // Latin: -es to -is
+		{"unchanged", "sheep"},    // Unchanged
+		{"ves_to_f", "knives"},    // ves to f/fe
+		{"men_to_man", "firemen"}, // -men to -man
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				inflect.Singular(bm.input)
+			}
+		})
+	}
+}
+
+func BenchmarkAn(b *testing.B) {
+	// Test with inputs covering different article selection rules
+	benchmarks := []struct {
+		name  string
+		input string
+	}{
+		{"consonant", "cat"},           // a cat
+		{"vowel", "apple"},             // an apple
+		{"silent_h", "honest person"},  // an honest
+		{"consonant_u", "university"},  // a university (y sound)
+		{"abbreviation", "FBI agent"},  // an FBI
+		{"phrase", "elegant solution"}, // an elegant
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				inflect.An(bm.input)
+			}
+		})
+	}
+}
+
+func BenchmarkOrdinal(b *testing.B) {
+	// Test with numbers covering different ordinal suffix rules
+	benchmarks := []struct {
+		name  string
+		input int
+	}{
+		{"first", 1},         // 1st
+		{"second", 2},        // 2nd
+		{"third", 3},         // 3rd
+		{"fourth", 4},        // 4th
+		{"eleventh", 11},     // 11th (special teen)
+		{"twenty_first", 21}, // 21st
+		{"hundredth", 100},   // 100th
+		{"large", 12345},     // 12345th
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				inflect.Ordinal(bm.input)
+			}
+		})
+	}
+}
+
+func BenchmarkOrdinalWord(b *testing.B) {
+	// Test with numbers of varying complexity
+	benchmarks := []struct {
+		name  string
+		input int
+	}{
+		{"first", 1},         // first
+		{"twelfth", 12},      // twelfth
+		{"twenty_first", 21}, // twenty-first
+		{"hundredth", 100},   // one hundredth
+		{"thousand", 1000},   // one thousandth
+		{"complex", 12345},   // complex ordinal word
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				inflect.OrdinalWord(bm.input)
+			}
+		})
+	}
+}
+
+func BenchmarkNumberToWords(b *testing.B) {
+	// Test with numbers of varying magnitudes
+	benchmarks := []struct {
+		name  string
+		input int
+	}{
+		{"zero", 0},
+		{"single_digit", 7},
+		{"teen", 15},
+		{"two_digit", 42},
+		{"hundred", 123},
+		{"thousand", 1234},
+		{"million", 1234567},
+		{"billion", 1234567890},
+		{"negative", -42},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				inflect.NumberToWords(bm.input)
+			}
+		})
+	}
+}
+
+func BenchmarkJoin(b *testing.B) {
+	// Test with slices of varying lengths
+	benchmarks := []struct {
+		name  string
+		input []string
+	}{
+		{"empty", []string{}},
+		{"single", []string{"apple"}},
+		{"two", []string{"apple", "banana"}},
+		{"three", []string{"apple", "banana", "cherry"}},
+		{"five", []string{"one", "two", "three", "four", "five"}},
+		{"ten", []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				inflect.Join(bm.input)
+			}
+		})
+	}
+}
+
+func BenchmarkPresentParticiple(b *testing.B) {
+	// Test with verbs covering different transformation rules
+	benchmarks := []struct {
+		name  string
+		input string
+	}{
+		{"add_ing", "play"},         // playing (just add -ing)
+		{"double_consonant", "run"}, // running (double final consonant)
+		{"drop_e", "make"},          // making (drop silent e)
+		{"ie_to_y", "die"},          // dying (ie -> y)
+		{"ee_keep", "see"},          // seeing (keep ee)
+		{"add_k", "panic"},          // panicking (add k before -ing)
+		{"already_ing", "sing"},     // singing
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				inflect.PresentParticiple(bm.input)
+			}
+		})
+	}
+}
+
+func BenchmarkCompare(b *testing.B) {
+	// Test with different comparison scenarios
+	benchmarks := []struct {
+		name  string
+		word1 string
+		word2 string
+	}{
+		{"equal", "cat", "cat"},
+		{"singular_to_plural", "cat", "cats"},
+		{"plural_to_singular", "cats", "cat"},
+		{"irregular_s_to_p", "child", "children"},
+		{"irregular_p_to_s", "mice", "mouse"},
+		{"unrelated", "cat", "dog"},
+		{"unchanged", "sheep", "sheep"},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				inflect.Compare(bm.word1, bm.word2)
+			}
+		})
+	}
+}
