@@ -206,3 +206,197 @@ func BenchmarkOrdinalWord(b *testing.B) {
 		})
 	}
 }
+
+func TestOrdinalSuffix(t *testing.T) {
+	tests := []struct {
+		name  string
+		input int
+		want  string
+	}{
+		// Basic suffixes
+		{name: "1 -> st", input: 1, want: "st"},
+		{name: "2 -> nd", input: 2, want: "nd"},
+		{name: "3 -> rd", input: 3, want: "rd"},
+		{name: "4 -> th", input: 4, want: "th"},
+		{name: "5 -> th", input: 5, want: "th"},
+		{name: "9 -> th", input: 9, want: "th"},
+		{name: "10 -> th", input: 10, want: "th"},
+
+		// Special teens (11, 12, 13 always use "th")
+		{name: "11 -> th", input: 11, want: "th"},
+		{name: "12 -> th", input: 12, want: "th"},
+		{name: "13 -> th", input: 13, want: "th"},
+		{name: "14 -> th", input: 14, want: "th"},
+
+		// 21, 22, 23 follow regular rules
+		{name: "21 -> st", input: 21, want: "st"},
+		{name: "22 -> nd", input: 22, want: "nd"},
+		{name: "23 -> rd", input: 23, want: "rd"},
+		{name: "24 -> th", input: 24, want: "th"},
+
+		// 111, 112, 113 use "th" (like 11, 12, 13)
+		{name: "111 -> th", input: 111, want: "th"},
+		{name: "112 -> th", input: 112, want: "th"},
+		{name: "113 -> th", input: 113, want: "th"},
+
+		// 121, 122, 123 follow regular rules
+		{name: "121 -> st", input: 121, want: "st"},
+		{name: "122 -> nd", input: 122, want: "nd"},
+		{name: "123 -> rd", input: 123, want: "rd"},
+
+		// Zero
+		{name: "0 -> th", input: 0, want: "th"},
+
+		// Negative numbers (use absolute value for suffix)
+		{name: "-1 -> st", input: -1, want: "st"},
+		{name: "-2 -> nd", input: -2, want: "nd"},
+		{name: "-11 -> th", input: -11, want: "th"},
+		{name: "-21 -> st", input: -21, want: "st"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.OrdinalSuffix(tt.input)
+			if got != tt.want {
+				t.Errorf("OrdinalSuffix(%d) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsOrdinal(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  bool
+	}{
+		// Numeric ordinals
+		{name: "1st is ordinal", input: "1st", want: true},
+		{name: "2nd is ordinal", input: "2nd", want: true},
+		{name: "3rd is ordinal", input: "3rd", want: true},
+		{name: "4th is ordinal", input: "4th", want: true},
+		{name: "11th is ordinal", input: "11th", want: true},
+		{name: "21st is ordinal", input: "21st", want: true},
+		{name: "100th is ordinal", input: "100th", want: true},
+
+		// Word ordinals
+		{name: "first is ordinal", input: "first", want: true},
+		{name: "second is ordinal", input: "second", want: true},
+		{name: "third is ordinal", input: "third", want: true},
+		{name: "fourth is ordinal", input: "fourth", want: true},
+		{name: "fifth is ordinal", input: "fifth", want: true},
+		{name: "eleventh is ordinal", input: "eleventh", want: true},
+		{name: "twelfth is ordinal", input: "twelfth", want: true},
+		{name: "twentieth is ordinal", input: "twentieth", want: true},
+		{name: "twenty-first is ordinal", input: "twenty-first", want: true},
+		{name: "zeroth is ordinal", input: "zeroth", want: true},
+
+		// Case variations
+		{name: "First is ordinal", input: "First", want: true},
+		{name: "SECOND is ordinal", input: "SECOND", want: true},
+		{name: "Twenty-First is ordinal", input: "Twenty-First", want: true},
+
+		// Not ordinals
+		{name: "1 is not ordinal", input: "1", want: false},
+		{name: "one is not ordinal", input: "one", want: false},
+		{name: "two is not ordinal", input: "two", want: false},
+		{name: "twenty is not ordinal", input: "twenty", want: false},
+		{name: "twenty-one is not ordinal", input: "twenty-one", want: false},
+		{name: "hundred is not ordinal", input: "hundred", want: false},
+		{name: "cat is not ordinal", input: "cat", want: false},
+		{name: "empty is not ordinal", input: "", want: false},
+
+		// Edge cases - words that end in ordinal-like suffixes but aren't
+		{name: "north is not ordinal", input: "north", want: false},
+		{name: "month is not ordinal", input: "month", want: false},
+		{name: "earth is not ordinal", input: "earth", want: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.IsOrdinal(tt.input)
+			if got != tt.want {
+				t.Errorf("IsOrdinal(%q) = %v, want %v", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestOrdinalToCardinal(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		// Numeric ordinals to numbers
+		{name: "1st -> 1", input: "1st", want: "1"},
+		{name: "2nd -> 2", input: "2nd", want: "2"},
+		{name: "3rd -> 3", input: "3rd", want: "3"},
+		{name: "4th -> 4", input: "4th", want: "4"},
+		{name: "11th -> 11", input: "11th", want: "11"},
+		{name: "21st -> 21", input: "21st", want: "21"},
+		{name: "100th -> 100", input: "100th", want: "100"},
+		{name: "1000th -> 1000", input: "1000th", want: "1000"},
+
+		// Word ordinals to cardinal words
+		{name: "first -> one", input: "first", want: "one"},
+		{name: "second -> two", input: "second", want: "two"},
+		{name: "third -> three", input: "third", want: "three"},
+		{name: "fourth -> four", input: "fourth", want: "four"},
+		{name: "fifth -> five", input: "fifth", want: "five"},
+		{name: "sixth -> six", input: "sixth", want: "six"},
+		{name: "seventh -> seven", input: "seventh", want: "seven"},
+		{name: "eighth -> eight", input: "eighth", want: "eight"},
+		{name: "ninth -> nine", input: "ninth", want: "nine"},
+		{name: "tenth -> ten", input: "tenth", want: "ten"},
+		{name: "eleventh -> eleven", input: "eleventh", want: "eleven"},
+		{name: "twelfth -> twelve", input: "twelfth", want: "twelve"},
+		{name: "twentieth -> twenty", input: "twentieth", want: "twenty"},
+		{name: "twenty-first -> twenty-one", input: "twenty-first", want: "twenty-one"},
+		{name: "zeroth -> zero", input: "zeroth", want: "zero"},
+
+		// Case preservation
+		{name: "First -> One", input: "First", want: "One"},
+		{name: "SECOND -> TWO", input: "SECOND", want: "TWO"},
+		{name: "Twenty-First -> Twenty-One", input: "Twenty-First", want: "Twenty-One"},
+
+		// Not ordinals - return unchanged
+		{name: "one unchanged", input: "one", want: "one"},
+		{name: "twenty unchanged", input: "twenty", want: "twenty"},
+		{name: "cat unchanged", input: "cat", want: "cat"},
+		{name: "42 unchanged", input: "42", want: "42"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.OrdinalToCardinal(tt.input)
+			if got != tt.want {
+				t.Errorf("OrdinalToCardinal(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func BenchmarkOrdinalSuffix(b *testing.B) {
+	inputs := []int{1, 2, 3, 11, 12, 13, 21, 22, 23, 100, 111, 121}
+	b.ResetTimer()
+	for i := range b.N {
+		inflect.OrdinalSuffix(inputs[i%len(inputs)])
+	}
+}
+
+func BenchmarkIsOrdinal(b *testing.B) {
+	inputs := []string{"1st", "first", "twenty-first", "one", "cat"}
+	b.ResetTimer()
+	for i := range b.N {
+		inflect.IsOrdinal(inputs[i%len(inputs)])
+	}
+}
+
+func BenchmarkOrdinalToCardinal(b *testing.B) {
+	inputs := []string{"1st", "first", "twenty-first", "SECOND"}
+	b.ResetTimer()
+	for i := range b.N {
+		inflect.OrdinalToCardinal(inputs[i%len(inputs)])
+	}
+}

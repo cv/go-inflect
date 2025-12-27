@@ -317,6 +317,26 @@ inflect.WordToOrdinal("TWENTY")      // "TWENTIETH"
 // Numeric strings also work
 inflect.WordToOrdinal("1")    // "1st"
 inflect.WordToOrdinal("21")   // "21st"
+
+// Get just the ordinal suffix
+inflect.OrdinalSuffix(1)   // "st"
+inflect.OrdinalSuffix(2)   // "nd"
+inflect.OrdinalSuffix(3)   // "rd"
+inflect.OrdinalSuffix(11)  // "th" (teens are special)
+inflect.OrdinalSuffix(21)  // "st"
+
+// Check if a string is an ordinal
+inflect.IsOrdinal("1st")          // true
+inflect.IsOrdinal("first")        // true
+inflect.IsOrdinal("twenty-first") // true
+inflect.IsOrdinal("one")          // false
+inflect.IsOrdinal("42")           // false
+
+// Convert ordinals back to cardinals
+inflect.OrdinalToCardinal("1st")          // "1"
+inflect.OrdinalToCardinal("first")        // "one"
+inflect.OrdinalToCardinal("twenty-first") // "twenty-one"
+inflect.OrdinalToCardinal("First")        // "One" (preserves case)
 ```
 
 ### Number to Words
@@ -472,7 +492,10 @@ inflect.CompareNouns("dog", "dogs") // "s:p"
 |----------|-------------|
 | `Ordinal(n int) string` | Returns numeric ordinal (1st, 2nd, 3rd, ...) |
 | `OrdinalWord(n int) string` | Returns ordinal as word (first, second, ...) |
+| `OrdinalSuffix(n int) string` | Returns just the ordinal suffix (st, nd, rd, th) |
 | `WordToOrdinal(s string) string` | Converts word/numeric string to ordinal |
+| `IsOrdinal(s string) bool` | Checks if a string is an ordinal |
+| `OrdinalToCardinal(s string) string` | Converts ordinal to cardinal (first → one) |
 | `NumberToWords(n int) string` | Converts integer to English words |
 | `NumberToWordsWithAnd(n int) string` | Converts integer to words (British style with "and") |
 

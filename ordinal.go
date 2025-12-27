@@ -21,8 +21,19 @@ func Ordinal(n int) string {
 	return fmt.Sprintf("%d%s", n, suffix)
 }
 
-// ordinalSuffix returns the ordinal suffix for a number.
-func ordinalSuffix(n int) string {
+// OrdinalSuffix returns the ordinal suffix for a number ("st", "nd", "rd", or "th").
+//
+// This is useful when you need just the suffix without the number.
+//
+// Examples:
+//   - OrdinalSuffix(1) returns "st"
+//   - OrdinalSuffix(2) returns "nd"
+//   - OrdinalSuffix(3) returns "rd"
+//   - OrdinalSuffix(4) returns "th"
+//   - OrdinalSuffix(11) returns "th" (special case for teens)
+//   - OrdinalSuffix(21) returns "st"
+//   - OrdinalSuffix(-1) returns "st" (uses absolute value)
+func OrdinalSuffix(n int) string {
 	// Handle negative numbers by using absolute value
 	if n < 0 {
 		n = -n
@@ -46,6 +57,11 @@ func ordinalSuffix(n int) string {
 	default:
 		return "th"
 	}
+}
+
+// ordinalSuffix is an alias for OrdinalSuffix for internal use.
+func ordinalSuffix(n int) string {
+	return OrdinalSuffix(n)
 }
 
 // OrdinalWord converts an integer to its ordinal word representation.
@@ -291,4 +307,146 @@ func toTitleCase(s string) string {
 	}
 
 	return string(runes)
+}
+
+// ordinalToCardinal maps ordinal word forms to cardinal word forms.
+var ordinalToCardinalMap = map[string]string{
+	"zeroth":      "zero",
+	"first":       "one",
+	"second":      "two",
+	"third":       "three",
+	"fourth":      "four",
+	"fifth":       "five",
+	"sixth":       "six",
+	"seventh":     "seven",
+	"eighth":      "eight",
+	"ninth":       "nine",
+	"tenth":       "ten",
+	"eleventh":    "eleven",
+	"twelfth":     "twelve",
+	"thirteenth":  "thirteen",
+	"fourteenth":  "fourteen",
+	"fifteenth":   "fifteen",
+	"sixteenth":   "sixteen",
+	"seventeenth": "seventeen",
+	"eighteenth":  "eighteen",
+	"nineteenth":  "nineteen",
+	"twentieth":   "twenty",
+	"thirtieth":   "thirty",
+	"fortieth":    "forty",
+	"fiftieth":    "fifty",
+	"sixtieth":    "sixty",
+	"seventieth":  "seventy",
+	"eightieth":   "eighty",
+	"ninetieth":   "ninety",
+}
+
+// ordinalWords is a set of valid ordinal words for fast lookup.
+var ordinalWords = map[string]bool{
+	"zeroth": true, "first": true, "second": true, "third": true,
+	"fourth": true, "fifth": true, "sixth": true, "seventh": true,
+	"eighth": true, "ninth": true, "tenth": true, "eleventh": true,
+	"twelfth": true, "thirteenth": true, "fourteenth": true, "fifteenth": true,
+	"sixteenth": true, "seventeenth": true, "eighteenth": true, "nineteenth": true,
+	"twentieth": true, "thirtieth": true, "fortieth": true, "fiftieth": true,
+	"sixtieth": true, "seventieth": true, "eightieth": true, "ninetieth": true,
+}
+
+// IsOrdinal checks if a string is an ordinal (either numeric like "1st" or word like "first").
+//
+// Examples:
+//   - IsOrdinal("1st") returns true
+//   - IsOrdinal("first") returns true
+//   - IsOrdinal("twenty-first") returns true
+//   - IsOrdinal("1") returns false
+//   - IsOrdinal("one") returns false
+//   - IsOrdinal("cat") returns false
+func IsOrdinal(s string) bool {
+	if s == "" {
+		return false
+	}
+
+	// Check for numeric ordinals (e.g., "1st", "2nd", "3rd", "4th")
+	if len(s) >= 3 {
+		suffix := strings.ToLower(s[len(s)-2:])
+		prefix := s[:len(s)-2]
+		if (suffix == "st" || suffix == "nd" || suffix == "rd" || suffix == "th") && prefix != "" {
+			// Check if prefix is a valid number
+			if _, err := strconv.Atoi(prefix); err == nil {
+				return true
+			}
+		}
+	}
+
+	// Check for word ordinals
+	lower := strings.ToLower(s)
+
+	// Check for compound ordinals (e.g., "twenty-first")
+	if idx := strings.LastIndex(lower, "-"); idx >= 0 {
+		suffix := lower[idx+1:]
+		return ordinalWords[suffix]
+	}
+
+	// Check for simple ordinal words
+	return ordinalWords[lower]
+}
+
+// OrdinalToCardinal converts an ordinal to its cardinal form.
+//
+// If the input is a numeric ordinal (e.g., "1st"), it returns the number (e.g., "1").
+// If the input is a word ordinal (e.g., "first"), it returns the cardinal word (e.g., "one").
+// If the input is not an ordinal, it is returned unchanged.
+//
+// The function preserves the case pattern of the input:
+//   - "first" → "one"
+//   - "First" → "One"
+//   - "FIRST" → "ONE"
+//   - "Twenty-First" → "Twenty-One"
+//
+// Examples:
+//   - OrdinalToCardinal("1st") returns "1"
+//   - OrdinalToCardinal("first") returns "one"
+//   - OrdinalToCardinal("twenty-first") returns "twenty-one"
+//   - OrdinalToCardinal("one") returns "one" (unchanged, not an ordinal)
+func OrdinalToCardinal(s string) string {
+	if s == "" {
+		return s
+	}
+
+	// Check for numeric ordinals (e.g., "1st", "2nd", "3rd", "4th")
+	if len(s) >= 3 {
+		suffix := strings.ToLower(s[len(s)-2:])
+		prefix := s[:len(s)-2]
+		if (suffix == "st" || suffix == "nd" || suffix == "rd" || suffix == "th") && prefix != "" {
+			// Check if prefix is a valid number
+			if _, err := strconv.Atoi(prefix); err == nil {
+				return prefix
+			}
+		}
+	}
+
+	// Detect case pattern
+	casePattern := detectCase(s)
+
+	// Convert to lowercase for lookup
+	lower := strings.ToLower(s)
+
+	// Check for compound ordinals (e.g., "twenty-first" → "twenty-one")
+	if idx := strings.LastIndex(lower, "-"); idx >= 0 {
+		prefix := lower[:idx]
+		suffix := lower[idx+1:]
+
+		if cardinal, ok := ordinalToCardinalMap[suffix]; ok {
+			result := prefix + "-" + cardinal
+			return applyCase(result, casePattern)
+		}
+	}
+
+	// Check for simple ordinal words
+	if cardinal, ok := ordinalToCardinalMap[lower]; ok {
+		return applyCase(cardinal, casePattern)
+	}
+
+	// Not an ordinal, return unchanged
+	return s
 }
