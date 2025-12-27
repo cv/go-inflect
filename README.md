@@ -440,6 +440,37 @@ inflect.PresentParticiple("panic")  // "panicking"
 inflect.PresentParticiple("picnic") // "picnicking"
 ```
 
+### Past Participle
+
+Convert verbs to their past participle form.
+
+```go
+// Regular verbs (-ed)
+inflect.PastParticiple("walk")    // "walked"
+inflect.PastParticiple("play")    // "played"
+inflect.PastParticiple("stop")    // "stopped" (double consonant)
+inflect.PastParticiple("try")     // "tried" (y -> ied)
+inflect.PastParticiple("like")    // "liked" (just add -d)
+
+// Irregular verbs
+inflect.PastParticiple("go")      // "gone"
+inflect.PastParticiple("take")    // "taken"
+inflect.PastParticiple("run")     // "run" (unchanged)
+inflect.PastParticiple("write")   // "written"
+inflect.PastParticiple("think")   // "thought"
+inflect.PastParticiple("buy")     // "bought"
+
+// Case preservation
+inflect.PastParticiple("Go")      // "Gone"
+inflect.PastParticiple("WALK")    // "WALKED"
+
+// Check if a word is a participle
+inflect.IsParticiple("running")   // true (present participle)
+inflect.IsParticiple("walked")    // true (past participle)
+inflect.IsParticiple("taken")     // true (irregular past participle)
+inflect.IsParticiple("walk")      // false (base verb)
+```
+
 ### Word Comparison
 
 Compare words to determine their singular/plural relationship.
@@ -532,6 +563,8 @@ inflect.CompareNouns("dog", "dogs") // "s:p"
 | Function | Description |
 |----------|-------------|
 | `PresentParticiple(verb string) string` | Returns present participle (-ing form) |
+| `PastParticiple(verb string) string` | Returns past participle (walked, gone, taken) |
+| `IsParticiple(word string) bool` | Checks if a word is a participle |
 
 ### Comparison Functions
 
