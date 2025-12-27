@@ -23,6 +23,7 @@ var defaultNum int
 // classicalMode controls whether to prefer classical Latin/Greek plurals.
 // When true, words like "formula" become "formulae" instead of "formulas".
 // Default is false (modern English plurals).
+//
 // Deprecated: Use classicalAll and individual classical options instead.
 var classicalMode bool
 
