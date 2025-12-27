@@ -3,6 +3,8 @@ package inflect_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	inflect "github.com/cv/go-inflect"
 )
 
@@ -177,9 +179,7 @@ func TestInflect(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			if got != tt.expected {
-				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
 		})
 	}
 }
@@ -204,9 +204,7 @@ func TestInflectPlural(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			if got != tt.expected {
-				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
 		})
 	}
 }
@@ -227,9 +225,7 @@ func TestInflectSingular(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			if got != tt.expected {
-				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
 		})
 	}
 }
@@ -252,9 +248,7 @@ func TestInflectArticle(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			if got != tt.expected {
-				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
 		})
 	}
 }
@@ -282,9 +276,7 @@ func TestInflectOrdinal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			if got != tt.expected {
-				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
 		})
 	}
 }
@@ -304,9 +296,7 @@ func TestInflectNum(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			if got != tt.expected {
-				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
 		})
 	}
 }
@@ -380,9 +370,7 @@ func TestPluralNoun(t *testing.T) {
 			} else {
 				got = inflect.PluralNoun(tt.word)
 			}
-			if got != tt.expected {
-				t.Errorf("PluralNoun(%q, %v) = %q, want %q", tt.word, tt.count, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "PluralNoun(%q, %v)", tt.word, tt.count)
 		})
 	}
 }
@@ -464,9 +452,7 @@ func TestPluralVerb(t *testing.T) {
 			} else {
 				got = inflect.PluralVerb(tt.word)
 			}
-			if got != tt.expected {
-				t.Errorf("PluralVerb(%q, %v) = %q, want %q", tt.word, tt.count, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "PluralVerb(%q, %v)", tt.word, tt.count)
 		})
 	}
 }
@@ -529,9 +515,7 @@ func TestPluralAdj(t *testing.T) {
 			} else {
 				got = inflect.PluralAdj(tt.word)
 			}
-			if got != tt.expected {
-				t.Errorf("PluralAdj(%q, %v) = %q, want %q", tt.word, tt.count, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "PluralAdj(%q, %v)", tt.word, tt.count)
 		})
 	}
 }
@@ -597,9 +581,7 @@ func TestSingularNoun(t *testing.T) {
 			} else {
 				got = inflect.SingularNoun(tt.word)
 			}
-			if got != tt.expected {
-				t.Errorf("SingularNoun(%q, %v) = %q, want %q", tt.word, tt.count, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "SingularNoun(%q, %v)", tt.word, tt.count)
 		})
 	}
 }
@@ -653,10 +635,7 @@ func TestSingularNounWithGender(t *testing.T) {
 			defer inflect.Gender(originalGender)
 
 			got := inflect.SingularNoun(tt.word)
-			if got != tt.expected {
-				t.Errorf("with Gender(%q), SingularNoun(%q) = %q, want %q",
-					tt.gender, tt.word, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "with Gender(%q), SingularNoun(%q)", tt.gender, tt.word)
 		})
 	}
 }
@@ -667,10 +646,7 @@ func TestPluralVerbWithCustomDef(t *testing.T) {
 	defer inflect.UndefVerb("foobar")
 
 	got := inflect.PluralVerb("foobar")
-	want := "feebar"
-	if got != want {
-		t.Errorf("PluralVerb(%q) with custom def = %q, want %q", "foobar", got, want)
-	}
+	assert.Equal(t, "feebar", got, "PluralVerb with custom def")
 }
 
 func TestPluralAdjWithCustomDef(t *testing.T) {
@@ -679,10 +655,7 @@ func TestPluralAdjWithCustomDef(t *testing.T) {
 	defer inflect.UndefAdj("red")
 
 	got := inflect.PluralAdj("red")
-	want := "reds"
-	if got != want {
-		t.Errorf("PluralAdj(%q) with custom def = %q, want %q", "red", got, want)
-	}
+	assert.Equal(t, "reds", got, "PluralAdj with custom def")
 }
 
 func TestInflectPluralNoun(t *testing.T) {
@@ -702,9 +675,7 @@ func TestInflectPluralNoun(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			if got != tt.expected {
-				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
 		})
 	}
 }
@@ -725,9 +696,7 @@ func TestInflectPluralVerb(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			if got != tt.expected {
-				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
 		})
 	}
 }
@@ -748,9 +717,7 @@ func TestInflectPluralAdj(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			if got != tt.expected {
-				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
 		})
 	}
 }
@@ -771,9 +738,7 @@ func TestInflectSingularNoun(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			if got != tt.expected {
-				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
 		})
 	}
 }
