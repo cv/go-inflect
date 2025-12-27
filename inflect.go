@@ -1538,6 +1538,25 @@ func NumberToWordsFloat(f float64) string {
 	return strings.Join(parts, " ")
 }
 
+// NumberToWordsThreshold converts an integer to its English word representation
+// only if the number is below the specified threshold. If the number is greater
+// than or equal to the threshold, it returns the number as a string.
+//
+// This is useful for making text more readable by spelling out small numbers
+// while keeping larger numbers in digit form.
+//
+// Examples:
+//   - NumberToWordsThreshold(5, 10) returns "five" (5 < 10, convert to words)
+//   - NumberToWordsThreshold(15, 10) returns "15" (15 >= 10, return as string)
+//   - NumberToWordsThreshold(100, 100) returns "100" (100 >= 100, return as string)
+//   - NumberToWordsThreshold(-3, 10) returns "negative three" (-3 < 10, convert to words)
+func NumberToWordsThreshold(n, threshold int) string {
+	if n < threshold {
+		return NumberToWords(n)
+	}
+	return strconv.Itoa(n)
+}
+
 // cardinalWord converts a positive integer to its cardinal word form.
 func cardinalWord(n int) string {
 	if n == 0 {

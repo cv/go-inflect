@@ -295,6 +295,62 @@ func TestNumberToWordsFloat(t *testing.T) {
 	}
 }
 
+func TestNumberToWordsThreshold(t *testing.T) {
+	tests := []struct {
+		name      string
+		n         int
+		threshold int
+		want      string
+	}{
+		// Numbers below threshold - convert to words
+		{name: "5 below 10", n: 5, threshold: 10, want: "five"},
+		{name: "0 below 10", n: 0, threshold: 10, want: "zero"},
+		{name: "9 below 10", n: 9, threshold: 10, want: "nine"},
+		{name: "1 below 5", n: 1, threshold: 5, want: "one"},
+		{name: "99 below 100", n: 99, threshold: 100, want: "ninety-nine"},
+
+		// Numbers at threshold - return as string
+		{name: "10 at 10", n: 10, threshold: 10, want: "10"},
+		{name: "100 at 100", n: 100, threshold: 100, want: "100"},
+		{name: "5 at 5", n: 5, threshold: 5, want: "5"},
+		{name: "0 at 0", n: 0, threshold: 0, want: "0"},
+
+		// Numbers above threshold - return as string
+		{name: "15 above 10", n: 15, threshold: 10, want: "15"},
+		{name: "100 above 10", n: 100, threshold: 10, want: "100"},
+		{name: "1000 above 100", n: 1000, threshold: 100, want: "1000"},
+		{name: "50 above 10", n: 50, threshold: 10, want: "50"},
+
+		// Negative numbers below threshold - convert to words
+		{name: "negative 3 below 10", n: -3, threshold: 10, want: "negative three"},
+		{name: "negative 1 below 5", n: -1, threshold: 5, want: "negative one"},
+		{name: "negative 99 below 100", n: -99, threshold: 100, want: "negative ninety-nine"},
+
+		// Threshold of 1 (only convert 0 and negatives)
+		{name: "0 below 1", n: 0, threshold: 1, want: "zero"},
+		{name: "1 at 1", n: 1, threshold: 1, want: "1"},
+		{name: "negative 5 below 1", n: -5, threshold: 1, want: "negative five"},
+
+		// Large threshold
+		{name: "999 below 1000", n: 999, threshold: 1000, want: "nine hundred ninety-nine"},
+		{name: "1000 at 1000", n: 1000, threshold: 1000, want: "1000"},
+
+		// Edge cases with negative threshold
+		{name: "5 above negative threshold", n: 5, threshold: -10, want: "5"},
+		{name: "negative 5 above negative 10", n: -5, threshold: -10, want: "-5"},
+		{name: "negative 15 below negative 10", n: -15, threshold: -10, want: "negative fifteen"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.NumberToWordsThreshold(tt.n, tt.threshold)
+			if got != tt.want {
+				t.Errorf("NumberToWordsThreshold(%d, %d) = %q, want %q", tt.n, tt.threshold, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestOrdinalWord(t *testing.T) {
 	tests := []struct {
 		name  string
