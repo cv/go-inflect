@@ -1901,6 +1901,38 @@ func JoinWithConj(words []string, conj string) string {
 	return JoinWithSep(words, conj, ", ")
 }
 
+// JoinWithAutoSep combines a slice of strings into a grammatically correct English list
+// with a custom conjunction, automatically choosing the separator based on content.
+//
+// If any item contains a comma, semicolons are used as separators ("; ").
+// Otherwise, commas are used (", ").
+//
+// This is useful when you don't know in advance whether items contain commas.
+//
+// Examples:
+//   - JoinWithAutoSep([]string{"a", "b", "c"}, "and") returns "a, b, and c"
+//   - JoinWithAutoSep([]string{"Jan 1, 2020", "Feb 2, 2021"}, "and") returns "Jan 1, 2020; and Feb 2, 2021"
+func JoinWithAutoSep(words []string, conj string) string {
+	// Check if any item contains a comma
+	hasComma := false
+	for _, w := range words {
+		if strings.Contains(w, ",") {
+			hasComma = true
+			break
+		}
+	}
+
+	if hasComma {
+		// For 2 items with commas, use semicolon before conjunction
+		// (JoinWithSep doesn't add separator for 2-item case)
+		if len(words) == 2 {
+			return words[0] + "; " + conj + " " + words[1]
+		}
+		return JoinWithSep(words, conj, "; ")
+	}
+	return JoinWithSep(words, conj, ", ")
+}
+
 // JoinWithSep combines a slice of strings into a grammatically correct English list
 // with a custom conjunction and separator.
 //

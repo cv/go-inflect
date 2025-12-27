@@ -145,6 +145,57 @@ func TestJoinWithSep(t *testing.T) {
 	}
 }
 
+func TestJoinWithAutoSep(t *testing.T) {
+	tests := []struct {
+		name  string
+		input []string
+		conj  string
+		want  string
+	}{
+		// Empty slice
+		{name: "empty slice", input: []string{}, conj: "and", want: ""},
+		{name: "nil slice", input: nil, conj: "and", want: ""},
+
+		// Single word (no commas)
+		{name: "single word", input: []string{"apple"}, conj: "and", want: "apple"},
+		{name: "single word with comma", input: []string{"Jan 1, 2020"}, conj: "and", want: "Jan 1, 2020"},
+
+		// Two words without commas -> uses comma separator
+		{name: "two words no commas", input: []string{"a", "b"}, conj: "and", want: "a and b"},
+		{name: "two words no commas or", input: []string{"a", "b"}, conj: "or", want: "a or b"},
+
+		// Two words with commas -> uses semicolon separator
+		{name: "two words with commas", input: []string{"Jan 1, 2020", "Feb 2, 2021"}, conj: "and", want: "Jan 1, 2020; and Feb 2, 2021"},
+		{name: "two words one has comma", input: []string{"Jan 1, 2020", "March"}, conj: "and", want: "Jan 1, 2020; and March"},
+
+		// Three+ words without commas -> uses comma separator
+		{name: "three words no commas", input: []string{"a", "b", "c"}, conj: "and", want: "a, b, and c"},
+		{name: "four words no commas", input: []string{"a", "b", "c", "d"}, conj: "or", want: "a, b, c, or d"},
+
+		// Three+ words with commas -> uses semicolon separator
+		{name: "three words with commas", input: []string{"Jan 1, 2020", "Feb 2, 2021", "Mar 3, 2022"}, conj: "and", want: "Jan 1, 2020; Feb 2, 2021; and Mar 3, 2022"},
+		{name: "three words one has comma", input: []string{"apple", "Jan 1, 2020", "banana"}, conj: "and", want: "apple; Jan 1, 2020; and banana"},
+		{name: "locations with commas", input: []string{"New York, NY", "Los Angeles, CA", "Chicago, IL"}, conj: "or", want: "New York, NY; Los Angeles, CA; or Chicago, IL"},
+
+		// Names in last, first format
+		{name: "names with commas", input: []string{"Smith, John", "Doe, Jane", "Brown, Bob"}, conj: "and", want: "Smith, John; Doe, Jane; and Brown, Bob"},
+
+		// Edge cases
+		{name: "comma only in last item", input: []string{"red", "green", "blue, dark"}, conj: "and", want: "red; green; and blue, dark"},
+		{name: "comma only in first item", input: []string{"red, light", "green", "blue"}, conj: "and", want: "red, light; green; and blue"},
+		{name: "multiple commas in items", input: []string{"a, b, c", "x, y, z"}, conj: "and", want: "a, b, c; and x, y, z"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.JoinWithAutoSep(tt.input, tt.conj)
+			if got != tt.want {
+				t.Errorf("JoinWithAutoSep(%q, %q) = %q, want %q", tt.input, tt.conj, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestNumberToWords(t *testing.T) {
 	tests := []struct {
 		name  string
