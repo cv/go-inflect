@@ -50,12 +50,28 @@ inflect.Comparative("big")        // "bigger"
 inflect.Superlative("big")        // "biggest"
 inflect.Comparative("beautiful")  // "more beautiful"
 inflect.Superlative("beautiful")  // "most beautiful"
+inflect.Adverb("quick")           // "quickly"
+inflect.Adverb("happy")           // "happily"
 
 // Possessive forms
 inflect.Possessive("cat")         // "cat's"
 inflect.Possessive("cats")        // "cats'"
 inflect.Possessive("children")    // "children's"
 inflect.Possessive("James")       // "James's" (modern style)
+
+// Fractions
+inflect.FractionToWords(1, 2)     // "one half"
+inflect.FractionToWords(3, 4)     // "three quarters"
+inflect.FractionToWords(2, 3)     // "two thirds"
+
+// Currency
+inflect.CurrencyToWords(123.45, "USD") // "one hundred twenty-three dollars and forty-five cents"
+inflect.CurrencyToWords(1.00, "GBP")   // "one pound"
+
+// Counting words
+inflect.CountingWord(1)           // "once"
+inflect.CountingWord(2)           // "twice"
+inflect.CountingWord(5)           // "five times"
 ```
 
 ## Core Functions
@@ -86,6 +102,7 @@ inflect.Possessive("James")       // "James's" (modern style)
 | `PluralAdj(word, count...)` | "this" → "these", "a" → "some" |
 | `Comparative(adj)` | "big" → "bigger", "beautiful" → "more beautiful" |
 | `Superlative(adj)` | "big" → "biggest", "beautiful" → "most beautiful" |
+| `Adverb(adj)` | "quick" → "quickly", "happy" → "happily" |
 | `Possessive(noun)` | "cat" → "cat's", "cats" → "cats'" |
 
 ### Numbers
@@ -96,6 +113,9 @@ inflect.Possessive("James")       // "James's" (modern style)
 | `NumberToWordsWithAnd(n)` | 101 → "one hundred and one" |
 | `Ordinal(n)` | 1 → "1st", 2 → "2nd" |
 | `OrdinalWord(n)` | 1 → "first", 2 → "second" |
+| `CountingWord(n)` | 1 → "once", 2 → "twice", 5 → "five times" |
+| `FractionToWords(num, den)` | (3, 4) → "three quarters" |
+| `CurrencyToWords(amount, code)` | (1.50, "USD") → "one dollar and fifty cents" |
 | `No(word, count)` | "no errors" or "3 errors" |
 
 ### Lists
