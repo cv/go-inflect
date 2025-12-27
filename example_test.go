@@ -1022,3 +1022,83 @@ func ExampleWordCount() {
 	// 0
 	// 1
 }
+
+// --- Case conversion examples ---
+
+func ExampleDasherize() {
+	fmt.Println(inflect.Dasherize("HelloWorld"))
+	fmt.Println(inflect.Dasherize("hello_world"))
+	fmt.Println(inflect.Dasherize("HTTPServer"))
+	fmt.Println(inflect.Dasherize("getHTTPResponse"))
+	// Output:
+	// hello-world
+	// hello-world
+	// http-server
+	// get-http-response
+}
+
+func ExampleKebabCase() {
+	fmt.Println(inflect.KebabCase("HelloWorld"))
+	fmt.Println(inflect.KebabCase("hello_world"))
+	fmt.Println(inflect.KebabCase("XMLParser"))
+	// Output:
+	// hello-world
+	// hello-world
+	// xml-parser
+}
+
+func ExampleUnderscore() {
+	fmt.Println(inflect.Underscore("HelloWorld"))
+	fmt.Println(inflect.Underscore("hello-world"))
+	fmt.Println(inflect.Underscore("HTTPServer"))
+	fmt.Println(inflect.Underscore("getHTTPResponse"))
+	// Output:
+	// hello_world
+	// hello_world
+	// http_server
+	// get_http_response
+}
+
+func ExampleSnakeCase() {
+	fmt.Println(inflect.SnakeCase("HelloWorld"))
+	fmt.Println(inflect.SnakeCase("hello-world"))
+	fmt.Println(inflect.SnakeCase("XMLParser"))
+	// Output:
+	// hello_world
+	// hello_world
+	// xml_parser
+}
+
+func ExamplePascalCase() {
+	fmt.Println(inflect.PascalCase("hello_world"))
+	fmt.Println(inflect.PascalCase("hello-world"))
+	fmt.Println(inflect.PascalCase("HTTP_SERVER"))
+	fmt.Println(inflect.PascalCase("helloWorld"))
+	// Output:
+	// HelloWorld
+	// HelloWorld
+	// HttpServer
+	// HelloWorld
+}
+
+func ExampleTitleCase() {
+	fmt.Println(inflect.TitleCase("hello_world"))
+	fmt.Println(inflect.TitleCase("hello-world"))
+	fmt.Println(inflect.TitleCase("get_http_response"))
+	// Output:
+	// HelloWorld
+	// HelloWorld
+	// GetHttpResponse
+}
+
+func ExampleCamelCase() {
+	fmt.Println(inflect.CamelCase("hello_world"))
+	fmt.Println(inflect.CamelCase("hello-world"))
+	fmt.Println(inflect.CamelCase("HTTP_SERVER"))
+	fmt.Println(inflect.CamelCase("HelloWorld"))
+	// Output:
+	// helloWorld
+	// helloWorld
+	// httpServer
+	// helloWorld
+}
