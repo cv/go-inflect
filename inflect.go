@@ -578,3 +578,25 @@ var tensOrdinal = []string{
 	"", "", "twentieth", "thirtieth", "fortieth", "fiftieth", "sixtieth",
 	"seventieth", "eightieth", "ninetieth",
 }
+
+// Join combines a slice of strings into a grammatically correct English list.
+//
+// The function uses the Oxford comma (serial comma) for lists of three or more items.
+//
+// Examples:
+//   - Join([]string{}) returns ""
+//   - Join([]string{"a"}) returns "a"
+//   - Join([]string{"a", "b"}) returns "a and b"
+//   - Join([]string{"a", "b", "c"}) returns "a, b, and c"
+func Join(words []string) string {
+	switch len(words) {
+	case 0:
+		return ""
+	case 1:
+		return words[0]
+	case 2:
+		return words[0] + " and " + words[1]
+	default:
+		return strings.Join(words[:len(words)-1], ", ") + ", and " + words[len(words)-1]
+	}
+}

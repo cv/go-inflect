@@ -6,6 +6,48 @@ import (
 	inflect "gitlab-master.nvidia.com/urg/go-inflect"
 )
 
+func TestJoin(t *testing.T) {
+	tests := []struct {
+		name  string
+		input []string
+		want  string
+	}{
+		// Empty slice
+		{name: "empty slice", input: []string{}, want: ""},
+		{name: "nil slice", input: nil, want: ""},
+
+		// Single word
+		{name: "single word", input: []string{"apple"}, want: "apple"},
+		{name: "single empty string", input: []string{""}, want: ""},
+
+		// Two words
+		{name: "two words", input: []string{"apple", "banana"}, want: "apple and banana"},
+		{name: "two short words", input: []string{"a", "b"}, want: "a and b"},
+
+		// Three+ words (Oxford comma)
+		{name: "three words", input: []string{"a", "b", "c"}, want: "a, b, and c"},
+		{name: "four words", input: []string{"apple", "banana", "cherry", "date"}, want: "apple, banana, cherry, and date"},
+		{name: "five words", input: []string{"one", "two", "three", "four", "five"}, want: "one, two, three, four, and five"},
+
+		// Words with special characters
+		{name: "words with commas", input: []string{"red, blue", "green"}, want: "red, blue and green"},
+		{name: "words with quotes", input: []string{`"hello"`, `"world"`}, want: `"hello" and "world"`},
+		{name: "words with unicode", input: []string{"café", "naïve", "résumé"}, want: "café, naïve, and résumé"},
+		{name: "words with numbers", input: []string{"item1", "item2", "item3"}, want: "item1, item2, and item3"},
+		{name: "words with spaces", input: []string{"New York", "Los Angeles", "Chicago"}, want: "New York, Los Angeles, and Chicago"},
+		{name: "words with ampersand", input: []string{"Tom & Jerry", "Mickey"}, want: "Tom & Jerry and Mickey"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Join(tt.input)
+			if got != tt.want {
+				t.Errorf("Join(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestOrdinalWord(t *testing.T) {
 	tests := []struct {
 		name  string
