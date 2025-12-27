@@ -1500,6 +1500,20 @@ func NumberToWords(n int) string {
 //   - NumberToWordsFloat(0.5) returns "zero point five"
 //   - NumberToWordsFloat(-2.718) returns "negative two point seven one eight"
 func NumberToWordsFloat(f float64) string {
+	return NumberToWordsFloatWithDecimal(f, "point")
+}
+
+// NumberToWordsFloatWithDecimal converts a floating-point number to its English word representation
+// using a custom word for the decimal point.
+//
+// The integer part is converted using NumberToWords, followed by the specified decimal word,
+// then each digit after the decimal point is converted individually.
+//
+// Examples:
+//   - NumberToWordsFloatWithDecimal(3.14, "point") returns "three point one four"
+//   - NumberToWordsFloatWithDecimal(3.14, "dot") returns "three dot one four"
+//   - NumberToWordsFloatWithDecimal(3.14, "and") returns "three and one four"
+func NumberToWordsFloatWithDecimal(f float64, decimal string) string {
 	// Handle negative numbers
 	prefix := ""
 	if f < 0 {
@@ -1526,7 +1540,7 @@ func NumberToWordsFloat(f float64) string {
 	// Build the result
 	var parts []string
 	parts = append(parts, prefix+cardinalWord(intPart))
-	parts = append(parts, "point")
+	parts = append(parts, decimal)
 
 	// Convert each decimal digit individually
 	digitWords := []string{"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}

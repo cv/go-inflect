@@ -295,6 +295,51 @@ func TestNumberToWordsFloat(t *testing.T) {
 	}
 }
 
+func TestNumberToWordsFloatWithDecimal(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   float64
+		decimal string
+		want    string
+	}{
+		// Examples from requirements
+		{name: "point decimal", input: 3.14, decimal: "point", want: "three point one four"},
+		{name: "dot decimal", input: 3.14, decimal: "dot", want: "three dot one four"},
+		{name: "and decimal", input: 3.14, decimal: "and", want: "three and one four"},
+
+		// Different decimal words
+		{name: "comma decimal", input: 2.5, decimal: "comma", want: "two comma five"},
+		{name: "decimal word", input: 1.23, decimal: "decimal", want: "one decimal two three"},
+
+		// Negative numbers with custom decimal
+		{name: "negative with dot", input: -1.5, decimal: "dot", want: "negative one dot five"},
+		{name: "negative with and", input: -0.25, decimal: "and", want: "negative zero and two five"},
+
+		// Whole numbers (no decimal part)
+		{name: "whole number with custom decimal", input: 5.0, decimal: "dot", want: "five"},
+		{name: "zero with custom decimal", input: 0.0, decimal: "and", want: "zero"},
+
+		// Larger numbers
+		{name: "hundred with dot", input: 100.01, decimal: "dot", want: "one hundred dot zero one"},
+		{name: "thousand with comma", input: 1000.999, decimal: "comma", want: "one thousand comma nine nine nine"},
+
+		// Long decimal
+		{name: "long decimal with dot", input: 1.23456, decimal: "dot", want: "one dot two three four five six"},
+
+		// Edge cases with empty or unusual decimal words
+		{name: "single char decimal", input: 7.89, decimal: ".", want: "seven . eight nine"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.NumberToWordsFloatWithDecimal(tt.input, tt.decimal)
+			if got != tt.want {
+				t.Errorf("NumberToWordsFloatWithDecimal(%v, %q) = %q, want %q", tt.input, tt.decimal, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestNumberToWordsThreshold(t *testing.T) {
 	tests := []struct {
 		name      string
