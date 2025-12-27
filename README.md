@@ -179,7 +179,7 @@ inflect.Inflect("This is the ordinal(1) item")
 ## Documentation
 
 - **pkg.go.dev**: [pkg.go.dev/github.com/cv/go-inflect](https://pkg.go.dev/github.com/cv/go-inflect)
-- **GitHub Pages**: [cv.github.io/go-inflect](https://cv.github.io/go-inflect/)
+- **GitHub Pages**: [lixo.org/go-inflect](https://lixo.org/go-inflect/)
 
 ## Contributing
 
