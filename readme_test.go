@@ -3,6 +3,8 @@ package inflect_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/cv/go-inflect"
 )
 
@@ -39,9 +41,7 @@ func TestREADMEExamples(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.got != tt.want {
-				t.Errorf("got %q, want %q", tt.got, tt.want)
-			}
+			assert.Equal(t, tt.want, tt.got)
 		})
 	}
 }
@@ -50,38 +50,24 @@ func TestREADMEClassical(t *testing.T) {
 	inflect.ClassicalAll(true)
 	defer inflect.ClassicalAll(false)
 
-	if got := inflect.Plural("formula"); got != "formulae" {
-		t.Errorf("Classical Plural(formula) = %q, want %q", got, "formulae")
-	}
-	if got := inflect.Plural("cactus"); got != "cacti" {
-		t.Errorf("Classical Plural(cactus) = %q, want %q", got, "cacti")
-	}
+	assert.Equal(t, "formulae", inflect.Plural("formula"), "Classical Plural(formula)")
+	assert.Equal(t, "cacti", inflect.Plural("cactus"), "Classical Plural(cactus)")
 }
 
 func TestREADMEGender(t *testing.T) {
 	defer inflect.Gender("t")
 
 	inflect.Gender("m")
-	if got := inflect.SingularNoun("they"); got != "he" {
-		t.Errorf("Gender m SingularNoun(they) = %q, want %q", got, "he")
-	}
+	assert.Equal(t, "he", inflect.SingularNoun("they"), "Gender m SingularNoun(they)")
 
 	inflect.Gender("f")
-	if got := inflect.SingularNoun("they"); got != "she" {
-		t.Errorf("Gender f SingularNoun(they) = %q, want %q", got, "she")
-	}
+	assert.Equal(t, "she", inflect.SingularNoun("they"), "Gender f SingularNoun(they)")
 
 	inflect.Gender("t")
-	if got := inflect.SingularNoun("they"); got != "they" {
-		t.Errorf("Gender t SingularNoun(they) = %q, want %q", got, "they")
-	}
+	assert.Equal(t, "they", inflect.SingularNoun("they"), "Gender t SingularNoun(they)")
 }
 
 func TestREADMEInflect(t *testing.T) {
-	if got := inflect.Inflect("I saw plural('cat', 3)"); got != "I saw cats" {
-		t.Errorf("Inflect plural = %q, want %q", got, "I saw cats")
-	}
-	if got := inflect.Inflect("This is the ordinal(1) item"); got != "This is the 1st item" {
-		t.Errorf("Inflect ordinal = %q, want %q", got, "This is the 1st item")
-	}
+	assert.Equal(t, "I saw cats", inflect.Inflect("I saw plural('cat', 3)"), "Inflect plural")
+	assert.Equal(t, "This is the 1st item", inflect.Inflect("This is the ordinal(1) item"), "Inflect ordinal")
 }

@@ -3,6 +3,8 @@ package inflect_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	inflect "github.com/cv/go-inflect"
 )
 
@@ -72,9 +74,7 @@ func TestCompare(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Compare(tt.word1, tt.word2)
-			if got != tt.want {
-				t.Errorf("Compare(%q, %q) = %q, want %q", tt.word1, tt.word2, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "Compare(%q, %q)", tt.word1, tt.word2)
 		})
 	}
 }
@@ -97,14 +97,10 @@ func TestCompareNouns(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.CompareNouns(tt.noun1, tt.noun2)
-			if got != tt.want {
-				t.Errorf("CompareNouns(%q, %q) = %q, want %q", tt.noun1, tt.noun2, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "CompareNouns(%q, %q)", tt.noun1, tt.noun2)
 			// Verify it matches Compare() behavior
 			compareGot := inflect.Compare(tt.noun1, tt.noun2)
-			if got != compareGot {
-				t.Errorf("CompareNouns(%q, %q) = %q, but Compare() = %q", tt.noun1, tt.noun2, got, compareGot)
-			}
+			assert.Equal(t, compareGot, got, "CompareNouns(%q, %q) should match Compare()", tt.noun1, tt.noun2)
 		})
 	}
 }
@@ -160,9 +156,7 @@ func TestCompareVerbs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.CompareVerbs(tt.verb1, tt.verb2)
-			if got != tt.want {
-				t.Errorf("CompareVerbs(%q, %q) = %q, want %q", tt.verb1, tt.verb2, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "CompareVerbs(%q, %q)", tt.verb1, tt.verb2)
 		})
 	}
 }
@@ -210,9 +204,7 @@ func TestCompareAdjs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.CompareAdjs(tt.adj1, tt.adj2)
-			if got != tt.want {
-				t.Errorf("CompareAdjs(%q, %q) = %q, want %q", tt.adj1, tt.adj2, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "CompareAdjs(%q, %q)", tt.adj1, tt.adj2)
 		})
 	}
 }

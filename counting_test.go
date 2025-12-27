@@ -1,6 +1,10 @@
 package inflect
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestCountingWord(t *testing.T) {
 	tests := []struct {
@@ -46,9 +50,7 @@ func TestCountingWord(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
 			got := CountingWord(tt.n)
-			if got != tt.want {
-				t.Errorf("CountingWord(%d) = %q, want %q", tt.n, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "CountingWord(%d)", tt.n)
 		})
 	}
 }
@@ -89,9 +91,7 @@ func TestCountingWordWithOptions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
 			got := CountingWordWithOptions(tt.n, tt.useThrice)
-			if got != tt.want {
-				t.Errorf("CountingWordWithOptions(%d, %v) = %q, want %q", tt.n, tt.useThrice, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "CountingWordWithOptions(%d, %v)", tt.n, tt.useThrice)
 		})
 	}
 }
@@ -158,9 +158,7 @@ func TestCountingWordThreshold(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
 			got := CountingWordThreshold(tt.n, tt.threshold)
-			if got != tt.want {
-				t.Errorf("CountingWordThreshold(%d, %d) = %q, want %q", tt.n, tt.threshold, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "CountingWordThreshold(%d, %d)", tt.n, tt.threshold)
 		})
 	}
 }
@@ -181,9 +179,7 @@ func TestCountingWordLargeNumbers(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
 			got := CountingWord(tt.n)
-			if got != tt.want {
-				t.Errorf("CountingWord(%d) = %q, want %q", tt.n, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "CountingWord(%d)", tt.n)
 		})
 	}
 }
@@ -193,8 +189,6 @@ func TestCountingWordEdgeCases(t *testing.T) {
 	for n := -10; n <= 10; n++ {
 		got := CountingWord(n)
 		want := CountingWordWithOptions(n, true)
-		if got != want {
-			t.Errorf("CountingWord(%d) = %q, but CountingWordWithOptions(%d, true) = %q", n, got, n, want)
-		}
+		assert.Equal(t, want, got, "CountingWord(%d) should equal CountingWordWithOptions(%d, true)", n, n)
 	}
 }

@@ -3,6 +3,8 @@ package inflect_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	inflect "github.com/cv/go-inflect"
 )
 
@@ -115,10 +117,7 @@ func TestFractionToWords(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.FractionToWords(tt.numerator, tt.denominator)
-			if got != tt.want {
-				t.Errorf("FractionToWords(%d, %d) = %q, want %q",
-					tt.numerator, tt.denominator, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "FractionToWords(%d, %d)", tt.numerator, tt.denominator)
 		})
 	}
 }
@@ -140,10 +139,7 @@ func TestFractionToWordsWithFourths(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.FractionToWordsWithFourths(tt.numerator, tt.denominator)
-			if got != tt.want {
-				t.Errorf("FractionToWordsWithFourths(%d, %d) = %q, want %q",
-					tt.numerator, tt.denominator, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "FractionToWordsWithFourths(%d, %d)", tt.numerator, tt.denominator)
 		})
 	}
 }
@@ -168,10 +164,7 @@ func TestFractionToWordsExamples(t *testing.T) {
 	for _, ex := range examples {
 		t.Run("", func(t *testing.T) {
 			got := inflect.FractionToWords(ex.numerator, ex.denominator)
-			if got != ex.want {
-				t.Errorf("FractionToWords(%d, %d) = %q, want %q",
-					ex.numerator, ex.denominator, got, ex.want)
-			}
+			assert.Equal(t, ex.want, got, "FractionToWords(%d, %d)", ex.numerator, ex.denominator)
 		})
 	}
 }

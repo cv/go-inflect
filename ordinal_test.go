@@ -3,6 +3,8 @@ package inflect_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	inflect "github.com/cv/go-inflect"
 )
 
@@ -92,9 +94,7 @@ func TestOrdinalWord(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.OrdinalWord(tt.input)
-			if got != tt.want {
-				t.Errorf("OrdinalWord(%d) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "OrdinalWord(%d)", tt.input)
 		})
 	}
 }
@@ -152,9 +152,7 @@ func TestOrdinal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Ordinal(tt.input)
-			if got != tt.want {
-				t.Errorf("Ordinal(%d) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "Ordinal(%d)", tt.input)
 		})
 	}
 }
@@ -257,9 +255,7 @@ func TestOrdinalSuffix(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.OrdinalSuffix(tt.input)
-			if got != tt.want {
-				t.Errorf("OrdinalSuffix(%d) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "OrdinalSuffix(%d)", tt.input)
 		})
 	}
 }
@@ -315,9 +311,7 @@ func TestIsOrdinal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.IsOrdinal(tt.input)
-			if got != tt.want {
-				t.Errorf("IsOrdinal(%q) = %v, want %v", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "IsOrdinal(%q)", tt.input)
 		})
 	}
 }
@@ -370,9 +364,7 @@ func TestOrdinalToCardinal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.OrdinalToCardinal(tt.input)
-			if got != tt.want {
-				t.Errorf("OrdinalToCardinal(%q) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "OrdinalToCardinal(%q)", tt.input)
 		})
 	}
 }

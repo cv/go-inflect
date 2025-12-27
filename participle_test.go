@@ -3,6 +3,8 @@ package inflect_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	inflect "github.com/cv/go-inflect"
 )
 
@@ -110,9 +112,7 @@ func TestPresentParticiple(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.PresentParticiple(tt.input)
-			if got != tt.want {
-				t.Errorf("PresentParticiple(%q) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "PresentParticiple(%q)", tt.input)
 		})
 	}
 }
@@ -281,9 +281,7 @@ func TestPastParticiple(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.PastParticiple(tt.input)
-			if got != tt.want {
-				t.Errorf("PastParticiple(%q) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "PastParticiple(%q)", tt.input)
 		})
 	}
 }
@@ -378,9 +376,7 @@ func TestIsParticiple(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.IsParticiple(tt.input)
-			if got != tt.want {
-				t.Errorf("IsParticiple(%q) = %v, want %v", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "IsParticiple(%q)", tt.input)
 		})
 	}
 }

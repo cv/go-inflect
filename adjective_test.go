@@ -3,6 +3,8 @@ package inflect_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	inflect "github.com/cv/go-inflect"
 )
 
@@ -129,9 +131,7 @@ func TestComparative(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Comparative(tt.input)
-			if got != tt.want {
-				t.Errorf("Comparative(%q) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "Comparative(%q)", tt.input)
 		})
 	}
 }
@@ -259,9 +259,7 @@ func TestSuperlative(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Superlative(tt.input)
-			if got != tt.want {
-				t.Errorf("Superlative(%q) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "Superlative(%q)", tt.input)
 		})
 	}
 }

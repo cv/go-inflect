@@ -3,6 +3,8 @@ package inflect_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	inflect "github.com/cv/go-inflect"
 )
 
@@ -123,9 +125,7 @@ func TestCurrencyToWords(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.CurrencyToWords(tt.amount, tt.currency)
-			if got != tt.want {
-				t.Errorf("CurrencyToWords(%v, %q) = %q, want %q", tt.amount, tt.currency, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "CurrencyToWords(%v, %q)", tt.amount, tt.currency)
 		})
 	}
 }
@@ -147,9 +147,7 @@ func TestCurrencyToWordsExamples(t *testing.T) {
 	for _, ex := range examples {
 		t.Run("", func(t *testing.T) {
 			got := inflect.CurrencyToWords(ex.amount, ex.currency)
-			if got != ex.want {
-				t.Errorf("CurrencyToWords(%v, %q) = %q, want %q", ex.amount, ex.currency, got, ex.want)
-			}
+			assert.Equal(t, ex.want, got, "CurrencyToWords(%v, %q)", ex.amount, ex.currency)
 		})
 	}
 }

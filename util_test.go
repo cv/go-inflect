@@ -3,6 +3,8 @@ package inflect_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	inflect "github.com/cv/go-inflect"
 )
 
@@ -46,9 +48,7 @@ func TestIsPlural(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.IsPlural(tt.input)
-			if got != tt.want {
-				t.Errorf("IsPlural(%q) = %v, want %v", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "IsPlural(%q)", tt.input)
 		})
 	}
 }
@@ -87,9 +87,7 @@ func TestIsSingular(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.IsSingular(tt.input)
-			if got != tt.want {
-				t.Errorf("IsSingular(%q) = %v, want %v", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "IsSingular(%q)", tt.input)
 		})
 	}
 }
@@ -113,9 +111,7 @@ func TestWordCount(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.WordCount(tt.input)
-			if got != tt.want {
-				t.Errorf("WordCount(%q) = %d, want %d", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "WordCount(%q)", tt.input)
 		})
 	}
 }
@@ -138,9 +134,7 @@ func TestCapitalize(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Capitalize(tt.input)
-			if got != tt.want {
-				t.Errorf("Capitalize(%q) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "Capitalize(%q)", tt.input)
 		})
 	}
 }
@@ -164,9 +158,7 @@ func TestTitleize(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Titleize(tt.input)
-			if got != tt.want {
-				t.Errorf("Titleize(%q) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "Titleize(%q)", tt.input)
 		})
 	}
 }

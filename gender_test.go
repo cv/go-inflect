@@ -3,6 +3,8 @@ package inflect_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	inflect "github.com/cv/go-inflect"
 )
 
@@ -25,9 +27,8 @@ func TestGender(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			inflect.Gender(tt.setTo)
-			if got := inflect.GetGender(); got != tt.expected {
-				t.Errorf("Gender(%q): GetGender() = %q, want %q", tt.setTo, got, tt.expected)
-			}
+			got := inflect.GetGender()
+			assert.Equal(t, tt.expected, got, "Gender(%q): GetGender()", tt.setTo)
 		})
 	}
 }
@@ -38,9 +39,8 @@ func TestGetGenderDefault(t *testing.T) {
 	defer inflect.Gender("t")
 
 	// Default should be "t" (singular they)
-	if got := inflect.GetGender(); got != "t" {
-		t.Errorf("GetGender() default = %q, want %q", got, "t")
-	}
+	got := inflect.GetGender()
+	assert.Equal(t, "t", got, "GetGender() default")
 }
 
 func TestGenderInvalidValues(t *testing.T) {
@@ -50,9 +50,7 @@ func TestGenderInvalidValues(t *testing.T) {
 
 	// Set a valid gender first
 	inflect.Gender("m")
-	if got := inflect.GetGender(); got != "m" {
-		t.Errorf("Gender(m): GetGender() = %q, want %q", got, "m")
-	}
+	assert.Equal(t, "m", inflect.GetGender(), "Gender(m): GetGender()")
 
 	// Invalid values should be ignored
 	invalidValues := []string{
@@ -72,9 +70,8 @@ func TestGenderInvalidValues(t *testing.T) {
 	for _, invalid := range invalidValues {
 		t.Run("invalid:"+invalid, func(t *testing.T) {
 			inflect.Gender(invalid)
-			if got := inflect.GetGender(); got != "m" {
-				t.Errorf("Gender(%q): GetGender() = %q, want %q (unchanged)", invalid, got, "m")
-			}
+			got := inflect.GetGender()
+			assert.Equal(t, "m", got, "Gender(%q): should remain unchanged", invalid)
 		})
 	}
 }
@@ -101,8 +98,7 @@ func TestGenderSequence(t *testing.T) {
 
 	for i, step := range sequence {
 		inflect.Gender(step.setTo)
-		if got := inflect.GetGender(); got != step.expected {
-			t.Errorf("Step %d: Gender(%q): GetGender() = %q, want %q", i, step.setTo, got, step.expected)
-		}
+		got := inflect.GetGender()
+		assert.Equal(t, step.expected, got, "Step %d: Gender(%q)", i, step.setTo)
 	}
 }

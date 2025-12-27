@@ -3,6 +3,8 @@ package inflect_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	inflect "github.com/cv/go-inflect"
 )
 
@@ -101,9 +103,7 @@ func TestPossessive(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Possessive(tt.input)
-			if got != tt.want {
-				t.Errorf("Possessive(%q) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "Possessive(%q)", tt.input)
 		})
 	}
 }
@@ -136,9 +136,7 @@ func TestPossessiveWithStyle(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Possessive(tt.input)
-			if got != tt.want {
-				t.Errorf("Possessive(%q) with traditional style = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "Possessive(%q) with traditional style", tt.input)
 		})
 	}
 }
