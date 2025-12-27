@@ -36,9 +36,11 @@ inflect.OrdinalWord(3)    // "third"
 // List joining (Oxford comma)
 inflect.Join([]string{"a", "b", "c"}) // "a, b, and c"
 
-// Verb participles
+// Verb forms
 inflect.PresentParticiple("run")  // "running"
 inflect.PastParticiple("take")    // "taken"
+inflect.PastTense("walk")         // "walked"
+inflect.PastTense("go")           // "went"
 
 // Word comparison
 inflect.Compare("cat", "cats")    // "s:p" (singular to plural)
@@ -74,6 +76,7 @@ inflect.Possessive("James")       // "James's" (modern style)
 | `PluralVerb(word, count...)` | "is" → "are", "runs" → "run" |
 | `PresentParticiple(verb)` | "run" → "running" |
 | `PastParticiple(verb)` | "take" → "taken", "walk" → "walked" |
+| `PastTense(verb)` | "walk" → "walked", "go" → "went" |
 
 ### Articles & Adjectives
 
