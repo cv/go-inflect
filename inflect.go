@@ -97,12 +97,29 @@ var oExceptionWords = map[string]bool{
 }
 
 // unchangedPlurals contains words that don't change in plural form.
+// Note: Some animals like bison, buffalo are in herdAnimals instead,
+// since they have both unchanged (classical) and -s (modern) forms.
 var unchangedPlurals = map[string]bool{
-	"aircraft": true, "bison": true, "buffalo": true, "cod": true,
-	"deer": true, "fish": true, "moose": true, "offspring": true,
-	"pike": true, "salmon": true, "series": true, "sheep": true,
-	"shrimp": true, "species": true, "squid": true, "swine": true,
-	"trout": true, "tuna": true,
+	"aircraft": true, "cod": true, "deer": true, "fish": true,
+	"moose": true, "offspring": true, "pike": true, "salmon": true,
+	"series": true, "sheep": true, "shrimp": true, "species": true,
+	"squid": true, "swine": true, "trout": true, "tuna": true,
+}
+
+// herdAnimals contains animals that have both unchanged (classical) and
+// regular -s (modern) plural forms. When classicalHerd is enabled,
+// these remain unchanged; otherwise they take -s.
+// Examples: bison -> bison (classical) vs bisons (modern)
+//
+//	wildebeest -> wildebeest (classical) vs wildebeests (modern)
+var herdAnimals = map[string]bool{
+	"bison":      true,
+	"buffalo":    true,
+	"caribou":    true,
+	"elk":        true,
+	"grouse":     true,
+	"antelope":   true,
+	"wildebeest": true,
 }
 
 // classicalLatinPlurals contains words with classical Latin/Greek plural forms.
@@ -628,6 +645,50 @@ func IsClassicalPersons() bool {
 	return classicalPersons
 }
 
+// ClassicalHerd enables or disables classical herd animal pluralization.
+//
+// This controls the classicalHerd flag independently of other classical
+// options like classicalZero, classicalNames, classicalAncient, and classicalPersons.
+//
+// When enabled (true), Plural() uses unchanged forms for herd animals:
+//   - bison -> bison
+//   - buffalo -> buffalo
+//   - wildebeest -> wildebeest
+//
+// When disabled (false, the default), modern English plurals are used:
+//   - bison -> bisons
+//   - buffalo -> buffaloes
+//   - wildebeest -> wildebeests
+//
+// Note: Some animals like deer, sheep, moose always remain unchanged
+// regardless of this setting.
+//
+// Examples:
+//
+//	ClassicalHerd(true)
+//	Plural("wildebeest") // returns "wildebeest"
+//	ClassicalHerd(false)
+//	Plural("wildebeest") // returns "wildebeests"
+func ClassicalHerd(enabled bool) {
+	classicalHerd = enabled
+}
+
+// IsClassicalHerd returns whether classical herd animal pluralization is enabled.
+//
+// Returns true if ClassicalHerd(true) or ClassicalAll(true) was called,
+// false otherwise.
+//
+// Examples:
+//
+//	IsClassicalHerd() // returns false (default)
+//	ClassicalHerd(true)
+//	IsClassicalHerd() // returns true
+//	ClassicalHerd(false)
+//	IsClassicalHerd() // returns false
+func IsClassicalHerd() bool {
+	return classicalHerd
+}
+
 // Plural returns the plural form of an English noun.
 //
 // Examples:
@@ -662,6 +723,15 @@ func Plural(word string) string {
 	// Check for uncountable/unchanged words
 	if unchangedPlurals[lower] {
 		return word
+	}
+
+	// Check for herd animals (affected by classicalHerd flag)
+	if herdAnimals[lower] {
+		if classicalHerd {
+			return word // unchanged in classical mode
+		}
+		// Modern mode: apply standard suffix rules (adds -s or -es)
+		return applySuffixRules(word, lower)
 	}
 
 	// Check for words ending in -ese, -ois (nationalities that don't change)
