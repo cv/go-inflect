@@ -48,6 +48,12 @@ inflect.Comparative("big")        // "bigger"
 inflect.Superlative("big")        // "biggest"
 inflect.Comparative("beautiful")  // "more beautiful"
 inflect.Superlative("beautiful")  // "most beautiful"
+
+// Possessive forms
+inflect.Possessive("cat")         // "cat's"
+inflect.Possessive("cats")        // "cats'"
+inflect.Possessive("children")    // "children's"
+inflect.Possessive("James")       // "James's" (modern style)
 ```
 
 ## Core Functions
@@ -77,6 +83,7 @@ inflect.Superlative("beautiful")  // "most beautiful"
 | `PluralAdj(word, count...)` | "this" → "these", "a" → "some" |
 | `Comparative(adj)` | "big" → "bigger", "beautiful" → "more beautiful" |
 | `Superlative(adj)` | "big" → "biggest", "beautiful" → "most beautiful" |
+| `Possessive(noun)` | "cat" → "cat's", "cats" → "cats'" |
 
 ### Numbers
 
