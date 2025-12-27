@@ -1057,7 +1057,7 @@ func TestAn(t *testing.T) {
 	}
 }
 
-// TestA verifies that A() is an alias for An()
+// TestA verifies that A() is an alias for An().
 func TestA(t *testing.T) {
 	tests := []struct {
 		input string
@@ -2645,7 +2645,7 @@ func TestDefVerb(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			inflect.DefVerbReset()
 
 			// Define the custom rule - this should not panic
@@ -2803,7 +2803,7 @@ func TestDefAdj(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			inflect.DefAdjReset()
 
 			// Define the custom rule - this should not panic
@@ -3384,7 +3384,7 @@ func BenchmarkPlural(b *testing.B) {
 
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				inflect.Plural(bm.input)
 			}
 		})
@@ -3409,7 +3409,7 @@ func BenchmarkSingular(b *testing.B) {
 
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				inflect.Singular(bm.input)
 			}
 		})
@@ -3432,7 +3432,7 @@ func BenchmarkAn(b *testing.B) {
 
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				inflect.An(bm.input)
 			}
 		})
@@ -3457,7 +3457,7 @@ func BenchmarkOrdinal(b *testing.B) {
 
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				inflect.Ordinal(bm.input)
 			}
 		})
@@ -3480,7 +3480,7 @@ func BenchmarkOrdinalWord(b *testing.B) {
 
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				inflect.OrdinalWord(bm.input)
 			}
 		})
@@ -3506,7 +3506,7 @@ func BenchmarkNumberToWords(b *testing.B) {
 
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				inflect.NumberToWords(bm.input)
 			}
 		})
@@ -3529,7 +3529,7 @@ func BenchmarkJoin(b *testing.B) {
 
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				inflect.Join(bm.input)
 			}
 		})
@@ -3553,7 +3553,7 @@ func BenchmarkPresentParticiple(b *testing.B) {
 
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				inflect.PresentParticiple(bm.input)
 			}
 		})
@@ -3578,7 +3578,7 @@ func BenchmarkCompare(b *testing.B) {
 
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for range b.N {
 				inflect.Compare(bm.word1, bm.word2)
 			}
 		})

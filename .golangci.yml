@@ -1,0 +1,157 @@
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    # Bugs
+    - errcheck
+    - govet
+    - staticcheck
+    - bodyclose
+    - durationcheck
+    - nilerr
+    - noctx
+    - rowserrcheck
+    - sqlclosecheck
+    - gosec
+    - errorlint
+    - makezero
+    - nosprintfhostport
+    - reassign
+
+    # Performance
+    - gosimple
+    - ineffassign
+    - unconvert
+    - copyloopvar
+    - intrange
+
+    # Unused code
+    - unused
+
+    # Style & consistency
+    - gofmt
+    - goimports
+    - revive
+    - stylecheck
+    - gocritic
+    - misspell
+    - dupword
+    - godot
+    - goprintffuncname
+    - errname
+    - predeclared
+    - asciicheck
+    - bidichk
+    - usestdlibvars
+    - whitespace
+
+    # Maintainability
+    - dupl
+    - funlen
+    - cyclop
+    - gocyclo
+    - gocognit
+
+  disable:
+    # Library needs package-level state
+    - gochecknoglobals
+    - gochecknoinits
+
+    # Too strict / not applicable
+    - exhaustruct
+    - varnamelen
+    - lll
+    - wsl
+    - nlreturn
+    - mnd
+    - paralleltest
+    - testpackage
+    - goconst
+    - depguard
+    - wrapcheck
+    - ireturn
+    - nonamedreturns
+    - forcetypeassert
+    - prealloc
+    - tagliatelle
+    - tagalign
+    - thelper
+    - tparallel
+    - containedctx
+    - contextcheck
+
+
+
+linters-settings:
+  funlen:
+    lines: 80
+    statements: 50
+
+  cyclop:
+    # Inflection rules have many branches; 25 is reasonable for this domain
+    max-complexity: 25
+
+  gocyclo:
+    # Inflection rules have many branches; 25 is reasonable for this domain
+    min-complexity: 25
+
+  gocognit:
+    # Inflection rules are inherently complex with many branches
+    min-complexity: 40
+
+  dupl:
+    threshold: 150
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+    disabled-checks:
+      - hugeParam  # Not relevant for this library
+
+  revive:
+    rules:
+      - name: blank-imports
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: dot-imports
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: exported
+      - name: if-return
+      - name: increment-decrement
+      - name: var-naming
+      - name: var-declaration
+      - name: package-comments
+      - name: range
+      - name: receiver-naming
+      - name: time-naming
+      - name: unexported-return
+      - name: indent-error-flow
+      - name: errorf
+      - name: empty-block
+      - name: superfluous-else
+      - name: unused-parameter
+      - name: unreachable-code
+      - name: redefines-builtin-id
+
+  stylecheck:
+    checks:
+      - all
+      - -ST1000  # Package comments not required
+      - -ST1003  # Underscore in package name OK
+
+issues:
+  exclude-rules:
+    # Test files can have longer functions and more complexity
+    - path: _test\.go
+      linters:
+        - funlen
+        - cyclop
+        - gocyclo
+        - gocognit
+        - dupl
+        - dupword  # Test data legitimately contains repeated words

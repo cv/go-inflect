@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 // defaultNum stores the default count for number-related functions.
@@ -223,7 +224,7 @@ func isProperName(word string) bool {
 	}
 
 	// Check if the first letter is uppercase (proper name indicator)
-	firstRune := []rune(word)[0]
+	firstRune, _ := utf8.DecodeRuneInString(word)
 	if !unicode.IsUpper(firstRune) {
 		return false
 	}
@@ -367,7 +368,7 @@ func isAbbreviation(word string) bool {
 // abbreviationNeedsAn checks if an abbreviation should take "an".
 // This depends on how the first letter is pronounced.
 func abbreviationNeedsAn(abbrev string) bool {
-	if len(abbrev) == 0 {
+	if abbrev == "" {
 		return false
 	}
 
@@ -1100,7 +1101,7 @@ func oExceptionTakesS(lower string) bool {
 
 // matchCase adjusts the replacement to match the case pattern of the original.
 func matchCase(original, replacement string) string {
-	if len(original) == 0 || len(replacement) == 0 {
+	if original == "" || replacement == "" {
 		return replacement
 	}
 
@@ -1110,7 +1111,7 @@ func matchCase(original, replacement string) string {
 	}
 
 	// Check if original starts with uppercase
-	firstRune := []rune(original)[0]
+	firstRune, _ := utf8.DecodeRuneInString(original)
 	if unicode.IsUpper(firstRune) {
 		runes := []rune(replacement)
 		runes[0] = unicode.ToUpper(runes[0])
@@ -1678,8 +1679,7 @@ func NumberToWordsFloatWithDecimal(f float64, decimal string) string {
 
 	// Build the result
 	var parts []string
-	parts = append(parts, prefix+cardinalWord(intPart))
-	parts = append(parts, decimal)
+	parts = append(parts, prefix+cardinalWord(intPart), decimal)
 
 	// Convert each decimal digit individually
 	digitWords := []string{"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
@@ -1748,7 +1748,7 @@ func NumberToWordsGrouped(n, groupSize int) string {
 
 	// Split into groups from right to left
 	var groups []string
-	for len(s) > 0 {
+	for s != "" {
 		start := len(s) - groupSize
 		if start < 0 {
 			start = 0
@@ -2080,7 +2080,7 @@ func JoinWithAutoSep(words []string, conj string) string {
 // Examples:
 //   - JoinWithSep([]string{"a", "b", "c"}, "and", "; ") returns "a; b; and c"
 //   - JoinWithSep([]string{"Jan 1, 2020", "Feb 2, 2021"}, "and", "; ") returns "Jan 1, 2020; and Feb 2, 2021"
-func JoinWithSep(words []string, conj string, sep string) string {
+func JoinWithSep(words []string, conj, sep string) string {
 	switch len(words) {
 	case 0:
 		return ""
@@ -2188,7 +2188,7 @@ func CompareNouns(noun1, noun2 string) string {
 //   - "eq" if the verbs are equal (case-insensitive)
 //   - Comparison codes for different conjugation relationships
 //   - "" if the verbs are not related
-func CompareVerbs(verb1, verb2 string) string {
+func CompareVerbs(_, _ string) string {
 	// TODO: Implement verb conjugation comparison
 	return ""
 }
@@ -2204,7 +2204,7 @@ func CompareVerbs(verb1, verb2 string) string {
 //   - "eq" if the adjectives are equal (case-insensitive)
 //   - Comparison codes for different adjective relationships (e.g., base/comparative/superlative)
 //   - "" if the adjectives are not related
-func CompareAdjs(adj1, adj2 string) string {
+func CompareAdjs(_, _ string) string {
 	// TODO: Implement adjective comparison
 	return ""
 }
@@ -2339,9 +2339,7 @@ var inflectFuncPattern = regexp.MustCompile(`(\w+)\(([^)]*)\)`)
 //   - Inflect("There are num(3) plural('error', 3)") -> "There are 3 errors"
 //   - Inflect("This is the ordinal(1) item") -> "This is the 1st item"
 func Inflect(text string) string {
-	return inflectFuncPattern.ReplaceAllStringFunc(text, func(match string) string {
-		return processInflectCall(match)
-	})
+	return inflectFuncPattern.ReplaceAllStringFunc(text, processInflectCall)
 }
 
 // processInflectCall processes a single function call match and returns
@@ -2349,7 +2347,7 @@ func Inflect(text string) string {
 func processInflectCall(match string) string {
 	// Parse the function name and arguments
 	submatches := inflectFuncPattern.FindStringSubmatch(match)
-	if submatches == nil || len(submatches) < 3 {
+	if len(submatches) < 3 {
 		return match
 	}
 
