@@ -1228,6 +1228,8 @@ func TestUndefNoun(t *testing.T) {
 }
 
 func TestDefNounReset(t *testing.T) {
+	defer inflect.DefNounReset()
+
 	tests := []struct {
 		name          string
 		customRules   map[string]string // singular -> plural
@@ -1552,6 +1554,8 @@ func TestUndefAn(t *testing.T) {
 }
 
 func TestDefAReset(t *testing.T) {
+	defer inflect.DefAReset()
+
 	tests := []struct {
 		name        string
 		customA     []string // words to force "a"
@@ -1815,6 +1819,8 @@ func TestUndefVerb(t *testing.T) {
 }
 
 func TestDefVerbReset(t *testing.T) {
+	defer inflect.DefVerbReset()
+
 	// Add some custom rules
 	inflect.DefVerb("foo", "foos")
 	inflect.DefVerb("bar", "bars")
@@ -1971,6 +1977,8 @@ func TestUndefAdj(t *testing.T) {
 }
 
 func TestDefAdjReset(t *testing.T) {
+	defer inflect.DefAdjReset()
+
 	// Add some custom rules
 	inflect.DefAdj("foo", "foos")
 	inflect.DefAdj("bar", "bars")
@@ -2037,6 +2045,8 @@ func TestDefAdjIntegration(t *testing.T) {
 }
 
 func TestNum(t *testing.T) {
+	defer inflect.Num()
+
 	// Clear state before tests
 	inflect.Num(0)
 
@@ -2085,12 +2095,11 @@ func TestNum(t *testing.T) {
 			}
 		})
 	}
-
-	// Clean up
-	inflect.Num(0)
 }
 
 func TestGetNum(t *testing.T) {
+	defer inflect.Num()
+
 	tests := []struct {
 		name    string
 		setup   func()
@@ -2137,9 +2146,6 @@ func TestGetNum(t *testing.T) {
 			}
 		})
 	}
-
-	// Clean up
-	inflect.Num(0)
 }
 
 func TestNumIntegration(t *testing.T) {
