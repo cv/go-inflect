@@ -8,6 +8,8 @@ package inflect
 
 import (
 	"fmt"
+	"math"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -1486,6 +1488,54 @@ func NumberToWords(n int) string {
 		return "negative " + cardinalWord(-n)
 	}
 	return cardinalWord(n)
+}
+
+// NumberToWordsFloat converts a floating-point number to its English word representation.
+//
+// The integer part is converted using NumberToWords, followed by "point",
+// then each digit after the decimal point is converted individually.
+//
+// Examples:
+//   - NumberToWordsFloat(3.14) returns "three point one four"
+//   - NumberToWordsFloat(0.5) returns "zero point five"
+//   - NumberToWordsFloat(-2.718) returns "negative two point seven one eight"
+func NumberToWordsFloat(f float64) string {
+	// Handle negative numbers
+	prefix := ""
+	if f < 0 {
+		prefix = "negative "
+		f = math.Abs(f)
+	}
+
+	// Get integer part
+	intPart := int(f)
+
+	// Convert to string to extract decimal digits
+	str := strconv.FormatFloat(f, 'f', -1, 64)
+
+	// Find the decimal point
+	dotIdx := strings.Index(str, ".")
+	if dotIdx == -1 {
+		// No decimal point, just convert as integer
+		return prefix + cardinalWord(intPart)
+	}
+
+	// Get decimal digits
+	decimalDigits := str[dotIdx+1:]
+
+	// Build the result
+	var parts []string
+	parts = append(parts, prefix+cardinalWord(intPart))
+	parts = append(parts, "point")
+
+	// Convert each decimal digit individually
+	digitWords := []string{"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
+	for _, ch := range decimalDigits {
+		digit := int(ch - '0')
+		parts = append(parts, digitWords[digit])
+	}
+
+	return strings.Join(parts, " ")
 }
 
 // cardinalWord converts a positive integer to its cardinal word form.

@@ -254,6 +254,47 @@ func TestNumberToWords(t *testing.T) {
 	}
 }
 
+func TestNumberToWordsFloat(t *testing.T) {
+	tests := []struct {
+		name  string
+		input float64
+		want  string
+	}{
+		// Basic decimal numbers
+		{name: "pi approximation", input: 3.14, want: "three point one four"},
+		{name: "zero point five", input: 0.5, want: "zero point five"},
+		{name: "negative e approximation", input: -2.718, want: "negative two point seven one eight"},
+
+		// Whole numbers (no decimal part effectively)
+		{name: "whole number with decimal", input: 5.0, want: "five"},
+		{name: "zero", input: 0.0, want: "zero"},
+
+		// Single decimal digit
+		{name: "one point zero", input: 1.1, want: "one point one"},
+		{name: "nine point nine", input: 9.9, want: "nine point nine"},
+
+		// Multiple decimal digits
+		{name: "long decimal", input: 1.23456, want: "one point two three four five six"},
+
+		// Negative numbers
+		{name: "negative simple", input: -1.5, want: "negative one point five"},
+		{name: "negative zero point", input: -0.25, want: "negative zero point two five"},
+
+		// Larger integer parts
+		{name: "hundred point decimal", input: 100.01, want: "one hundred point zero one"},
+		{name: "thousand point decimal", input: 1000.999, want: "one thousand point nine nine nine"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.NumberToWordsFloat(tt.input)
+			if got != tt.want {
+				t.Errorf("NumberToWordsFloat(%v) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestOrdinalWord(t *testing.T) {
 	tests := []struct {
 		name  string
