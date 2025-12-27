@@ -1557,6 +1557,63 @@ func NumberToWordsThreshold(n, threshold int) string {
 	return strconv.Itoa(n)
 }
 
+// NumberToWordsGrouped converts an integer to English words by splitting it into
+// groups of the specified size and converting each group independently.
+//
+// This is useful for reading phone numbers, credit card numbers, and other
+// digit sequences where each group should be pronounced as a separate number.
+//
+// The number is split from right to left, so the leftmost group may have
+// fewer digits than the specified group size.
+//
+// Examples:
+//   - NumberToWordsGrouped(1234, 2) returns "twelve thirty-four"
+//   - NumberToWordsGrouped(123456, 2) returns "twelve thirty-four fifty-six"
+//   - NumberToWordsGrouped(1234, 3) returns "one two hundred thirty-four"
+//   - NumberToWordsGrouped(1234567890, 3) returns "one two hundred thirty-four five hundred sixty-seven eight hundred ninety"
+//   - NumberToWordsGrouped(0, 2) returns "zero"
+//   - NumberToWordsGrouped(-1234, 2) returns "negative twelve thirty-four"
+func NumberToWordsGrouped(n, groupSize int) string {
+	if groupSize <= 0 {
+		return NumberToWords(n)
+	}
+
+	// Handle negative numbers
+	prefix := ""
+	if n < 0 {
+		prefix = "negative "
+		n = -n
+	}
+
+	// Handle zero
+	if n == 0 {
+		return "zero"
+	}
+
+	// Convert number to string
+	s := strconv.Itoa(n)
+
+	// Split into groups from right to left
+	var groups []string
+	for len(s) > 0 {
+		start := len(s) - groupSize
+		if start < 0 {
+			start = 0
+		}
+		groups = append([]string{s[start:]}, groups...)
+		s = s[:start]
+	}
+
+	// Convert each group to words
+	var words []string
+	for _, g := range groups {
+		num, _ := strconv.Atoi(g)
+		words = append(words, cardinalWord(num))
+	}
+
+	return prefix + strings.Join(words, " ")
+}
+
 // cardinalWord converts a positive integer to its cardinal word form.
 func cardinalWord(n int) string {
 	if n == 0 {

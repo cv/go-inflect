@@ -351,6 +351,74 @@ func TestNumberToWordsThreshold(t *testing.T) {
 	}
 }
 
+func TestNumberToWordsGrouped(t *testing.T) {
+	tests := []struct {
+		name      string
+		n         int
+		groupSize int
+		want      string
+	}{
+		// Basic examples from requirements
+		{name: "1234 grouped by 2", n: 1234, groupSize: 2, want: "twelve thirty-four"},
+		{name: "123456 grouped by 2", n: 123456, groupSize: 2, want: "twelve thirty-four fifty-six"},
+		{name: "1234 grouped by 3", n: 1234, groupSize: 3, want: "one two hundred thirty-four"},
+		{name: "1234567890 grouped by 3", n: 1234567890, groupSize: 3, want: "one two hundred thirty-four five hundred sixty-seven eight hundred ninety"},
+
+		// Phone number use cases (grouped by various sizes)
+		{name: "phone 5551234 by 4", n: 5551234, groupSize: 4, want: "five hundred fifty-five one thousand two hundred thirty-four"},
+		{name: "area code 415 by 3", n: 415, groupSize: 3, want: "four hundred fifteen"},
+
+		// Credit card style (groups of 4)
+		{name: "1234567812345678 by 4", n: 1234567812345678, groupSize: 4, want: "one thousand two hundred thirty-four five thousand six hundred seventy-eight one thousand two hundred thirty-four five thousand six hundred seventy-eight"},
+
+		// Zero handling
+		{name: "zero grouped by 2", n: 0, groupSize: 2, want: "zero"},
+		{name: "zero grouped by 3", n: 0, groupSize: 3, want: "zero"},
+
+		// Negative numbers
+		{name: "negative 1234 by 2", n: -1234, groupSize: 2, want: "negative twelve thirty-four"},
+		{name: "negative 123456 by 2", n: -123456, groupSize: 2, want: "negative twelve thirty-four fifty-six"},
+
+		// Single digit groups
+		{name: "12345 grouped by 1", n: 12345, groupSize: 1, want: "one two three four five"},
+		{name: "9876 grouped by 1", n: 9876, groupSize: 1, want: "nine eight seven six"},
+
+		// Groups with zeros (each group is converted as a number, so 00->0, 01->1)
+		{name: "10001 grouped by 2", n: 10001, groupSize: 2, want: "one zero one"},
+		{name: "100100 grouped by 2", n: 100100, groupSize: 2, want: "ten one zero"},
+		{name: "1001001 grouped by 3", n: 1001001, groupSize: 3, want: "one one one"},
+
+		// Small numbers with various group sizes
+		{name: "5 grouped by 2", n: 5, groupSize: 2, want: "five"},
+		{name: "12 grouped by 2", n: 12, groupSize: 2, want: "twelve"},
+		{name: "123 grouped by 2", n: 123, groupSize: 2, want: "one twenty-three"},
+		{name: "99 grouped by 3", n: 99, groupSize: 3, want: "ninety-nine"},
+
+		// Larger group sizes
+		{name: "123456 grouped by 4", n: 123456, groupSize: 4, want: "twelve three thousand four hundred fifty-six"},
+		{name: "1234567 grouped by 4", n: 1234567, groupSize: 4, want: "one hundred twenty-three four thousand five hundred sixty-seven"},
+
+		// Edge case: group size <= 0 falls back to regular NumberToWords
+		{name: "1234 with group size 0", n: 1234, groupSize: 0, want: "one thousand two hundred thirty-four"},
+		{name: "1234 with negative group size", n: -1, groupSize: -1, want: "negative one"},
+
+		// Boundary cases
+		{name: "10 grouped by 2", n: 10, groupSize: 2, want: "ten"},
+		{name: "100 grouped by 2", n: 100, groupSize: 2, want: "one zero"},
+		{name: "1000 grouped by 2", n: 1000, groupSize: 2, want: "ten zero"},
+		{name: "10000 grouped by 2", n: 10000, groupSize: 2, want: "one zero zero"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.NumberToWordsGrouped(tt.n, tt.groupSize)
+			if got != tt.want {
+				t.Errorf("NumberToWordsGrouped(%d, %d) = %q, want %q", tt.n, tt.groupSize, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestFormatNumber(t *testing.T) {
 	tests := []struct {
 		name  string
