@@ -96,6 +96,55 @@ func TestJoinWithConj(t *testing.T) {
 	}
 }
 
+func TestJoinWithSep(t *testing.T) {
+	tests := []struct {
+		name  string
+		input []string
+		conj  string
+		sep   string
+		want  string
+	}{
+		// Empty slice
+		{name: "empty slice", input: []string{}, conj: "and", sep: "; ", want: ""},
+		{name: "nil slice", input: nil, conj: "and", sep: "; ", want: ""},
+
+		// Single word
+		{name: "single word", input: []string{"apple"}, conj: "and", sep: "; ", want: "apple"},
+
+		// Two words (separator not used between two items)
+		{name: "two words", input: []string{"a", "b"}, conj: "and", sep: "; ", want: "a and b"},
+		{name: "two words with or", input: []string{"a", "b"}, conj: "or", sep: "; ", want: "a or b"},
+
+		// Three+ words with semicolon separator
+		{name: "three words semicolon", input: []string{"a", "b", "c"}, conj: "and", sep: "; ", want: "a; b; and c"},
+		{name: "four words semicolon", input: []string{"a", "b", "c", "d"}, conj: "and", sep: "; ", want: "a; b; c; and d"},
+		{name: "three words semicolon or", input: []string{"a", "b", "c"}, conj: "or", sep: "; ", want: "a; b; or c"},
+
+		// Items containing commas (primary use case)
+		{name: "dates with commas", input: []string{"Jan 1, 2020", "Feb 2, 2021", "Mar 3, 2022"}, conj: "and", sep: "; ", want: "Jan 1, 2020; Feb 2, 2021; and Mar 3, 2022"},
+		{name: "locations with commas", input: []string{"New York, NY", "Los Angeles, CA", "Chicago, IL"}, conj: "or", sep: "; ", want: "New York, NY; Los Angeles, CA; or Chicago, IL"},
+		{name: "names with titles", input: []string{"Smith, John", "Doe, Jane"}, conj: "and", sep: "; ", want: "Smith, John and Doe, Jane"},
+
+		// Custom separators
+		{name: "pipe separator", input: []string{"a", "b", "c"}, conj: "and", sep: " | ", want: "a | b | and c"},
+		{name: "dash separator", input: []string{"x", "y", "z"}, conj: "or", sep: " - ", want: "x - y - or z"},
+		{name: "newline separator", input: []string{"line1", "line2", "line3"}, conj: "and", sep: "\n", want: "line1\nline2\nand line3"},
+
+		// Verify comma separator matches JoinWithConj behavior
+		{name: "comma separator three", input: []string{"a", "b", "c"}, conj: "and", sep: ", ", want: "a, b, and c"},
+		{name: "comma separator four", input: []string{"a", "b", "c", "d"}, conj: "or", sep: ", ", want: "a, b, c, or d"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.JoinWithSep(tt.input, tt.conj, tt.sep)
+			if got != tt.want {
+				t.Errorf("JoinWithSep(%q, %q, %q) = %q, want %q", tt.input, tt.conj, tt.sep, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestOrdinalWord(t *testing.T) {
 	tests := []struct {
 		name  string

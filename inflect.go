@@ -786,6 +786,18 @@ func Join(words []string) string {
 //   - JoinWithConj([]string{"a", "b", "c"}, "or") returns "a, b, or c"
 //   - JoinWithConj([]string{"a", "b", "c"}, "and/or") returns "a, b, and/or c"
 func JoinWithConj(words []string, conj string) string {
+	return JoinWithSep(words, conj, ", ")
+}
+
+// JoinWithSep combines a slice of strings into a grammatically correct English list
+// with a custom conjunction and separator.
+//
+// This is useful when list items themselves contain commas.
+//
+// Examples:
+//   - JoinWithSep([]string{"a", "b", "c"}, "and", "; ") returns "a; b; and c"
+//   - JoinWithSep([]string{"Jan 1, 2020", "Feb 2, 2021"}, "and", "; ") returns "Jan 1, 2020; and Feb 2, 2021"
+func JoinWithSep(words []string, conj string, sep string) string {
 	switch len(words) {
 	case 0:
 		return ""
@@ -794,6 +806,6 @@ func JoinWithConj(words []string, conj string) string {
 	case 2:
 		return words[0] + " " + conj + " " + words[1]
 	default:
-		return strings.Join(words[:len(words)-1], ", ") + ", " + conj + " " + words[len(words)-1]
+		return strings.Join(words[:len(words)-1], sep) + sep + conj + " " + words[len(words)-1]
 	}
 }
