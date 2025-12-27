@@ -9,6 +9,7 @@ package inflect
 import (
 	"fmt"
 	"math"
+	"regexp"
 	"strconv"
 	"strings"
 	"unicode"
@@ -2175,4 +2176,183 @@ func No(word string, count int) string {
 		return fmt.Sprintf("%d %s", count, word)
 	}
 	return fmt.Sprintf("%d %s", count, Plural(word))
+}
+
+// inflectFuncPattern matches function calls in the format:
+// functionName('arg') or functionName('arg', num) or functionName(num)
+// Supports single quotes, double quotes, or no quotes for string args.
+var inflectFuncPattern = regexp.MustCompile(`(\w+)\(([^)]*)\)`)
+
+// Inflect parses text containing inline function calls and replaces them
+// with their inflected results.
+//
+// Supported function calls:
+//   - plural('word') - returns the plural form of the word
+//   - plural('word', n) - returns plural if n != 1, singular otherwise
+//   - singular('word') - returns the singular form of the word
+//   - an('word') - returns the word with appropriate article ("a" or "an")
+//   - a('word') - alias for an()
+//   - ordinal(n) - returns ordinal form like "1st", "2nd", "3rd"
+//   - num(n) - returns the number as a string
+//
+// Examples:
+//   - Inflect("The plural of cat is plural('cat')") -> "The plural of cat is cats"
+//   - Inflect("I saw an('apple')") -> "I saw an apple"
+//   - Inflect("There are num(3) plural('error', 3)") -> "There are 3 errors"
+//   - Inflect("This is the ordinal(1) item") -> "This is the 1st item"
+func Inflect(text string) string {
+	return inflectFuncPattern.ReplaceAllStringFunc(text, func(match string) string {
+		return processInflectCall(match)
+	})
+}
+
+// processInflectCall processes a single function call match and returns
+// the inflected result.
+func processInflectCall(match string) string {
+	// Parse the function name and arguments
+	submatches := inflectFuncPattern.FindStringSubmatch(match)
+	if submatches == nil || len(submatches) < 3 {
+		return match
+	}
+
+	funcName := strings.ToLower(submatches[1])
+	argsStr := strings.TrimSpace(submatches[2])
+
+	// Parse arguments
+	args := parseInflectArgs(argsStr)
+
+	switch funcName {
+	case "plural":
+		return processPlural(args, match)
+	case "singular":
+		return processSingular(args, match)
+	case "an", "a":
+		return processArticle(args, match)
+	case "ordinal":
+		return processOrdinal(args, match)
+	case "num":
+		return processNum(args, match)
+	default:
+		return match
+	}
+}
+
+// parseInflectArgs parses the arguments string into a slice of strings.
+// Handles quoted strings and numeric arguments.
+func parseInflectArgs(argsStr string) []string {
+	if argsStr == "" {
+		return nil
+	}
+
+	var args []string
+	var current strings.Builder
+	inQuote := false
+	quoteChar := rune(0)
+
+	for i, r := range argsStr {
+		switch {
+		case (r == '\'' || r == '"') && !inQuote:
+			inQuote = true
+			quoteChar = r
+		case r == quoteChar && inQuote:
+			inQuote = false
+			quoteChar = 0
+		case r == ',' && !inQuote:
+			arg := strings.TrimSpace(current.String())
+			if arg != "" {
+				args = append(args, arg)
+			}
+			current.Reset()
+		default:
+			// Skip leading/trailing whitespace in arguments
+			if !inQuote && current.Len() == 0 && unicode.IsSpace(r) {
+				continue
+			}
+			// Check if we're at end and it's trailing whitespace
+			if !inQuote && unicode.IsSpace(r) {
+				// Look ahead to see if there's more non-whitespace
+				hasMore := false
+				for j := i + 1; j < len(argsStr); j++ {
+					if !unicode.IsSpace(rune(argsStr[j])) && argsStr[j] != ',' {
+						hasMore = true
+						break
+					} else if argsStr[j] == ',' {
+						break
+					}
+				}
+				if !hasMore {
+					continue
+				}
+			}
+			current.WriteRune(r)
+		}
+	}
+
+	// Add the last argument
+	arg := strings.TrimSpace(current.String())
+	if arg != "" {
+		args = append(args, arg)
+	}
+
+	return args
+}
+
+// processPlural handles plural('word') and plural('word', n).
+func processPlural(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+
+	word := args[0]
+
+	// If there's a count argument, use it to determine singular/plural
+	if len(args) >= 2 {
+		count, err := strconv.Atoi(args[1])
+		if err != nil {
+			return original
+		}
+		if count == 1 || count == -1 {
+			return word
+		}
+		return Plural(word)
+	}
+
+	return Plural(word)
+}
+
+// processSingular handles singular('word').
+func processSingular(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return Singular(args[0])
+}
+
+// processArticle handles an('word') and a('word').
+func processArticle(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return An(args[0])
+}
+
+// processOrdinal handles ordinal(n).
+func processOrdinal(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	n, err := strconv.Atoi(args[0])
+	if err != nil {
+		return original
+	}
+	return Ordinal(n)
+}
+
+// processNum handles num(n).
+func processNum(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	// Just return the number as-is (it's already a string)
+	return args[0]
 }

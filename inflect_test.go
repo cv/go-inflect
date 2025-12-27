@@ -3588,3 +3588,308 @@ func TestGenderSequence(t *testing.T) {
 		}
 	}
 }
+
+func TestInflect(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		// Basic plural function
+		{
+			name:     "simple plural",
+			input:    "The plural of cat is plural('cat')",
+			expected: "The plural of cat is cats",
+		},
+		{
+			name:     "plural with double quotes",
+			input:    `The plural of box is plural("box")`,
+			expected: "The plural of box is boxes",
+		},
+		{
+			name:     "plural irregular word",
+			input:    "One child, many plural('child')",
+			expected: "One child, many children",
+		},
+
+		// Plural with count
+		{
+			name:     "plural with count 1",
+			input:    "There is plural('error', 1)",
+			expected: "There is error",
+		},
+		{
+			name:     "plural with count 3",
+			input:    "There are plural('error', 3)",
+			expected: "There are errors",
+		},
+		{
+			name:     "plural with count 0",
+			input:    "There are plural('item', 0)",
+			expected: "There are items",
+		},
+
+		// Singular function
+		{
+			name:     "simple singular",
+			input:    "The singular of cats is singular('cats')",
+			expected: "The singular of cats is cat",
+		},
+		{
+			name:     "singular irregular",
+			input:    "One of the singular('children')",
+			expected: "One of the child",
+		},
+
+		// Article functions (an/a)
+		{
+			name:     "an with vowel",
+			input:    "I saw an('apple')",
+			expected: "I saw an apple",
+		},
+		{
+			name:     "an with consonant",
+			input:    "I saw an('banana')",
+			expected: "I saw a banana",
+		},
+		{
+			name:     "a function",
+			input:    "This is a('umbrella')",
+			expected: "This is an umbrella",
+		},
+		{
+			name:     "a with consonant",
+			input:    "This is a('cat')",
+			expected: "This is a cat",
+		},
+
+		// Ordinal function
+		{
+			name:     "ordinal 1",
+			input:    "This is the ordinal(1) item",
+			expected: "This is the 1st item",
+		},
+		{
+			name:     "ordinal 2",
+			input:    "This is the ordinal(2) place",
+			expected: "This is the 2nd place",
+		},
+		{
+			name:     "ordinal 3",
+			input:    "The ordinal(3) time",
+			expected: "The 3rd time",
+		},
+		{
+			name:     "ordinal 11",
+			input:    "The ordinal(11) hour",
+			expected: "The 11th hour",
+		},
+		{
+			name:     "ordinal 21",
+			input:    "The ordinal(21) century",
+			expected: "The 21st century",
+		},
+
+		// Num function
+		{
+			name:     "num simple",
+			input:    "There are num(3) items",
+			expected: "There are 3 items",
+		},
+		{
+			name:     "num zero",
+			input:    "There are num(0) items",
+			expected: "There are 0 items",
+		},
+		{
+			name:     "num large",
+			input:    "Count: num(1000)",
+			expected: "Count: 1000",
+		},
+
+		// Combined examples
+		{
+			name:     "num with plural",
+			input:    "There are num(3) plural('error', 3)",
+			expected: "There are 3 errors",
+		},
+		{
+			name:     "num with plural singular case",
+			input:    "There is num(1) plural('error', 1)",
+			expected: "There is 1 error",
+		},
+		{
+			name:     "multiple functions",
+			input:    "I have an('apple') and plural('orange', 2)",
+			expected: "I have an apple and oranges",
+		},
+		{
+			name:     "ordinal with plural",
+			input:    "The ordinal(1) of plural('mouse', 3)",
+			expected: "The 1st of mice",
+		},
+
+		// Edge cases
+		{
+			name:     "no functions",
+			input:    "Just plain text",
+			expected: "Just plain text",
+		},
+		{
+			name:     "empty string",
+			input:    "",
+			expected: "",
+		},
+		{
+			name:     "unknown function preserved",
+			input:    "This unknown('test') stays",
+			expected: "This unknown('test') stays",
+		},
+		{
+			name:     "function at start",
+			input:    "plural('cat') are cute",
+			expected: "cats are cute",
+		},
+		{
+			name:     "function at end",
+			input:    "I love plural('dog')",
+			expected: "I love dogs",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			if got != tt.expected {
+				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestInflectPlural(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"basic noun", "plural('cat')", "cats"},
+		{"irregular noun", "plural('mouse')", "mice"},
+		{"with count 0", "plural('dog', 0)", "dogs"},
+		{"with count 1", "plural('dog', 1)", "dog"},
+		{"with count 2", "plural('dog', 2)", "dogs"},
+		{"with count -1", "plural('dog', -1)", "dog"},
+		{"s ending", "plural('bus')", "buses"},
+		{"y ending", "plural('baby')", "babies"},
+		{"unchanged", "plural('sheep')", "sheep"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			if got != tt.expected {
+				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestInflectSingular(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"basic noun", "singular('cats')", "cat"},
+		{"irregular noun", "singular('mice')", "mouse"},
+		{"es ending", "singular('boxes')", "box"},
+		{"ies ending", "singular('babies')", "baby"},
+		{"unchanged", "singular('sheep')", "sheep"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			if got != tt.expected {
+				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestInflectArticle(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"an with a", "an('apple')", "an apple"},
+		{"an with e", "an('elephant')", "an elephant"},
+		{"an with consonant", "an('cat')", "a cat"},
+		{"a with vowel", "a('orange')", "an orange"},
+		{"a with consonant", "a('dog')", "a dog"},
+		{"silent h", "an('hour')", "an hour"},
+		{"aspirated h", "an('house')", "a house"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			if got != tt.expected {
+				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestInflectOrdinal(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"1st", "ordinal(1)", "1st"},
+		{"2nd", "ordinal(2)", "2nd"},
+		{"3rd", "ordinal(3)", "3rd"},
+		{"4th", "ordinal(4)", "4th"},
+		{"11th", "ordinal(11)", "11th"},
+		{"12th", "ordinal(12)", "12th"},
+		{"13th", "ordinal(13)", "13th"},
+		{"21st", "ordinal(21)", "21st"},
+		{"22nd", "ordinal(22)", "22nd"},
+		{"23rd", "ordinal(23)", "23rd"},
+		{"100th", "ordinal(100)", "100th"},
+		{"101st", "ordinal(101)", "101st"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			if got != tt.expected {
+				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestInflectNum(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"zero", "num(0)", "0"},
+		{"positive", "num(42)", "42"},
+		{"large", "num(12345)", "12345"},
+		{"negative", "num(-5)", "-5"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			if got != tt.expected {
+				t.Errorf("Inflect(%q) = %q, want %q", tt.input, got, tt.expected)
+			}
+		})
+	}
+}
