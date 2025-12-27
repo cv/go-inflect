@@ -98,11 +98,38 @@ func Plural(word string) string {
 ## Session Handoff Notes
 
 Last session (2025-12-26):
-- Implemented `An()` and `A()` functions for indefinite article selection
-- Implemented `Plural()` function for English noun pluralization
-- 88 tests passing, 95.8% coverage
-- Closed issue go-inflect-j4l (An function)
-- Next: Continue with Pluralization epic (more edge cases, compound words)
+Implemented 29 tasks using claude-opus-4-5 subagents:
+
+### Core Functions Implemented:
+- `An()`/`A()` - indefinite article selection
+- `Plural()`/`Singular()` - noun pluralization
+- `Ordinal()`/`OrdinalWord()` - numeric and word ordinals
+- `NumberToWords()` - integer to English words
+- `Join()`/`JoinWithConj()`/`JoinWithSep()` - list joining
+- `PresentParticiple()` - verb -ing forms
+- `Compare()`/`CompareNouns()` - word comparison
+- `No()` - count + word formatting
+- `Num()`/`GetNum()` - default count storage
+- `Classical()`/`IsClassical()` - classical mode toggle
+
+### Custom Definition Functions:
+- `DefNoun()`/`UndefNoun()`/`DefNounReset()`
+- `DefA()`/`DefAn()`/`UndefA()`/`UndefAn()`/`DefAReset()`
+- `DefVerb()`/`DefAdj()` stubs with full API
+
+### Quality:
+- 500+ tests passing
+- 98.1% code coverage
+- 66 benchmark cases
+- Comprehensive README with examples
+
+### Remaining Work (19 tasks):
+- Classical mode options (persons, ancient, herd, names, zero)
+- Gender() for pronoun selection
+- Inflect() for inline text parsing
+- Regex patterns in custom definitions
+- CI/CD setup
+- Contribution guidelines
 
 **Note**: No git remote configured yet. To push:
 ```bash
