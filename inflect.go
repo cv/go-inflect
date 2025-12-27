@@ -1998,6 +1998,50 @@ func GetNum() int {
 	return defaultNum
 }
 
+// FormatNumber formats an integer with commas as thousand separators.
+//
+// Examples:
+//   - FormatNumber(1000) returns "1,000"
+//   - FormatNumber(1000000) returns "1,000,000"
+//   - FormatNumber(123456789) returns "123,456,789"
+//   - FormatNumber(-1234) returns "-1,234"
+//   - FormatNumber(999) returns "999" (no comma needed)
+func FormatNumber(n int) string {
+	// Handle negative numbers
+	if n < 0 {
+		return "-" + FormatNumber(-n)
+	}
+
+	// Convert to string
+	s := strconv.Itoa(n)
+
+	// No formatting needed for numbers with 3 or fewer digits
+	if len(s) <= 3 {
+		return s
+	}
+
+	// Build result with commas inserted every 3 digits from the right
+	var result strings.Builder
+	result.Grow(len(s) + (len(s)-1)/3) // pre-allocate space for digits + commas
+
+	// Calculate the position of the first comma
+	firstGroup := len(s) % 3
+	if firstGroup == 0 {
+		firstGroup = 3
+	}
+
+	// Write first group (1-3 digits)
+	result.WriteString(s[:firstGroup])
+
+	// Write remaining groups with preceding commas
+	for i := firstGroup; i < len(s); i += 3 {
+		result.WriteByte(',')
+		result.WriteString(s[i : i+3])
+	}
+
+	return result.String()
+}
+
 // No returns a count and noun phrase in English, using "no" for zero counts.
 //
 // The function handles pluralization automatically:

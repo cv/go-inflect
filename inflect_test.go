@@ -351,6 +351,69 @@ func TestNumberToWordsThreshold(t *testing.T) {
 	}
 }
 
+func TestFormatNumber(t *testing.T) {
+	tests := []struct {
+		name  string
+		input int
+		want  string
+	}{
+		// Basic cases from requirements
+		{name: "1000", input: 1000, want: "1,000"},
+		{name: "1000000", input: 1000000, want: "1,000,000"},
+		{name: "123456789", input: 123456789, want: "123,456,789"},
+		{name: "negative 1234", input: -1234, want: "-1,234"},
+		{name: "999 no comma", input: 999, want: "999"},
+
+		// Small numbers (no commas needed)
+		{name: "zero", input: 0, want: "0"},
+		{name: "single digit", input: 5, want: "5"},
+		{name: "two digits", input: 42, want: "42"},
+		{name: "three digits", input: 100, want: "100"},
+
+		// Boundary cases around 1000
+		{name: "999 boundary", input: 999, want: "999"},
+		{name: "1000 boundary", input: 1000, want: "1,000"},
+		{name: "1001", input: 1001, want: "1,001"},
+
+		// Various digit groupings
+		{name: "4 digits", input: 1234, want: "1,234"},
+		{name: "5 digits", input: 12345, want: "12,345"},
+		{name: "6 digits", input: 123456, want: "123,456"},
+		{name: "7 digits", input: 1234567, want: "1,234,567"},
+		{name: "8 digits", input: 12345678, want: "12,345,678"},
+		{name: "9 digits", input: 123456789, want: "123,456,789"},
+		{name: "10 digits", input: 1234567890, want: "1,234,567,890"},
+
+		// Numbers with zeros
+		{name: "10000", input: 10000, want: "10,000"},
+		{name: "100000", input: 100000, want: "100,000"},
+		{name: "1000000", input: 1000000, want: "1,000,000"},
+		{name: "10000000", input: 10000000, want: "10,000,000"},
+		{name: "1000000000", input: 1000000000, want: "1,000,000,000"},
+
+		// Negative numbers
+		{name: "negative small", input: -5, want: "-5"},
+		{name: "negative three digits", input: -999, want: "-999"},
+		{name: "negative 1000", input: -1000, want: "-1,000"},
+		{name: "negative million", input: -1000000, want: "-1,000,000"},
+		{name: "negative large", input: -123456789, want: "-123,456,789"},
+
+		// Numbers with trailing zeros
+		{name: "trailing zeros 4 digits", input: 1000, want: "1,000"},
+		{name: "trailing zeros 7 digits", input: 1000000, want: "1,000,000"},
+		{name: "mixed with zeros", input: 1002003, want: "1,002,003"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.FormatNumber(tt.input)
+			if got != tt.want {
+				t.Errorf("FormatNumber(%d) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestOrdinalWord(t *testing.T) {
 	tests := []struct {
 		name  string
