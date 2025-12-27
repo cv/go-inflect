@@ -582,6 +582,7 @@ var tensOrdinal = []string{
 // Join combines a slice of strings into a grammatically correct English list.
 //
 // The function uses the Oxford comma (serial comma) for lists of three or more items.
+// It uses "and" as the conjunction. For custom conjunctions, use JoinWithConj.
 //
 // Examples:
 //   - Join([]string{}) returns ""
@@ -589,14 +590,27 @@ var tensOrdinal = []string{
 //   - Join([]string{"a", "b"}) returns "a and b"
 //   - Join([]string{"a", "b", "c"}) returns "a, b, and c"
 func Join(words []string) string {
+	return JoinWithConj(words, "and")
+}
+
+// JoinWithConj combines a slice of strings into a grammatically correct English list
+// with a custom conjunction.
+//
+// The function uses the Oxford comma (serial comma) for lists of three or more items.
+//
+// Examples:
+//   - JoinWithConj([]string{"a", "b"}, "or") returns "a or b"
+//   - JoinWithConj([]string{"a", "b", "c"}, "or") returns "a, b, or c"
+//   - JoinWithConj([]string{"a", "b", "c"}, "and/or") returns "a, b, and/or c"
+func JoinWithConj(words []string, conj string) string {
 	switch len(words) {
 	case 0:
 		return ""
 	case 1:
 		return words[0]
 	case 2:
-		return words[0] + " and " + words[1]
+		return words[0] + " " + conj + " " + words[1]
 	default:
-		return strings.Join(words[:len(words)-1], ", ") + ", and " + words[len(words)-1]
+		return strings.Join(words[:len(words)-1], ", ") + ", " + conj + " " + words[len(words)-1]
 	}
 }

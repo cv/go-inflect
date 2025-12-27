@@ -48,6 +48,54 @@ func TestJoin(t *testing.T) {
 	}
 }
 
+func TestJoinWithConj(t *testing.T) {
+	tests := []struct {
+		name  string
+		input []string
+		conj  string
+		want  string
+	}{
+		// Empty slice
+		{name: "empty slice with or", input: []string{}, conj: "or", want: ""},
+		{name: "nil slice with or", input: nil, conj: "or", want: ""},
+
+		// Single word
+		{name: "single word with or", input: []string{"apple"}, conj: "or", want: "apple"},
+		{name: "single empty string with or", input: []string{""}, conj: "or", want: ""},
+
+		// Two words with "or"
+		{name: "two words with or", input: []string{"apple", "banana"}, conj: "or", want: "apple or banana"},
+		{name: "two short words with or", input: []string{"a", "b"}, conj: "or", want: "a or b"},
+
+		// Three+ words with "or" (Oxford comma)
+		{name: "three words with or", input: []string{"a", "b", "c"}, conj: "or", want: "a, b, or c"},
+		{name: "four words with or", input: []string{"apple", "banana", "cherry", "date"}, conj: "or", want: "apple, banana, cherry, or date"},
+
+		// Other conjunctions
+		{name: "two words with and/or", input: []string{"a", "b"}, conj: "and/or", want: "a and/or b"},
+		{name: "three words with and/or", input: []string{"a", "b", "c"}, conj: "and/or", want: "a, b, and/or c"},
+		{name: "two words with nor", input: []string{"this", "that"}, conj: "nor", want: "this nor that"},
+		{name: "three words with nor", input: []string{"this", "that", "other"}, conj: "nor", want: "this, that, nor other"},
+
+		// Verify "and" conjunction matches Join() behavior
+		{name: "two words with and", input: []string{"a", "b"}, conj: "and", want: "a and b"},
+		{name: "three words with and", input: []string{"a", "b", "c"}, conj: "and", want: "a, b, and c"},
+
+		// Words with special characters
+		{name: "words with spaces and or", input: []string{"New York", "Los Angeles"}, conj: "or", want: "New York or Los Angeles"},
+		{name: "words with unicode and or", input: []string{"café", "thé", "chocolat"}, conj: "or", want: "café, thé, or chocolat"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.JoinWithConj(tt.input, tt.conj)
+			if got != tt.want {
+				t.Errorf("JoinWithConj(%q, %q) = %q, want %q", tt.input, tt.conj, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestOrdinalWord(t *testing.T) {
 	tests := []struct {
 		name  string
