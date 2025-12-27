@@ -113,6 +113,170 @@ inflect.Singular("sheep")    // "sheep"
 inflect.Singular("fish")     // "fish"
 ```
 
+### Part-of-Speech Specific Pluralization
+
+For more precise inflection, use part-of-speech specific functions that handle pronouns, verbs, and adjectives.
+
+#### PluralNoun
+
+Pluralizes nouns and pronouns with optional count parameter.
+
+```go
+// Pronouns - nominative case
+inflect.PluralNoun("I")       // "We"
+inflect.PluralNoun("he")      // "they"
+inflect.PluralNoun("she")     // "they"
+inflect.PluralNoun("it")      // "they"
+
+// Pronouns - accusative case
+inflect.PluralNoun("me")      // "us"
+inflect.PluralNoun("him")     // "them"
+inflect.PluralNoun("her")     // "them"
+
+// Pronouns - possessive
+inflect.PluralNoun("my")      // "our"
+inflect.PluralNoun("mine")    // "ours"
+inflect.PluralNoun("his")     // "their"
+inflect.PluralNoun("hers")    // "theirs"
+
+// Pronouns - reflexive
+inflect.PluralNoun("myself")   // "ourselves"
+inflect.PluralNoun("himself")  // "themselves"
+inflect.PluralNoun("herself")  // "themselves"
+
+// Regular nouns (delegates to Plural)
+inflect.PluralNoun("cat")     // "cats"
+inflect.PluralNoun("child")   // "children"
+
+// With count parameter
+inflect.PluralNoun("cat", 1)  // "cat" (singular when count=1)
+inflect.PluralNoun("cat", 2)  // "cats"
+inflect.PluralNoun("cat", 0)  // "cats"
+```
+
+#### PluralVerb
+
+Pluralizes verbs (converts 3rd person singular to base form).
+
+```go
+// Auxiliary verbs
+inflect.PluralVerb("is")      // "are"
+inflect.PluralVerb("was")     // "were"
+inflect.PluralVerb("has")     // "have"
+inflect.PluralVerb("does")    // "do"
+
+// Contractions
+inflect.PluralVerb("isn't")   // "aren't"
+inflect.PluralVerb("wasn't")  // "weren't"
+inflect.PluralVerb("doesn't") // "don't"
+inflect.PluralVerb("hasn't")  // "haven't"
+
+// Modal verbs (unchanged)
+inflect.PluralVerb("can")     // "can"
+inflect.PluralVerb("will")    // "will"
+inflect.PluralVerb("must")    // "must"
+
+// Regular 3rd person singular verbs
+inflect.PluralVerb("runs")    // "run"
+inflect.PluralVerb("walks")   // "walk"
+inflect.PluralVerb("tries")   // "try"
+inflect.PluralVerb("watches") // "watch"
+
+// With count parameter
+inflect.PluralVerb("is", 1)   // "is" (singular when count=1)
+inflect.PluralVerb("is", 2)   // "are"
+```
+
+#### PluralAdj
+
+Pluralizes adjectives (demonstratives, articles, possessives).
+
+```go
+// Demonstrative adjectives
+inflect.PluralAdj("this")     // "these"
+inflect.PluralAdj("that")     // "those"
+
+// Indefinite articles
+inflect.PluralAdj("a")        // "some"
+inflect.PluralAdj("an")       // "some"
+
+// Possessive adjectives
+inflect.PluralAdj("my")       // "our"
+inflect.PluralAdj("his")      // "their"
+inflect.PluralAdj("her")      // "their"
+inflect.PluralAdj("its")      // "their"
+
+// With count parameter
+inflect.PluralAdj("this", 1)  // "this" (singular when count=1)
+inflect.PluralAdj("this", 2)  // "these"
+```
+
+#### SingularNoun
+
+Singularizes nouns and pronouns with gender support.
+
+```go
+// Pronouns - nominative case
+inflect.SingularNoun("we")    // "I"
+inflect.SingularNoun("they")  // "they" (default gender is singular they)
+
+// Pronouns - accusative case
+inflect.SingularNoun("us")    // "me"
+inflect.SingularNoun("them")  // "them" (default gender)
+
+// Pronouns - possessive
+inflect.SingularNoun("our")   // "my"
+inflect.SingularNoun("ours")  // "mine"
+inflect.SingularNoun("their") // "their" (default gender)
+
+// Pronouns - reflexive
+inflect.SingularNoun("ourselves")   // "myself"
+inflect.SingularNoun("themselves")  // "themself" (default gender)
+
+// Regular nouns (delegates to Singular)
+inflect.SingularNoun("cats")     // "cat"
+inflect.SingularNoun("children") // "child"
+
+// With count parameter
+inflect.SingularNoun("cats", 1)  // "cat"
+inflect.SingularNoun("cats", 2)  // "cats" (plural when count!=1)
+```
+
+### Gender for Pronouns
+
+Set the gender for third-person singular pronouns returned by `SingularNoun()`.
+
+```go
+// Default is "t" (singular they)
+inflect.SingularNoun("they")  // "they"
+inflect.SingularNoun("them")  // "them"
+
+// Masculine
+inflect.Gender("m")
+inflect.SingularNoun("they")  // "he"
+inflect.SingularNoun("them")  // "him"
+inflect.SingularNoun("their") // "his"
+
+// Feminine
+inflect.Gender("f")
+inflect.SingularNoun("they")  // "she"
+inflect.SingularNoun("them")  // "her"
+inflect.SingularNoun("their") // "her"
+
+// Neuter
+inflect.Gender("n")
+inflect.SingularNoun("they")  // "it"
+inflect.SingularNoun("them")  // "it"
+inflect.SingularNoun("their") // "its"
+
+// Singular they (default)
+inflect.Gender("t")
+inflect.SingularNoun("they")  // "they"
+
+// Check current gender
+inflect.GetGender()  // returns "m", "f", "n", or "t"
+```
+
 ### Ordinals
 
 Convert numbers to ordinal form (numeric or word).
@@ -261,19 +425,57 @@ inflect.CompareNouns("dog", "dogs") // "s:p"
 
 ## API Reference
 
+### Core Functions
+
 | Function | Description |
 |----------|-------------|
 | `An(word string) string` | Returns word prefixed with "a" or "an" |
 | `A(word string) string` | Alias for `An()` |
 | `Plural(word string) string` | Returns the plural form of a noun |
 | `Singular(word string) string` | Returns the singular form of a noun |
+
+### Part-of-Speech Specific Functions
+
+| Function | Description |
+|----------|-------------|
+| `PluralNoun(word string, count ...int) string` | Pluralizes nouns and pronouns |
+| `PluralVerb(word string, count ...int) string` | Pluralizes verbs (3rd person → base form) |
+| `PluralAdj(word string, count ...int) string` | Pluralizes adjectives (this→these, a→some) |
+| `SingularNoun(word string, count ...int) string` | Singularizes nouns and pronouns |
+
+### Gender Control
+
+| Function | Description |
+|----------|-------------|
+| `Gender(g string)` | Sets gender for 3rd person pronouns ("m", "f", "n", "t") |
+| `GetGender() string` | Returns current gender setting |
+
+### Number Functions
+
+| Function | Description |
+|----------|-------------|
 | `Ordinal(n int) string` | Returns numeric ordinal (1st, 2nd, 3rd, ...) |
 | `OrdinalWord(n int) string` | Returns ordinal as word (first, second, ...) |
 | `NumberToWords(n int) string` | Converts integer to English words |
+
+### List Functions
+
+| Function | Description |
+|----------|-------------|
 | `Join(words []string) string` | Joins list with "and" and Oxford comma |
 | `JoinWithConj(words []string, conj string) string` | Joins with custom conjunction |
 | `JoinWithSep(words []string, conj string, sep string) string` | Joins with custom conjunction and separator |
+
+### Verb Functions
+
+| Function | Description |
+|----------|-------------|
 | `PresentParticiple(verb string) string` | Returns present participle (-ing form) |
+
+### Comparison Functions
+
+| Function | Description |
+|----------|-------------|
 | `Compare(word1, word2 string) string` | Compares singular/plural relationship |
 | `CompareNouns(noun1, noun2 string) string` | Alias for `Compare()` |
 
