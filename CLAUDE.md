@@ -2,137 +2,40 @@
 
 ## Project Overview
 
-This is a Go port of the Python [inflect](https://pypi.org/project/inflect/) library for English word inflection. The goal is to provide idiomatic Go equivalents for pluralization, singularization, indefinite articles, number-to-words conversion, and more.
+Go port of the Python [inflect](https://pypi.org/project/inflect/) library for English word inflection.
 
 ## Development Workflow
 
-### 1. Find Work
 ```bash
 bd ready              # See available issues
-bd show <id>          # View issue details
-```
-
-### 2. Claim & Implement
-```bash
-bd update <id> --status in_progress  # Claim the work
-```
-
-Then:
-1. Read the test file first (tests define requirements)
-2. Check `reference/` for Python source behavior
-3. Implement in `inflect.go`
-4. Run tests: `go test -v`
-
-### 3. Quality Gates
-```bash
-gofmt -w .            # Format code
-go vet ./...          # Static analysis
+bd update <id> --status in_progress  # Claim work
 go test -v            # Run tests
-go test -cover        # Check coverage
+gofmt -w . && go vet  # Lint
+git commit && git push
+bd close <id> -r "reason"
+bd sync               # Sync with remote
 ```
 
-### 4. Commit & Close
-```bash
-git add -A
-git commit -m "Implement feature X..."
-bd close <id> -r "Reason"
-```
+## Current State (2025-12-26)
 
-### 5. Push (MANDATORY before session end)
-```bash
-git pull --rebase
-bd sync
-git push
-```
+### Completed: 39 tasks
+- **Core**: An/A, Plural/Singular, Ordinal/OrdinalWord, NumberToWords
+- **Joining**: Join, JoinWithConj, JoinWithSep
+- **Verbs**: PresentParticiple
+- **Comparison**: Compare, CompareNouns
+- **Custom Defs**: DefNoun, DefA/DefAn, DefVerb, DefAdj + Undef/Reset
+- **Classical Mode**: ClassicalAll, ClassicalAncient, ClassicalPersons, ClassicalZero, ClassicalHerd, ClassicalNames
+- **Utility**: No, Num, Gender
+- **Docs**: README.md, CONTRIBUTING.md, LICENSE
 
-## Code Style
-
-- Follow [Effective Go](https://go.dev/doc/effective_go)
-- Package comment at top of `inflect.go`
-- Doc comments on all exported functions
-- Table-driven tests
-- Handle edge cases (empty strings, single characters)
-
-## Reference Materials
-
-- `reference/tests/` - Python test files showing expected behavior
-- `reference/README.rst` - Python library documentation
-- `features.md` - Feature list to implement
-- `ROADMAP.md` - Development phases
-- `TEST_COVERAGE.md` - Test case reference
-
-## Architecture Decisions
-
-### Pronunciation-Based Article Selection (An/A)
-The `An()` function uses a multi-layered approach:
-1. Check for silent 'h' words (honest, hour, heir)
-2. Check for abbreviations (uppercase = letter pronunciation)
-3. Check for known lowercase abbreviations (mpeg, jpeg)
-4. Check for consonant-Y sounds in U-words (Ukrainian, unanimous)
-5. Default: vowel letters get "an", consonants get "a"
-
-This matches the Python inflect behavior while being idiomatic Go.
-
-## Common Patterns
-
-### Adding New Inflection Functions
-
-1. Define the exported function with doc comment
-2. Create helper functions for rule matching
-3. Use word lists for exceptions
-4. Write table-driven tests first
-
-Example structure:
-```go
-// Plural returns the plural form of an English noun.
-func Plural(word string) string {
-    if word == "" {
-        return ""
-    }
-    // Check irregular forms first
-    // Apply suffix rules
-    // Default behavior
-}
-```
-
-## Session Handoff Notes
-
-Last session (2025-12-26):
-Implemented 29 tasks using claude-opus-4-5 subagents:
-
-### Core Functions Implemented:
-- `An()`/`A()` - indefinite article selection
-- `Plural()`/`Singular()` - noun pluralization
-- `Ordinal()`/`OrdinalWord()` - numeric and word ordinals
-- `NumberToWords()` - integer to English words
-- `Join()`/`JoinWithConj()`/`JoinWithSep()` - list joining
-- `PresentParticiple()` - verb -ing forms
-- `Compare()`/`CompareNouns()` - word comparison
-- `No()` - count + word formatting
-- `Num()`/`GetNum()` - default count storage
-- `Classical()`/`IsClassical()` - classical mode toggle
-
-### Custom Definition Functions:
-- `DefNoun()`/`UndefNoun()`/`DefNounReset()`
-- `DefA()`/`DefAn()`/`UndefA()`/`UndefAn()`/`DefAReset()`
-- `DefVerb()`/`DefAdj()` stubs with full API
-
-### Quality:
-- 500+ tests passing
-- 98.1% code coverage
-- 66 benchmark cases
-- Comprehensive README with examples
-
-### Remaining Work (19 tasks):
-- Classical mode options (persons, ancient, herd, names, zero)
-- Gender() for pronoun selection
-- Inflect() for inline text parsing
-- Regex patterns in custom definitions
+### Remaining: 11 tasks
 - CI/CD setup
-- Contribution guidelines
+- Inflect() inline text parsing
+- Regex patterns in custom definitions
+- Comma/semicolon detection in Join
+- NumberToWords options (decimal, threshold, comma, group)
 
-**Note**: No git remote configured yet. To push:
-```bash
-git remote add origin git@gitlab-master.nvidia.com:urg/go-inflect.git
-git push -u origin main
-```
+### Quality
+- 96.1% test coverage
+- 5,228 lines of code
+- 66 benchmarks
