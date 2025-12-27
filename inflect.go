@@ -1009,3 +1009,22 @@ func Compare(word1, word2 string) string {
 
 	return ""
 }
+
+// CompareNouns compares two nouns for singular/plural equality.
+//
+// This is an alias for Compare that makes the intent explicit when working
+// specifically with nouns.
+//
+// It returns:
+//   - "eq" if the nouns are equal (case-insensitive)
+//   - "s:p" if noun1 is singular and noun2 is its plural form
+//   - "p:s" if noun1 is plural and noun2 is its singular form
+//   - "p:p" if both nouns are different plural forms of the same word
+//   - "" if the nouns are not related
+//
+// Examples:
+//   - CompareNouns("cat", "cats") returns "s:p"
+//   - CompareNouns("mice", "mouse") returns "p:s"
+func CompareNouns(noun1, noun2 string) string {
+	return Compare(noun1, noun2)
+}

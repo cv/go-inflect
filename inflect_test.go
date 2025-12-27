@@ -674,6 +674,36 @@ func TestCompare(t *testing.T) {
 	}
 }
 
+func TestCompareNouns(t *testing.T) {
+	// CompareNouns is an alias for Compare, so we just verify it behaves the same
+	tests := []struct {
+		name  string
+		noun1 string
+		noun2 string
+		want  string
+	}{
+		{name: "singular to plural", noun1: "cat", noun2: "cats", want: "s:p"},
+		{name: "plural to singular", noun1: "cats", noun2: "cat", want: "p:s"},
+		{name: "equal nouns", noun1: "dog", noun2: "dog", want: "eq"},
+		{name: "unrelated nouns", noun1: "cat", noun2: "dog", want: ""},
+		{name: "irregular plural", noun1: "child", noun2: "children", want: "s:p"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.CompareNouns(tt.noun1, tt.noun2)
+			if got != tt.want {
+				t.Errorf("CompareNouns(%q, %q) = %q, want %q", tt.noun1, tt.noun2, got, tt.want)
+			}
+			// Verify it matches Compare() behavior
+			compareGot := inflect.Compare(tt.noun1, tt.noun2)
+			if got != compareGot {
+				t.Errorf("CompareNouns(%q, %q) = %q, but Compare() = %q", tt.noun1, tt.noun2, got, compareGot)
+			}
+		})
+	}
+}
+
 func TestPlural(t *testing.T) {
 	tests := []struct {
 		name  string
