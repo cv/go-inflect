@@ -178,7 +178,8 @@ inflect.Inflect("This is the ordinal(1) item")
 
 ## Documentation
 
-Full API documentation with examples: [pkg.go.dev/github.com/cv/go-inflect](https://pkg.go.dev/github.com/cv/go-inflect)
+- **pkg.go.dev**: [pkg.go.dev/github.com/cv/go-inflect](https://pkg.go.dev/github.com/cv/go-inflect)
+- **GitHub Pages**: [cv.github.io/go-inflect](https://cv.github.io/go-inflect/)
 
 ## Contributing
 
