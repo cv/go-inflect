@@ -387,6 +387,22 @@ inflect.JoinWithConj([]string{"read", "write", "execute"}, "and/or")
 // Custom separator (useful when items contain commas)
 inflect.JoinWithSep([]string{"Jan 1, 2020", "Feb 2, 2021", "Mar 3, 2022"}, "and", "; ")
 // "Jan 1, 2020; Feb 2, 2021; and Mar 3, 2022"
+
+// Auto-detect separator based on content
+inflect.JoinWithAutoSep([]string{"a", "b", "c"}, "and")
+// "a, b, and c" (no commas in items, uses comma)
+inflect.JoinWithAutoSep([]string{"Jan 1, 2020", "Feb 2, 2021"}, "and")
+// "Jan 1, 2020; and Feb 2, 2021" (commas in items, uses semicolon)
+
+// Different final separator (before conjunction)
+inflect.JoinWithFinalSep([]string{"a", "b", "c"}, "and", ", ", "; ")
+// "a, b; and c"
+
+// Without Oxford comma (British style)
+inflect.JoinNoOxford([]string{"a", "b", "c"})
+// "a, b and c"
+inflect.JoinNoOxfordWithConj([]string{"a", "b", "c"}, "or")
+// "a, b or c"
 ```
 
 ### Present Participle
@@ -505,7 +521,11 @@ inflect.CompareNouns("dog", "dogs") // "s:p"
 |----------|-------------|
 | `Join(words []string) string` | Joins list with "and" and Oxford comma |
 | `JoinWithConj(words []string, conj string) string` | Joins with custom conjunction |
-| `JoinWithSep(words []string, conj string, sep string) string` | Joins with custom conjunction and separator |
+| `JoinWithSep(words []string, conj, sep string) string` | Joins with custom separator |
+| `JoinWithFinalSep(words []string, conj, sep, finalSep string) string` | Joins with different final separator |
+| `JoinWithAutoSep(words []string, conj string) string` | Auto-detects separator based on content |
+| `JoinNoOxford(words []string) string` | Joins without Oxford comma |
+| `JoinNoOxfordWithConj(words []string, conj string) string` | Joins without Oxford comma, custom conjunction |
 
 ### Verb Functions
 

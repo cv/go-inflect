@@ -70,6 +70,18 @@ func JoinWithAutoSep(words []string, conj string) string {
 //   - JoinWithSep([]string{"a", "b", "c"}, "and", "; ") returns "a; b; and c"
 //   - JoinWithSep([]string{"Jan 1, 2020", "Feb 2, 2021"}, "and", "; ") returns "Jan 1, 2020; and Feb 2, 2021"
 func JoinWithSep(words []string, conj, sep string) string {
+	return JoinWithFinalSep(words, conj, sep, sep)
+}
+
+// JoinWithFinalSep combines a slice of strings with a custom separator and
+// a different final separator (before the conjunction).
+//
+// This allows for maximum flexibility in list formatting.
+//
+// Examples:
+//   - JoinWithFinalSep([]string{"a", "b", "c"}, "and", ", ", "; ") returns "a, b; and c"
+//   - JoinWithFinalSep([]string{"a", "b", "c"}, "and", ", ", "") returns "a, b and c" (no Oxford comma)
+func JoinWithFinalSep(words []string, conj, sep, finalSep string) string {
 	switch len(words) {
 	case 0:
 		return ""
@@ -78,6 +90,28 @@ func JoinWithSep(words []string, conj, sep string) string {
 	case 2:
 		return words[0] + " " + conj + " " + words[1]
 	default:
-		return strings.Join(words[:len(words)-1], sep) + sep + conj + " " + words[len(words)-1]
+		return strings.Join(words[:len(words)-1], sep) + finalSep + conj + " " + words[len(words)-1]
 	}
+}
+
+// JoinNoOxford combines a slice of strings without the Oxford comma.
+//
+// Unlike Join, this function omits the comma before the final conjunction.
+// Use this for non-Oxford comma style lists.
+//
+// Examples:
+//   - JoinNoOxford([]string{"a", "b"}) returns "a and b"
+//   - JoinNoOxford([]string{"a", "b", "c"}) returns "a, b and c"
+func JoinNoOxford(words []string) string {
+	return JoinNoOxfordWithConj(words, "and")
+}
+
+// JoinNoOxfordWithConj combines a slice of strings without the Oxford comma
+// using a custom conjunction.
+//
+// Examples:
+//   - JoinNoOxfordWithConj([]string{"a", "b", "c"}, "or") returns "a, b or c"
+//   - JoinNoOxfordWithConj([]string{"a", "b", "c"}, "and") returns "a, b and c"
+func JoinNoOxfordWithConj(words []string, conj string) string {
+	return JoinWithFinalSep(words, conj, ", ", " ")
 }

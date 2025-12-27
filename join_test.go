@@ -218,3 +218,116 @@ func BenchmarkJoin(b *testing.B) {
 		})
 	}
 }
+
+func TestJoinWithFinalSep(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    []string
+		conj     string
+		sep      string
+		finalSep string
+		want     string
+	}{
+		// Empty and single
+		{name: "empty slice", input: []string{}, conj: "and", sep: ", ", finalSep: "; ", want: ""},
+		{name: "single word", input: []string{"a"}, conj: "and", sep: ", ", finalSep: "; ", want: "a"},
+
+		// Two words (no separator used)
+		{name: "two words", input: []string{"a", "b"}, conj: "and", sep: ", ", finalSep: "; ", want: "a and b"},
+
+		// Three+ words with different final separator
+		{name: "three words comma then semicolon", input: []string{"a", "b", "c"}, conj: "and", sep: ", ", finalSep: "; ", want: "a, b; and c"},
+		{name: "four words comma then semicolon", input: []string{"a", "b", "c", "d"}, conj: "and", sep: ", ", finalSep: "; ", want: "a, b, c; and d"},
+
+		// Same separator and final separator (should match JoinWithSep)
+		{name: "same separators", input: []string{"a", "b", "c"}, conj: "and", sep: ", ", finalSep: ", ", want: "a, b, and c"},
+
+		// No final separator (space only for clean look)
+		{name: "space final separator", input: []string{"a", "b", "c"}, conj: "and", sep: ", ", finalSep: " ", want: "a, b and c"},
+
+		// Different conjunctions
+		{name: "or conjunction", input: []string{"a", "b", "c"}, conj: "or", sep: ", ", finalSep: "; ", want: "a, b; or c"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.JoinWithFinalSep(tt.input, tt.conj, tt.sep, tt.finalSep)
+			if got != tt.want {
+				t.Errorf("JoinWithFinalSep(%q, %q, %q, %q) = %q, want %q", tt.input, tt.conj, tt.sep, tt.finalSep, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestJoinNoOxford(t *testing.T) {
+	tests := []struct {
+		name  string
+		input []string
+		want  string
+	}{
+		// Empty and single
+		{name: "empty slice", input: []string{}, want: ""},
+		{name: "single word", input: []string{"a"}, want: "a"},
+
+		// Two words (same as Join)
+		{name: "two words", input: []string{"a", "b"}, want: "a and b"},
+
+		// Three+ words without Oxford comma
+		{name: "three words", input: []string{"a", "b", "c"}, want: "a, b and c"},
+		{name: "four words", input: []string{"a", "b", "c", "d"}, want: "a, b, c and d"},
+		{name: "five words", input: []string{"one", "two", "three", "four", "five"}, want: "one, two, three, four and five"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.JoinNoOxford(tt.input)
+			if got != tt.want {
+				t.Errorf("JoinNoOxford(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestJoinNoOxfordWithConj(t *testing.T) {
+	tests := []struct {
+		name  string
+		input []string
+		conj  string
+		want  string
+	}{
+		// Empty and single
+		{name: "empty slice", input: []string{}, conj: "or", want: ""},
+		{name: "single word", input: []string{"a"}, conj: "or", want: "a"},
+
+		// Two words
+		{name: "two words", input: []string{"a", "b"}, conj: "or", want: "a or b"},
+
+		// Three+ words without Oxford comma
+		{name: "three words or", input: []string{"a", "b", "c"}, conj: "or", want: "a, b or c"},
+		{name: "three words and", input: []string{"a", "b", "c"}, conj: "and", want: "a, b and c"},
+		{name: "four words nor", input: []string{"a", "b", "c", "d"}, conj: "nor", want: "a, b, c nor d"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.JoinNoOxfordWithConj(tt.input, tt.conj)
+			if got != tt.want {
+				t.Errorf("JoinNoOxfordWithConj(%q, %q) = %q, want %q", tt.input, tt.conj, got, tt.want)
+			}
+		})
+	}
+}
+
+func BenchmarkJoinWithFinalSep(b *testing.B) {
+	input := []string{"a", "b", "c", "d", "e"}
+	for range b.N {
+		inflect.JoinWithFinalSep(input, "and", ", ", "; ")
+	}
+}
+
+func BenchmarkJoinNoOxford(b *testing.B) {
+	input := []string{"a", "b", "c", "d", "e"}
+	for range b.N {
+		inflect.JoinNoOxford(input)
+	}
+}
