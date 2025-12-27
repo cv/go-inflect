@@ -14,6 +14,16 @@ bd close <id>         # Complete work
 bd sync               # Sync with git
 ```
 
+## Working on Tickets
+
+When working on a ticket, delegate the bulk of the work to a **pi subagent** running `claude-opus-4-5`:
+
+```bash
+pi --model claude-opus-4-5 "your task description"
+```
+
+See `pi --help` for options. Once the subagent completes, review and verify the work before pushing to remote.
+
 ## Session Completion
 
 **Work is NOT complete until `git push` succeeds.**
