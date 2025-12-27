@@ -40,7 +40,17 @@ git clone https://github.com/YOUR_USERNAME/go-inflect.git
 cd go-inflect
 ```
 
-### 2. Create a Branch
+### 2. Setup Development Environment
+
+```bash
+# Install golangci-lint v2
+go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+
+# Setup pre-commit hooks (runs build, test, lint before each commit)
+./.githooks/setup.sh
+```
+
+### 3. Create a Branch
 
 Create a descriptive branch name for your changes:
 
@@ -50,13 +60,13 @@ git checkout -b feature/add-new-pluralization-rule
 git checkout -b fix/silent-h-handling
 ```
 
-### 3. Make Changes
+### 4. Make Changes
 
 - Write your code following the style guidelines below
 - Add or update tests for your changes
 - Update documentation if needed
 
-### 4. Run Tests
+### 5. Run Tests
 
 Ensure all tests pass before submitting:
 
@@ -70,7 +80,7 @@ For coverage information:
 go test -cover
 ```
 
-### 5. Run Linters
+### 6. Run Linters
 
 Format your code and check for issues:
 
@@ -79,7 +89,7 @@ gofmt -w .
 go vet ./...
 ```
 
-### 6. Submit a Pull Request
+### 7. Submit a Pull Request
 
 1. Commit your changes with a clear, descriptive message
 2. Push your branch to your fork
