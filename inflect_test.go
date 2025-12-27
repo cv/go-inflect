@@ -3,7 +3,7 @@ package inflect_test
 import (
 	"testing"
 
-	inflect "gitlab-master.nvidia.com/urg/go-inflect"
+	inflect "github.com/cv/go-inflect"
 )
 
 func TestJoin(t *testing.T) {

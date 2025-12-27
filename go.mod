@@ -1,3 +1,3 @@
-module gitlab-master.nvidia.com/urg/go-inflect
+module github.com/cv/go-inflect
 
 go 1.25.5

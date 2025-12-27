@@ -7,13 +7,13 @@ A Go port of the [Python inflect](https://github.com/jaraco/inflect) library for
 ## Installation
 
 ```bash
-go get gitlab-master.nvidia.com/urg/go-inflect
+go get github.com/cv/go-inflect
 ```
 
 ## Usage
 
 ```go
-import "gitlab-master.nvidia.com/urg/go-inflect"
+import "github.com/cv/go-inflect"
 ```
 
 ### Indefinite Articles (An/A)
