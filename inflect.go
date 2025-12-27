@@ -7,6 +7,7 @@
 package inflect
 
 import (
+	"fmt"
 	"strings"
 	"unicode"
 )
@@ -382,4 +383,45 @@ var unchangedPlurals = []string{
 	"aircraft", "bison", "buffalo", "cod", "deer", "fish", "moose",
 	"offspring", "pike", "salmon", "series", "sheep", "shrimp",
 	"species", "squid", "swine", "trout", "tuna",
+}
+
+// Ordinal converts an integer to its ordinal string representation.
+//
+// Examples:
+//   - Ordinal(1) returns "1st"
+//   - Ordinal(2) returns "2nd"
+//   - Ordinal(3) returns "3rd"
+//   - Ordinal(11) returns "11th"
+//   - Ordinal(21) returns "21st"
+//   - Ordinal(-1) returns "-1st"
+func Ordinal(n int) string {
+	suffix := ordinalSuffix(n)
+	return fmt.Sprintf("%d%s", n, suffix)
+}
+
+// ordinalSuffix returns the ordinal suffix for a number.
+func ordinalSuffix(n int) string {
+	// Handle negative numbers by using absolute value
+	if n < 0 {
+		n = -n
+	}
+
+	// Special case: 11, 12, 13 always use "th"
+	// Check the last two digits to handle 111, 112, 113, etc.
+	lastTwo := n % 100
+	if lastTwo >= 11 && lastTwo <= 13 {
+		return "th"
+	}
+
+	// Otherwise, check the last digit
+	switch n % 10 {
+	case 1:
+		return "st"
+	case 2:
+		return "nd"
+	case 3:
+		return "rd"
+	default:
+		return "th"
+	}
 }
