@@ -3,6 +3,8 @@ package inflect_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	inflect "github.com/cv/go-inflect"
 )
 
@@ -46,9 +48,7 @@ func TestAn(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.An(tt.input)
-			if got != tt.want {
-				t.Errorf("An(%q) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "An(%q)", tt.input)
 		})
 	}
 }
@@ -65,9 +65,7 @@ func TestA(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
 			got := inflect.A(tt.input)
-			if got != tt.want {
-				t.Errorf("A(%q) = %q, want %q", tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "A(%q)", tt.input)
 		})
 	}
 }
@@ -104,9 +102,7 @@ func TestDefA(t *testing.T) {
 			inflect.DefA(tt.word)
 
 			got := inflect.An(tt.input)
-			if got != tt.want {
-				t.Errorf("After DefA(%q): An(%q) = %q, want %q", tt.word, tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "After DefA(%q): An(%q)", tt.word, tt.input)
 		})
 	}
 }
@@ -143,9 +139,7 @@ func TestDefAn(t *testing.T) {
 			inflect.DefAn(tt.word)
 
 			got := inflect.An(tt.input)
-			if got != tt.want {
-				t.Errorf("After DefAn(%q): An(%q) = %q, want %q", tt.word, tt.input, got, tt.want)
-			}
+			assert.Equal(t, tt.want, got, "After DefAn(%q): An(%q)", tt.word, tt.input)
 		})
 	}
 }
@@ -197,14 +191,10 @@ func TestUndefA(t *testing.T) {
 			}
 
 			removed := inflect.UndefA(tt.undefWord)
-			if removed != tt.wantRemoved {
-				t.Errorf("UndefA(%q) = %v, want %v", tt.undefWord, removed, tt.wantRemoved)
-			}
+			assert.Equal(t, tt.wantRemoved, removed, "UndefA(%q)", tt.undefWord)
 
 			got := inflect.An(tt.checkInput)
-			if got != tt.wantAfter {
-				t.Errorf("After UndefA: An(%q) = %q, want %q", tt.checkInput, got, tt.wantAfter)
-			}
+			assert.Equal(t, tt.wantAfter, got, "After UndefA: An(%q)", tt.checkInput)
 		})
 	}
 }
@@ -256,14 +246,10 @@ func TestUndefAn(t *testing.T) {
 			}
 
 			removed := inflect.UndefAn(tt.undefWord)
-			if removed != tt.wantRemoved {
-				t.Errorf("UndefAn(%q) = %v, want %v", tt.undefWord, removed, tt.wantRemoved)
-			}
+			assert.Equal(t, tt.wantRemoved, removed, "UndefAn(%q)", tt.undefWord)
 
 			got := inflect.An(tt.checkInput)
-			if got != tt.wantAfter {
-				t.Errorf("After UndefAn: An(%q) = %q, want %q", tt.checkInput, got, tt.wantAfter)
-			}
+			assert.Equal(t, tt.wantAfter, got, "After UndefAn: An(%q)", tt.checkInput)
 		})
 	}
 }
@@ -332,9 +318,7 @@ func TestDefAReset(t *testing.T) {
 			// Check results
 			for input, want := range tt.checkInputs {
 				got := inflect.An(input)
-				if got != want {
-					t.Errorf("After reset: An(%q) = %q, want %q", input, got, want)
-				}
+				assert.Equal(t, want, got, "After reset: An(%q)", input)
 			}
 		})
 	}
@@ -349,15 +333,11 @@ func TestDefADefAnPrecedence(t *testing.T) {
 
 		// First define as "an"
 		inflect.DefAn("test")
-		if got := inflect.An("test"); got != "an test" {
-			t.Errorf("After DefAn: An(test) = %q, want %q", got, "an test")
-		}
+		assert.Equal(t, "an test", inflect.An("test"), "After DefAn")
 
 		// Then override with "a"
 		inflect.DefA("test")
-		if got := inflect.An("test"); got != "a test" {
-			t.Errorf("After DefA override: An(test) = %q, want %q", got, "a test")
-		}
+		assert.Equal(t, "a test", inflect.An("test"), "After DefA override")
 	})
 
 	t.Run("DefAn overrides previous DefA", func(t *testing.T) {
@@ -365,15 +345,11 @@ func TestDefADefAnPrecedence(t *testing.T) {
 
 		// First define as "a"
 		inflect.DefA("test")
-		if got := inflect.An("test"); got != "a test" {
-			t.Errorf("After DefA: An(test) = %q, want %q", got, "a test")
-		}
+		assert.Equal(t, "a test", inflect.An("test"), "After DefA")
 
 		// Then override with "an"
 		inflect.DefAn("test")
-		if got := inflect.An("test"); got != "an test" {
-			t.Errorf("After DefAn override: An(test) = %q, want %q", got, "an test")
-		}
+		assert.Equal(t, "an test", inflect.An("test"), "After DefAn override")
 	})
 }
 
@@ -385,40 +361,24 @@ func TestDefAIntegration(t *testing.T) {
 		inflect.DefAReset()
 
 		// 1. Verify default behavior
-		if got := inflect.An("ape"); got != "an ape" {
-			t.Errorf("Default: An(ape) = %q, want %q", got, "an ape")
-		}
-		if got := inflect.An("hero"); got != "a hero" {
-			t.Errorf("Default: An(hero) = %q, want %q", got, "a hero")
-		}
+		assert.Equal(t, "an ape", inflect.An("ape"), "Default: An(ape)")
+		assert.Equal(t, "a hero", inflect.An("hero"), "Default: An(hero)")
 
 		// 2. Add custom "a" rule
 		inflect.DefA("ape")
-		if got := inflect.An("ape"); got != "a ape" {
-			t.Errorf("After DefA: An(ape) = %q, want %q", got, "a ape")
-		}
+		assert.Equal(t, "a ape", inflect.An("ape"), "After DefA: An(ape)")
 
 		// 3. Add custom "an" rule
 		inflect.DefAn("hero")
-		if got := inflect.An("hero"); got != "an hero" {
-			t.Errorf("After DefAn: An(hero) = %q, want %q", got, "an hero")
-		}
+		assert.Equal(t, "an hero", inflect.An("hero"), "After DefAn: An(hero)")
 
 		// 4. Remove custom "a" rule
-		if removed := inflect.UndefA("ape"); !removed {
-			t.Error("UndefA(ape) should return true")
-		}
-		if got := inflect.An("ape"); got != "an ape" {
-			t.Errorf("After UndefA: An(ape) = %q, want %q", got, "an ape")
-		}
+		assert.True(t, inflect.UndefA("ape"), "UndefA(ape) should return true")
+		assert.Equal(t, "an ape", inflect.An("ape"), "After UndefA: An(ape)")
 
 		// 5. Remove custom "an" rule
-		if removed := inflect.UndefAn("hero"); !removed {
-			t.Error("UndefAn(hero) should return true")
-		}
-		if got := inflect.An("hero"); got != "a hero" {
-			t.Errorf("After UndefAn: An(hero) = %q, want %q", got, "a hero")
-		}
+		assert.True(t, inflect.UndefAn("hero"), "UndefAn(hero) should return true")
+		assert.Equal(t, "a hero", inflect.An("hero"), "After UndefAn: An(hero)")
 
 		// 6. Add multiple rules and reset
 		inflect.DefA("ape")
@@ -428,18 +388,10 @@ func TestDefAIntegration(t *testing.T) {
 
 		inflect.DefAReset()
 
-		if got := inflect.An("ape"); got != "an ape" {
-			t.Errorf("After reset: An(ape) = %q, want %q", got, "an ape")
-		}
-		if got := inflect.An("eagle"); got != "an eagle" {
-			t.Errorf("After reset: An(eagle) = %q, want %q", got, "an eagle")
-		}
-		if got := inflect.An("hero"); got != "a hero" {
-			t.Errorf("After reset: An(hero) = %q, want %q", got, "a hero")
-		}
-		if got := inflect.An("cat"); got != "a cat" {
-			t.Errorf("After reset: An(cat) = %q, want %q", got, "a cat")
-		}
+		assert.Equal(t, "an ape", inflect.An("ape"), "After reset: An(ape)")
+		assert.Equal(t, "an eagle", inflect.An("eagle"), "After reset: An(eagle)")
+		assert.Equal(t, "a hero", inflect.An("hero"), "After reset: An(hero)")
+		assert.Equal(t, "a cat", inflect.An("cat"), "After reset: An(cat)")
 	})
 }
 
@@ -477,16 +429,12 @@ func TestDefAPattern(t *testing.T) {
 			inflect.DefAReset()
 
 			err := inflect.DefAPattern(tt.pattern)
-			if err != nil {
-				t.Fatalf("DefAPattern(%q) returned error: %v", tt.pattern, err)
-			}
+			assert.NoError(t, err, "DefAPattern(%q)", tt.pattern)
 
 			for _, input := range tt.inputs {
 				got := inflect.An(input)
 				want := tt.want + " " + input
-				if got != want {
-					t.Errorf("An(%q) = %q, want %q", input, got, want)
-				}
+				assert.Equal(t, want, got, "An(%q)", input)
 			}
 		})
 	}
@@ -526,16 +474,12 @@ func TestDefAnPattern(t *testing.T) {
 			inflect.DefAReset()
 
 			err := inflect.DefAnPattern(tt.pattern)
-			if err != nil {
-				t.Fatalf("DefAnPattern(%q) returned error: %v", tt.pattern, err)
-			}
+			assert.NoError(t, err, "DefAnPattern(%q)", tt.pattern)
 
 			for _, input := range tt.inputs {
 				got := inflect.An(input)
 				want := tt.want + " " + input
-				if got != want {
-					t.Errorf("An(%q) = %q, want %q", input, got, want)
-				}
+				assert.Equal(t, want, got, "An(%q)", input)
 			}
 		})
 	}
@@ -545,14 +489,10 @@ func TestDefAPatternInvalidRegex(t *testing.T) {
 	defer inflect.DefAReset()
 
 	err := inflect.DefAPattern("[invalid")
-	if err == nil {
-		t.Error("DefAPattern with invalid regex should return error")
-	}
+	assert.Error(t, err, "DefAPattern with invalid regex should return error")
 
 	err = inflect.DefAnPattern("[invalid")
-	if err == nil {
-		t.Error("DefAnPattern with invalid regex should return error")
-	}
+	assert.Error(t, err, "DefAnPattern with invalid regex should return error")
 }
 
 func TestUndefAPattern(t *testing.T) {
@@ -562,30 +502,21 @@ func TestUndefAPattern(t *testing.T) {
 		inflect.DefAReset()
 
 		// Use "apple" which normally takes "an" but pattern forces "a"
-		if err := inflect.DefAPattern("apple.*"); err != nil {
-			t.Fatalf("DefAPattern failed: %v", err)
-		}
-		if got := inflect.An("appleton"); got != "a appleton" {
-			t.Errorf("Before UndefAPattern: An(appleton) = %q, want %q", got, "a appleton")
-		}
+		err := inflect.DefAPattern("apple.*")
+		assert.NoError(t, err, "DefAPattern failed")
+		assert.Equal(t, "a appleton", inflect.An("appleton"), "Before UndefAPattern")
 
 		// Remove pattern
-		if removed := inflect.UndefAPattern("apple.*"); !removed {
-			t.Error("UndefAPattern should return true for existing pattern")
-		}
+		assert.True(t, inflect.UndefAPattern("apple.*"), "UndefAPattern should return true for existing pattern")
 
 		// Verify default behavior restored (words starting with vowel get "an")
-		if got := inflect.An("appleton"); got != "an appleton" {
-			t.Errorf("After UndefAPattern: An(appleton) = %q, want %q", got, "an appleton")
-		}
+		assert.Equal(t, "an appleton", inflect.An("appleton"), "After UndefAPattern")
 	})
 
 	t.Run("remove non-existing pattern", func(t *testing.T) {
 		inflect.DefAReset()
 
-		if removed := inflect.UndefAPattern("nonexistent.*"); removed {
-			t.Error("UndefAPattern should return false for non-existing pattern")
-		}
+		assert.False(t, inflect.UndefAPattern("nonexistent.*"), "UndefAPattern should return false for non-existing pattern")
 	})
 }
 
@@ -596,30 +527,21 @@ func TestUndefAnPattern(t *testing.T) {
 		inflect.DefAReset()
 
 		// Add pattern and verify it works
-		if err := inflect.DefAnPattern("hero.*"); err != nil {
-			t.Fatalf("DefAnPattern failed: %v", err)
-		}
-		if got := inflect.An("heroic"); got != "an heroic" {
-			t.Errorf("Before UndefAnPattern: An(heroic) = %q, want %q", got, "an heroic")
-		}
+		err := inflect.DefAnPattern("hero.*")
+		assert.NoError(t, err, "DefAnPattern failed")
+		assert.Equal(t, "an heroic", inflect.An("heroic"), "Before UndefAnPattern")
 
 		// Remove pattern
-		if removed := inflect.UndefAnPattern("hero.*"); !removed {
-			t.Error("UndefAnPattern should return true for existing pattern")
-		}
+		assert.True(t, inflect.UndefAnPattern("hero.*"), "UndefAnPattern should return true for existing pattern")
 
 		// Verify default behavior restored
-		if got := inflect.An("heroic"); got != "a heroic" {
-			t.Errorf("After UndefAnPattern: An(heroic) = %q, want %q", got, "a heroic")
-		}
+		assert.Equal(t, "a heroic", inflect.An("heroic"), "After UndefAnPattern")
 	})
 
 	t.Run("remove non-existing pattern", func(t *testing.T) {
 		inflect.DefAReset()
 
-		if removed := inflect.UndefAnPattern("nonexistent.*"); removed {
-			t.Error("UndefAnPattern should return false for non-existing pattern")
-		}
+		assert.False(t, inflect.UndefAnPattern("nonexistent.*"), "UndefAnPattern should return false for non-existing pattern")
 	})
 }
 
@@ -629,39 +551,25 @@ func TestDefAResetClearsPatterns(t *testing.T) {
 	// Add both exact matches and patterns
 	inflect.DefA("apple")
 	inflect.DefAn("cat")
-	if err := inflect.DefAPattern("euro.*"); err != nil {
-		t.Fatalf("DefAPattern failed: %v", err)
-	}
-	if err := inflect.DefAnPattern("honor.*"); err != nil {
-		t.Fatalf("DefAnPattern failed: %v", err)
-	}
+	err := inflect.DefAPattern("euro.*")
+	assert.NoError(t, err, "DefAPattern failed")
+	err = inflect.DefAnPattern("honor.*")
+	assert.NoError(t, err, "DefAnPattern failed")
 
 	// Verify patterns are working
-	if got := inflect.An("apple"); got != "a apple" {
-		t.Errorf("Before reset: An(apple) = %q, want %q", got, "a apple")
-	}
-	if got := inflect.An("european"); got != "a european" {
-		t.Errorf("Before reset: An(european) = %q, want %q", got, "a european")
-	}
-	if got := inflect.An("honorable"); got != "an honorable" {
-		t.Errorf("Before reset: An(honorable) = %q, want %q", got, "an honorable")
-	}
+	assert.Equal(t, "a apple", inflect.An("apple"), "Before reset: An(apple)")
+	assert.Equal(t, "a european", inflect.An("european"), "Before reset: An(european)")
+	assert.Equal(t, "an honorable", inflect.An("honorable"), "Before reset: An(honorable)")
 
 	// Reset
 	inflect.DefAReset()
 
 	// Verify all patterns are cleared (back to defaults)
-	if got := inflect.An("apple"); got != "an apple" {
-		t.Errorf("After reset: An(apple) = %q, want %q", got, "an apple")
-	}
+	assert.Equal(t, "an apple", inflect.An("apple"), "After reset: An(apple)")
 	// "european" defaults to "a" because "eu" sounds like "you"
-	if got := inflect.An("european"); got != "a european" {
-		t.Errorf("After reset: An(european) = %q, want %q", got, "a european")
-	}
+	assert.Equal(t, "a european", inflect.An("european"), "After reset: An(european)")
 	// "honorable" defaults to "an" because the "h" is silent
-	if got := inflect.An("honorable"); got != "an honorable" {
-		t.Errorf("After reset: An(honorable) = %q, want %q", got, "an honorable")
-	}
+	assert.Equal(t, "an honorable", inflect.An("honorable"), "After reset: An(honorable)")
 }
 
 func TestPatternPrecedence(t *testing.T) {
@@ -671,54 +579,40 @@ func TestPatternPrecedence(t *testing.T) {
 		inflect.DefAReset()
 
 		// Add pattern first
-		if err := inflect.DefAnPattern("euro.*"); err != nil {
-			t.Fatalf("DefAnPattern failed: %v", err)
-		}
-		if got := inflect.An("euro"); got != "an euro" {
-			t.Errorf("With pattern only: An(euro) = %q, want %q", got, "an euro")
-		}
+		err := inflect.DefAnPattern("euro.*")
+		assert.NoError(t, err, "DefAnPattern failed")
+		assert.Equal(t, "an euro", inflect.An("euro"), "With pattern only")
 
 		// Add exact word match - should take precedence
 		inflect.DefA("euro")
-		if got := inflect.An("euro"); got != "a euro" {
-			t.Errorf("With exact word override: An(euro) = %q, want %q", got, "a euro")
-		}
+		assert.Equal(t, "a euro", inflect.An("euro"), "With exact word override")
 
 		// Other words matching pattern still work
-		if got := inflect.An("european"); got != "an european" {
-			t.Errorf("Pattern still matches: An(european) = %q, want %q", got, "an european")
-		}
+		assert.Equal(t, "an european", inflect.An("european"), "Pattern still matches")
 	})
 
 	t.Run("DefAPattern takes precedence over DefAnPattern", func(t *testing.T) {
 		inflect.DefAReset()
 
 		// Both patterns match "european"
-		if err := inflect.DefAnPattern("euro.*"); err != nil {
-			t.Fatalf("DefAnPattern failed: %v", err)
-		}
-		if err := inflect.DefAPattern("europ.*"); err != nil {
-			t.Fatalf("DefAPattern failed: %v", err)
-		}
+		err := inflect.DefAnPattern("euro.*")
+		assert.NoError(t, err, "DefAnPattern failed")
+		err = inflect.DefAPattern("europ.*")
+		assert.NoError(t, err, "DefAPattern failed")
 
 		// DefAPattern should take precedence
-		if got := inflect.An("european"); got != "a european" {
-			t.Errorf("An(european) = %q, want %q", got, "a european")
-		}
+		assert.Equal(t, "a european", inflect.An("european"))
 
 		// "euro" only matches DefAnPattern
-		if got := inflect.An("euro"); got != "an euro" {
-			t.Errorf("An(euro) = %q, want %q", got, "an euro")
-		}
+		assert.Equal(t, "an euro", inflect.An("euro"))
 	})
 }
 
 func TestPatternCaseInsensitive(t *testing.T) {
 	defer inflect.DefAReset()
 
-	if err := inflect.DefAPattern("euro.*"); err != nil {
-		t.Fatalf("DefAPattern failed: %v", err)
-	}
+	err := inflect.DefAPattern("euro.*")
+	assert.NoError(t, err, "DefAPattern failed")
 
 	// Pattern should match regardless of case
 	tests := []struct {
@@ -734,9 +628,7 @@ func TestPatternCaseInsensitive(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		if got := inflect.An(tt.input); got != tt.want {
-			t.Errorf("An(%q) = %q, want %q", tt.input, got, tt.want)
-		}
+		assert.Equal(t, tt.want, inflect.An(tt.input), "An(%q)", tt.input)
 	}
 }
 
