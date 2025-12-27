@@ -42,6 +42,12 @@ inflect.PastParticiple("take")    // "taken"
 
 // Word comparison
 inflect.Compare("cat", "cats")    // "s:p" (singular to plural)
+
+// Adjective forms
+inflect.Comparative("big")        // "bigger"
+inflect.Superlative("big")        // "biggest"
+inflect.Comparative("beautiful")  // "more beautiful"
+inflect.Superlative("beautiful")  // "most beautiful"
 ```
 
 ## Core Functions
@@ -69,6 +75,8 @@ inflect.Compare("cat", "cats")    // "s:p" (singular to plural)
 |----------|-------------|
 | `An(word)` / `A(word)` | Prefix with "a" or "an" |
 | `PluralAdj(word, count...)` | "this" → "these", "a" → "some" |
+| `Comparative(adj)` | "big" → "bigger", "beautiful" → "more beautiful" |
+| `Superlative(adj)` | "big" → "biggest", "beautiful" → "most beautiful" |
 
 ### Numbers
 
