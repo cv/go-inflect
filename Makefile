@@ -1,4 +1,4 @@
-.PHONY: help deps build test lint fuzz bench bench-save bench-compare
+.PHONY: help deps build test lint fuzz bench bench-save bench-compare reference
 
 .DEFAULT_GOAL := help
 
@@ -32,3 +32,6 @@ bench-save: ## Save benchmark baseline
 bench-compare: ## Compare against baseline
 	go test -bench=. -benchmem -count=6 ./... > benchmarks/new.txt
 	go run golang.org/x/perf/cmd/benchstat benchmarks/baseline.txt benchmarks/new.txt
+
+reference: ## Generate reference documentation
+	go run tools/generate_reference.go

@@ -2,6 +2,10 @@
 
 Go port of Python [inflect](https://pypi.org/project/inflect/) for English word inflection. See `README.md` for API documentation.
 
+## Populating Context
+
+Run `make reference` to generate a CSV reference of all public functions with signatures, descriptions, locations, and test coverage. Use this to quickly understand the API surface.
+
 ## Issue Tracking
 
 Uses **bd** (beads). Run `bd onboard` to get started.
