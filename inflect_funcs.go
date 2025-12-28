@@ -39,8 +39,13 @@ var inflectFuncPattern = regexp.MustCompile(`(\w+)\(([^)]*)\)`)
 //   - ordinal_word(n) - returns ordinal word like "first", "second", "third"
 //   - num(n) - returns the number as a string
 //   - number_to_words(n) - converts number to words like "forty-two"
+//   - number_to_words_with_and(n) - converts number to words with "and" like "one hundred and twenty-three"
+//   - number_to_words_threshold(n, threshold) - returns words if n < threshold, else digits
 //   - counting_word(n) - returns counting words: 1 → "once", 2 → "twice", 3+ → "3 times"
 //   - no(word, count) - returns "no word" for 0, or "count words" otherwise
+//   - format_number(n) - formats number with commas like "1,000"
+//   - fraction(num, denom) - converts fraction to words like "one quarter"
+//   - currency_to_words(amount, currency) - converts currency to words like "one dollar and fifty cents"
 //
 // Verb tenses:
 //   - past_tense(verb) - returns past tense like "walk" → "walked"
@@ -51,6 +56,38 @@ var inflectFuncPattern = regexp.MustCompile(`(\w+)\(([^)]*)\)`)
 //   - possessive(noun) - returns possessive form like "cat" → "cat's"
 //   - comparative(adj) - returns comparative form like "big" → "bigger"
 //   - superlative(adj) - returns superlative form like "big" → "biggest"
+//   - adverb(adj) - returns adverb form like "quick" → "quickly"
+//
+// Word ordinals:
+//   - word_to_ordinal(word) - converts cardinal to ordinal word like "one" → "first"
+//   - ordinal_to_cardinal(word) - converts ordinal to cardinal word like "first" → "one"
+//
+// Capitalization:
+//   - capitalize(word) - capitalizes first letter like "hello" → "Hello"
+//   - titleize(text) - capitalizes each word like "hello world" → "Hello World"
+//
+// Case conversion:
+//   - snake_case(text) - converts to snake_case
+//   - camel_case(text) - converts to camelCase
+//   - pascal_case(text) - converts to PascalCase
+//   - kebab_case(text) - converts to kebab-case
+//   - humanize(text) - converts to human-readable form
+//
+// Rails-style functions:
+//   - tableize(word) - converts to table name like "Person" → "people"
+//   - foreign_key(word) - converts to foreign key like "Person" → "person_id"
+//   - typeify(word) - converts to type name like "user_post" → "UserPost"
+//   - parameterize(word) - converts to URL slug like "Hello World" → "hello-world"
+//   - asciify(word) - converts to ASCII like "café" → "cafe"
+//
+// Word comparison:
+//   - compare(word1, word2) - compares words for singular/plural equality
+//   - compare_nouns(noun1, noun2) - compares nouns for singular/plural equality
+//   - compare_verbs(verb1, verb2) - compares verbs for singular/plural equality
+//   - compare_adjs(adj1, adj2) - compares adjectives for singular/plural equality
+//
+// Other:
+//   - word_count(text) - counts words in text, returns count as string
 //
 // Examples:
 //   - Inflect("The plural of cat is plural('cat')") -> "The plural of cat is cats"
@@ -73,6 +110,77 @@ func Inflect(text string) string {
 	return inflectFuncPattern.ReplaceAllStringFunc(text, processInflectCall)
 }
 
+// inflectFunc is a function that processes arguments and returns the result.
+type inflectFunc func(args []string, original string) string
+
+// inflectFuncs maps function names to their handlers.
+var inflectFuncs = map[string]inflectFunc{
+	// Basic inflection
+	"plural":        processPlural,
+	"plural_noun":   processPluralNoun,
+	"plural_verb":   processPluralVerb,
+	"plural_adj":    processPluralAdj,
+	"singular":      processSingularNoun,
+	"singular_noun": processSingularNoun,
+	"an":            processArticle,
+	"a":             processArticle,
+
+	// Numbers
+	"ordinal":                   processOrdinal,
+	"ordinal_word":              processOrdinalWord,
+	"num":                       processNum,
+	"number_to_words":           processNumberToWords,
+	"number_to_words_with_and":  processNumberToWordsWithAnd,
+	"number_to_words_threshold": processNumberToWordsThreshold,
+	"counting_word":             processCountingWord,
+	"no":                        processNo,
+	"format_number":             processFormatNumber,
+	"fraction":                  processFraction,
+	"currency_to_words":         processCurrencyToWords,
+
+	// Verb tenses
+	"past_tense":         processPastTense,
+	"past_participle":    processPastParticiple,
+	"present_participle": processPresentParticiple,
+
+	// Other inflections
+	"possessive":  processPossessive,
+	"comparative": processComparative,
+	"superlative": processSuperlative,
+	"adverb":      processAdverb,
+
+	// Word ordinals
+	"word_to_ordinal":     processWordToOrdinal,
+	"ordinal_to_cardinal": processOrdinalToCardinal,
+
+	// Capitalization
+	"capitalize": processCapitalize,
+	"titleize":   processTitleize,
+
+	// Case conversion
+	"snake_case":  processSnakeCase,
+	"camel_case":  processCamelCase,
+	"pascal_case": processPascalCase,
+	"kebab_case":  processKebabCase,
+	"humanize":    processHumanize,
+
+	// Rails-style functions
+	"tableize":     processTableize,
+	"foreign_key":  processForeignKey,
+	"typeify":      processTypeify,
+	"parameterize": processParameterize,
+	"asciify":      processAsciify,
+
+	// Word comparison
+	"compare":       processCompare,
+	"compare_nouns": processCompareNouns,
+	"compare_verbs": processCompareVerbs,
+	"compare_adjs":  processCompareAdjs,
+
+	// Other
+	"word_count": processWordCount,
+}
+
 // processInflectCall processes a single function call match and returns
 // the inflected result.
 func processInflectCall(match string) string {
@@ -85,49 +193,13 @@ func processInflectCall(match string) string {
 	funcName := strings.ToLower(submatches[1])
 	argsStr := strings.TrimSpace(submatches[2])
 
-	// Parse arguments
-	args := parseInflectArgs(argsStr)
-
-	switch funcName {
-	case "plural":
-		return processPlural(args, match)
-	case "plural_noun":
-		return processPluralNoun(args, match)
-	case "plural_verb":
-		return processPluralVerb(args, match)
-	case "plural_adj":
-		return processPluralAdj(args, match)
-	case "singular", "singular_noun":
-		return processSingularNoun(args, match)
-	case "an", "a":
-		return processArticle(args, match)
-	case "ordinal":
-		return processOrdinal(args, match)
-	case "ordinal_word":
-		return processOrdinalWord(args, match)
-	case "num":
-		return processNum(args, match)
-	case "number_to_words":
-		return processNumberToWords(args, match)
-	case "counting_word":
-		return processCountingWord(args, match)
-	case "no":
-		return processNo(args, match)
-	case "past_tense":
-		return processPastTense(args, match)
-	case "past_participle":
-		return processPastParticiple(args, match)
-	case "present_participle":
-		return processPresentParticiple(args, match)
-	case "possessive":
-		return processPossessive(args, match)
-	case "comparative":
-		return processComparative(args, match)
-	case "superlative":
-		return processSuperlative(args, match)
-	default:
-		return match
+	// Look up and call the handler function
+	if handler, ok := inflectFuncs[funcName]; ok {
+		args := parseInflectArgs(argsStr)
+		return handler(args, match)
 	}
+
+	return match
 }
 
 // parseInflectArgs parses the arguments string into a slice of strings.
@@ -703,4 +775,233 @@ func SingularNoun(word string, count ...int) string {
 
 	// Fall back to regular Singular() for nouns
 	return prefix + Singular(trimmed) + suffix
+}
+
+// processAdverb handles adverb('adj').
+func processAdverb(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return Adverb(args[0])
+}
+
+// processCapitalize handles capitalize('word').
+func processCapitalize(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return Capitalize(args[0])
+}
+
+// processTitleize handles titleize('text').
+func processTitleize(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return Titleize(args[0])
+}
+
+// processWordToOrdinal handles word_to_ordinal('word').
+func processWordToOrdinal(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return WordToOrdinal(args[0])
+}
+
+// processOrdinalToCardinal handles ordinal_to_cardinal('word').
+func processOrdinalToCardinal(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return OrdinalToCardinal(args[0])
+}
+
+// processFraction handles fraction(num, denom).
+func processFraction(args []string, original string) string {
+	if len(args) < 2 {
+		return original
+	}
+	num, err := strconv.Atoi(args[0])
+	if err != nil {
+		return original
+	}
+	denom, err := strconv.Atoi(args[1])
+	if err != nil {
+		return original
+	}
+	return FractionToWords(num, denom)
+}
+
+// processFormatNumber handles format_number(n).
+func processFormatNumber(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	n, err := strconv.Atoi(args[0])
+	if err != nil {
+		return original
+	}
+	return FormatNumber(n)
+}
+
+// processSnakeCase handles snake_case('text').
+func processSnakeCase(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return SnakeCase(args[0])
+}
+
+// processCamelCase handles camel_case('text').
+func processCamelCase(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return CamelCase(args[0])
+}
+
+// processPascalCase handles pascal_case('text').
+func processPascalCase(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return PascalCase(args[0])
+}
+
+// processKebabCase handles kebab_case('text').
+func processKebabCase(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return KebabCase(args[0])
+}
+
+// processHumanize handles humanize('text').
+func processHumanize(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return Humanize(args[0])
+}
+
+// processTableize handles tableize('word').
+func processTableize(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return Tableize(args[0])
+}
+
+// processForeignKey handles foreign_key('word').
+func processForeignKey(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return ForeignKey(args[0])
+}
+
+// processTypeify handles typeify('word').
+func processTypeify(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return Typeify(args[0])
+}
+
+// processParameterize handles parameterize('word').
+func processParameterize(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return Parameterize(args[0])
+}
+
+// processAsciify handles asciify('word').
+func processAsciify(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return Asciify(args[0])
+}
+
+// processNumberToWordsWithAnd handles number_to_words_with_and(n).
+func processNumberToWordsWithAnd(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	n, err := strconv.Atoi(args[0])
+	if err != nil {
+		return original
+	}
+	return NumberToWordsWithAnd(n)
+}
+
+// processNumberToWordsThreshold handles number_to_words_threshold(n, threshold).
+func processNumberToWordsThreshold(args []string, original string) string {
+	if len(args) < 2 {
+		return original
+	}
+	n, err := strconv.Atoi(args[0])
+	if err != nil {
+		return original
+	}
+	threshold, err := strconv.Atoi(args[1])
+	if err != nil {
+		return original
+	}
+	return NumberToWordsThreshold(n, threshold)
+}
+
+// processCurrencyToWords handles currency_to_words(amount, currency).
+func processCurrencyToWords(args []string, original string) string {
+	if len(args) < 2 {
+		return original
+	}
+	amount, err := strconv.ParseFloat(args[0], 64)
+	if err != nil {
+		return original
+	}
+	currency := args[1]
+	return CurrencyToWords(amount, currency)
+}
+
+// processCompare handles compare('word1', 'word2').
+func processCompare(args []string, original string) string {
+	if len(args) < 2 {
+		return original
+	}
+	return Compare(args[0], args[1])
+}
+
+// processCompareNouns handles compare_nouns('noun1', 'noun2').
+func processCompareNouns(args []string, original string) string {
+	if len(args) < 2 {
+		return original
+	}
+	return CompareNouns(args[0], args[1])
+}
+
+// processCompareVerbs handles compare_verbs('verb1', 'verb2').
+func processCompareVerbs(args []string, original string) string {
+	if len(args) < 2 {
+		return original
+	}
+	return CompareVerbs(args[0], args[1])
+}
+
+// processCompareAdjs handles compare_adjs('adj1', 'adj2').
+func processCompareAdjs(args []string, original string) string {
+	if len(args) < 2 {
+		return original
+	}
+	return CompareAdjs(args[0], args[1])
+}
+
+// processWordCount handles word_count('text').
+func processWordCount(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return strconv.Itoa(WordCount(args[0]))
 }

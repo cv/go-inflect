@@ -1055,3 +1055,569 @@ func TestInflectNewFunctionsEdgeCases(t *testing.T) {
 		})
 	}
 }
+
+func TestInflectAdverb(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "quick -> quickly", input: "adverb('quick')", expected: "quickly"},
+		{name: "slow -> slowly", input: "adverb('slow')", expected: "slowly"},
+		{name: "happy -> happily", input: "adverb('happy')", expected: "happily"},
+		{name: "gentle -> gently", input: "adverb('gentle')", expected: "gently"},
+		{name: "in sentence", input: "He ran adverb('quick')", expected: "He ran quickly"},
+		{name: "double quotes", input: `She spoke adverb("soft")`, expected: "She spoke softly"},
+		{name: "no args", input: "adverb()", expected: "adverb()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectCapitalize(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "hello -> Hello", input: "capitalize('hello')", expected: "Hello"},
+		{name: "WORLD stays WORLD", input: "capitalize('WORLD')", expected: "WORLD"},
+		{name: "already capitalized", input: "capitalize('Hello')", expected: "Hello"},
+		{name: "in sentence", input: "The word is capitalize('test')", expected: "The word is Test"},
+		{name: "no args", input: "capitalize()", expected: "capitalize()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectTitleize(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "hello world -> Hello World", input: "titleize('hello world')", expected: "Hello World"},
+		{name: "the quick brown fox", input: "titleize('the quick brown fox')", expected: "The Quick Brown Fox"},
+		{name: "in sentence", input: "Title: titleize('my book title')", expected: "Title: My Book Title"},
+		{name: "no args", input: "titleize()", expected: "titleize()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectWordToOrdinal(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "one -> first", input: "word_to_ordinal('one')", expected: "first"},
+		{name: "two -> second", input: "word_to_ordinal('two')", expected: "second"},
+		{name: "three -> third", input: "word_to_ordinal('three')", expected: "third"},
+		{name: "twenty -> twentieth", input: "word_to_ordinal('twenty')", expected: "twentieth"},
+		{name: "in sentence", input: "The word_to_ordinal('one') place", expected: "The first place"},
+		{name: "no args", input: "word_to_ordinal()", expected: "word_to_ordinal()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectOrdinalToCardinal(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "first -> one", input: "ordinal_to_cardinal('first')", expected: "one"},
+		{name: "second -> two", input: "ordinal_to_cardinal('second')", expected: "two"},
+		{name: "third -> three", input: "ordinal_to_cardinal('third')", expected: "three"},
+		{name: "twentieth -> twenty", input: "ordinal_to_cardinal('twentieth')", expected: "twenty"},
+		{name: "in sentence", input: "The ordinal_to_cardinal('first') item", expected: "The one item"},
+		{name: "no args", input: "ordinal_to_cardinal()", expected: "ordinal_to_cardinal()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectFraction(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "1/4 -> one quarter", input: "fraction(1, 4)", expected: "one quarter"},
+		{name: "1/2 -> one half", input: "fraction(1, 2)", expected: "one half"},
+		{name: "3/4 -> three quarters", input: "fraction(3, 4)", expected: "three quarters"},
+		{name: "2/3 -> two thirds", input: "fraction(2, 3)", expected: "two thirds"},
+		{name: "in sentence", input: "I ate fraction(1, 4) of the pie", expected: "I ate one quarter of the pie"},
+		{name: "single arg", input: "fraction(1)", expected: "fraction(1)"},
+		{name: "no args", input: "fraction()", expected: "fraction()"},
+		{name: "non-numeric", input: "fraction('a', 'b')", expected: "fraction('a', 'b')"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectFormatNumber(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "1000 -> 1,000", input: "format_number(1000)", expected: "1,000"},
+		{name: "1000000 -> 1,000,000", input: "format_number(1000000)", expected: "1,000,000"},
+		{name: "123 -> 123", input: "format_number(123)", expected: "123"},
+		{name: "in sentence", input: "The total is format_number(1000000)", expected: "The total is 1,000,000"},
+		{name: "no args", input: "format_number()", expected: "format_number()"},
+		{name: "non-numeric", input: "format_number('abc')", expected: "format_number('abc')"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectSnakeCase(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "HelloWorld -> hello_world", input: "snake_case('HelloWorld')", expected: "hello_world"},
+		{name: "hello world -> hello_world", input: "snake_case('hello world')", expected: "hello_world"},
+		{name: "camelCase -> camel_case", input: "snake_case('camelCase')", expected: "camel_case"},
+		{name: "in sentence", input: "Variable: snake_case('MyVariable')", expected: "Variable: my_variable"},
+		{name: "no args", input: "snake_case()", expected: "snake_case()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectCamelCase(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "hello_world -> helloWorld", input: "camel_case('hello_world')", expected: "helloWorld"},
+		{name: "hello world -> helloWorld", input: "camel_case('hello world')", expected: "helloWorld"},
+		{name: "HelloWorld -> helloWorld", input: "camel_case('HelloWorld')", expected: "helloWorld"},
+		{name: "in sentence", input: "Variable: camel_case('my_variable')", expected: "Variable: myVariable"},
+		{name: "no args", input: "camel_case()", expected: "camel_case()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectPascalCase(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "hello_world -> HelloWorld", input: "pascal_case('hello_world')", expected: "HelloWorld"},
+		{name: "hello world -> HelloWorld", input: "pascal_case('hello world')", expected: "HelloWorld"},
+		{name: "camelCase -> CamelCase", input: "pascal_case('camelCase')", expected: "CamelCase"},
+		{name: "in sentence", input: "Class: pascal_case('my_class')", expected: "Class: MyClass"},
+		{name: "no args", input: "pascal_case()", expected: "pascal_case()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectKebabCase(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "HelloWorld -> hello-world", input: "kebab_case('HelloWorld')", expected: "hello-world"},
+		{name: "hello world -> hello-world", input: "kebab_case('hello world')", expected: "hello-world"},
+		{name: "camelCase -> camel-case", input: "kebab_case('camelCase')", expected: "camel-case"},
+		{name: "in sentence", input: "URL: kebab_case('MyPage')", expected: "URL: my-page"},
+		{name: "no args", input: "kebab_case()", expected: "kebab_case()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectHumanize(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "hello_world -> Hello world", input: "humanize('hello_world')", expected: "Hello world"},
+		{name: "employee_salary -> Employee salary", input: "humanize('employee_salary')", expected: "Employee salary"},
+		{name: "in sentence", input: "Label: humanize('user_name')", expected: "Label: User name"},
+		{name: "no args", input: "humanize()", expected: "humanize()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectTableize(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "Person -> people", input: "tableize('Person')", expected: "people"},
+		{name: "UserPost -> user_posts", input: "tableize('UserPost')", expected: "user_posts"},
+		{name: "in sentence", input: "Table: tableize('BlogPost')", expected: "Table: blog_posts"},
+		{name: "no args", input: "tableize()", expected: "tableize()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectForeignKey(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "Person -> person_id", input: "foreign_key('Person')", expected: "person_id"},
+		{name: "UserPost -> user_post_id", input: "foreign_key('UserPost')", expected: "user_post_id"},
+		{name: "in sentence", input: "FK: foreign_key('Message')", expected: "FK: message_id"},
+		{name: "no args", input: "foreign_key()", expected: "foreign_key()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectTypeify(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "user_post -> UserPost", input: "typeify('user_post')", expected: "UserPost"},
+		{name: "blog_posts -> BlogPost", input: "typeify('blog_posts')", expected: "BlogPost"},
+		{name: "in sentence", input: "Type: typeify('admin_users')", expected: "Type: AdminUser"},
+		{name: "no args", input: "typeify()", expected: "typeify()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectParameterize(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "Hello World -> hello-world", input: "parameterize('Hello World')", expected: "hello-world"},
+		{name: "My Blog Post -> my-blog-post", input: "parameterize('My Blog Post')", expected: "my-blog-post"},
+		{name: "in sentence", input: "Slug: parameterize('My Article Title')", expected: "Slug: my-article-title"},
+		{name: "no args", input: "parameterize()", expected: "parameterize()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectAsciify(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "café -> cafe", input: "asciify('café')", expected: "cafe"},
+		{name: "naïve -> naive", input: "asciify('naïve')", expected: "naive"},
+		{name: "in sentence", input: "ASCII: asciify('résumé')", expected: "ASCII: resume"},
+		{name: "no args", input: "asciify()", expected: "asciify()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectNumberToWordsWithAnd(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "123 with and", input: "number_to_words_with_and(123)", expected: "one hundred and twenty-three"},
+		{name: "1001 with and", input: "number_to_words_with_and(1001)", expected: "one thousand and one"},
+		{name: "in sentence", input: "Total: number_to_words_with_and(101)", expected: "Total: one hundred and one"},
+		{name: "no args", input: "number_to_words_with_and()", expected: "number_to_words_with_and()"},
+		{name: "non-numeric", input: "number_to_words_with_and('abc')", expected: "number_to_words_with_and('abc')"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectNumberToWordsThreshold(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "5 threshold 10 -> five", input: "number_to_words_threshold(5, 10)", expected: "five"},
+		{name: "15 threshold 10 -> 15", input: "number_to_words_threshold(15, 10)", expected: "15"},
+		{name: "in sentence", input: "Count: number_to_words_threshold(3, 10)", expected: "Count: three"},
+		{name: "single arg", input: "number_to_words_threshold(5)", expected: "number_to_words_threshold(5)"},
+		{name: "no args", input: "number_to_words_threshold()", expected: "number_to_words_threshold()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectCurrencyToWords(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "1.50 USD", input: "currency_to_words(1.50, 'USD')", expected: "one dollar and fifty cents"},
+		{name: "100.00 USD", input: "currency_to_words(100.00, 'USD')", expected: "one hundred dollars"},
+		{name: "0.50 USD", input: "currency_to_words(0.50, 'USD')", expected: "fifty cents"},
+		{name: "1.00 GBP", input: "currency_to_words(1.00, 'GBP')", expected: "one pound"},
+		{name: "in sentence", input: "Price: currency_to_words(25.99, 'USD')", expected: "Price: twenty-five dollars and ninety-nine cents"},
+		{name: "single arg", input: "currency_to_words(100)", expected: "currency_to_words(100)"},
+		{name: "no args", input: "currency_to_words()", expected: "currency_to_words()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectCompare(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "cat cat -> eq", input: "compare('cat', 'cat')", expected: "eq"},
+		{name: "cat cats -> s:p", input: "compare('cat', 'cats')", expected: "s:p"},
+		{name: "cats cat -> p:s", input: "compare('cats', 'cat')", expected: "p:s"},
+		{name: "cat dog -> empty", input: "compare('cat', 'dog')", expected: ""},
+		{name: "single arg", input: "compare('cat')", expected: "compare('cat')"},
+		{name: "no args", input: "compare()", expected: "compare()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectCompareNouns(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "child children -> s:p", input: "compare_nouns('child', 'children')", expected: "s:p"},
+		{name: "children child -> p:s", input: "compare_nouns('children', 'child')", expected: "p:s"},
+		{name: "single arg", input: "compare_nouns('cat')", expected: "compare_nouns('cat')"},
+		{name: "no args", input: "compare_nouns()", expected: "compare_nouns()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectCompareVerbs(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "is are -> s:p", input: "compare_verbs('is', 'are')", expected: "s:p"},
+		{name: "are is -> p:s", input: "compare_verbs('are', 'is')", expected: "p:s"},
+		{name: "single arg", input: "compare_verbs('is')", expected: "compare_verbs('is')"},
+		{name: "no args", input: "compare_verbs()", expected: "compare_verbs()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectCompareAdjs(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "this these -> s:p", input: "compare_adjs('this', 'these')", expected: "s:p"},
+		{name: "these this -> p:s", input: "compare_adjs('these', 'this')", expected: "p:s"},
+		{name: "single arg", input: "compare_adjs('this')", expected: "compare_adjs('this')"},
+		{name: "no args", input: "compare_adjs()", expected: "compare_adjs()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectWordCount(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "hello world -> 2", input: "word_count('hello world')", expected: "2"},
+		{name: "one -> 1", input: "word_count('one')", expected: "1"},
+		{name: "empty string returns original", input: "word_count('')", expected: "word_count('')"},
+		{name: "multiple spaces", input: "word_count('one  two  three')", expected: "3"},
+		{name: "in sentence", input: "Words: word_count('hello world')", expected: "Words: 2"},
+		{name: "no args", input: "word_count()", expected: "word_count()"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectNewFunctionsEdgeCasesExtended(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		// New empty args cases
+		{name: "adverb no args", input: "adverb()", expected: "adverb()"},
+		{name: "capitalize no args", input: "capitalize()", expected: "capitalize()"},
+		{name: "titleize no args", input: "titleize()", expected: "titleize()"},
+		{name: "word_to_ordinal no args", input: "word_to_ordinal()", expected: "word_to_ordinal()"},
+		{name: "ordinal_to_cardinal no args", input: "ordinal_to_cardinal()", expected: "ordinal_to_cardinal()"},
+		{name: "fraction no args", input: "fraction()", expected: "fraction()"},
+		{name: "format_number no args", input: "format_number()", expected: "format_number()"},
+		{name: "snake_case no args", input: "snake_case()", expected: "snake_case()"},
+		{name: "camel_case no args", input: "camel_case()", expected: "camel_case()"},
+		{name: "pascal_case no args", input: "pascal_case()", expected: "pascal_case()"},
+		{name: "kebab_case no args", input: "kebab_case()", expected: "kebab_case()"},
+		{name: "humanize no args", input: "humanize()", expected: "humanize()"},
+		{name: "tableize no args", input: "tableize()", expected: "tableize()"},
+		{name: "foreign_key no args", input: "foreign_key()", expected: "foreign_key()"},
+		{name: "typeify no args", input: "typeify()", expected: "typeify()"},
+		{name: "parameterize no args", input: "parameterize()", expected: "parameterize()"},
+		{name: "asciify no args", input: "asciify()", expected: "asciify()"},
+		{name: "word_count no args", input: "word_count()", expected: "word_count()"},
+
+		// Multiple new functions in one string
+		{name: "multiple case functions", input: "snake_case('HelloWorld') and kebab_case('HelloWorld')", expected: "hello_world and hello-world"},
+		{name: "adverb and capitalize", input: "capitalize(adverb('quick'))", expected: "Adverb(quick)"}, // outer function processes inner as literal string
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
