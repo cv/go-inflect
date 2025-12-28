@@ -2,7 +2,31 @@ package inflect
 
 // defaultEngine is the package-level Engine instance used by all package-level functions.
 // This provides backward compatibility while allowing thread-safe concurrent access.
+// All package-level functions are thin wrappers that delegate to this Engine.
 var defaultEngine = NewEngine()
+
+// DefaultEngine returns the default package-level Engine.
+// This can be used to access Engine methods directly or to configure
+// the default behavior.
+//
+// The returned Engine is safe for concurrent use; all methods are protected
+// by an internal mutex. However, callers should be aware that modifications
+// to the default Engine affect all package-level function calls globally.
+//
+// For isolated configurations, use NewEngine() to create a separate instance.
+//
+// Examples:
+//
+//	// Access the default engine directly
+//	e := inflect.DefaultEngine()
+//	e.Classical(true)
+//	e.Plural("formula") // returns "formulae"
+//
+//	// All package-level calls use the same engine
+//	inflect.Plural("formula") // also returns "formulae"
+func DefaultEngine() *Engine {
+	return defaultEngine
+}
 
 // ClassicalAll enables or disables all classical pluralization options at once.
 //

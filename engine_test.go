@@ -5,6 +5,73 @@ import (
 	"testing"
 )
 
+func TestDefaultEngine(t *testing.T) {
+	// Get the default engine
+	e := DefaultEngine()
+
+	// Verify it's not nil
+	if e == nil {
+		t.Fatal("DefaultEngine() returned nil")
+	}
+
+	// Verify it's the same instance each time
+	e2 := DefaultEngine()
+	if e != e2 {
+		t.Error("DefaultEngine() should return the same instance")
+	}
+
+	// Save current state
+	originalClassical := e.IsClassical()
+
+	// Modify the default engine
+	e.Classical(true)
+
+	// Verify the change affects package-level functions
+	// (by checking that both return the same plural for a classical word)
+	engineResult := e.Plural("formula")
+	packageResult := Plural("formula")
+
+	if engineResult != packageResult {
+		t.Errorf("DefaultEngine().Plural(\"formula\") = %q, Plural(\"formula\") = %q, should be equal",
+			engineResult, packageResult)
+	}
+
+	// Verify the classical mode is enabled
+	if engineResult != "formulae" {
+		t.Errorf("Expected classical plural \"formulae\", got %q", engineResult)
+	}
+
+	// Restore original state
+	e.Classical(originalClassical)
+}
+
+func TestDefaultEngineThreadSafety(_ *testing.T) {
+	e := DefaultEngine()
+
+	// Reset to known state
+	e.Classical(false)
+	defer e.Classical(false) // cleanup
+
+	// Test concurrent access to DefaultEngine
+	done := make(chan bool)
+	for range 10 {
+		go func() {
+			for range 100 {
+				eng := DefaultEngine()
+				_ = eng.Plural("cat")
+				_ = eng.Singular("cats")
+				_ = eng.IsClassical()
+			}
+			done <- true
+		}()
+	}
+
+	// Wait for all goroutines
+	for range 10 {
+		<-done
+	}
+}
+
 func TestNewEngine(t *testing.T) {
 	e := NewEngine()
 
