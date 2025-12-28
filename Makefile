@@ -34,4 +34,4 @@ bench-compare: ## Compare against baseline
 	go run golang.org/x/perf/cmd/benchstat benchmarks/baseline.txt benchmarks/new.txt
 
 reference: ## Generate reference documentation
-	go run tools/generate_reference.go
+	go run tools/gen-reference.go
