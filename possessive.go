@@ -21,18 +21,30 @@ const (
 	PossessiveTraditional
 )
 
-// possessiveStyle controls the style for forming possessives of words ending in s.
-var possessiveStyle = PossessiveModern
-
 // PossessiveStyle sets the style for forming possessives of words ending in s.
 // Use PossessiveModern (default) for "James's" or PossessiveTraditional for "James'".
 func PossessiveStyle(style PossessiveStyleType) {
-	possessiveStyle = style
+	defaultEngine.SetPossessiveStyle(style)
+}
+
+// SetPossessiveStyle sets the style for forming possessives of words ending in s.
+// Use PossessiveModern (default) for "James's" or PossessiveTraditional for "James'".
+func (e *Engine) SetPossessiveStyle(style PossessiveStyleType) {
+	e.mu.Lock()
+	e.possessiveStyle = style
+	e.mu.Unlock()
 }
 
 // GetPossessiveStyle returns the current possessive style setting.
 func GetPossessiveStyle() PossessiveStyleType {
-	return possessiveStyle
+	return defaultEngine.GetPossessiveStyle()
+}
+
+// GetPossessiveStyle returns the current possessive style setting.
+func (e *Engine) GetPossessiveStyle() PossessiveStyleType {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	return e.possessiveStyle
 }
 
 // Package-level maps to avoid allocation on each call.
@@ -112,6 +124,25 @@ var (
 //   - Possessive("James") returns "James's" (with PossessiveModern)
 //   - Possessive("James") returns "James'" (with PossessiveTraditional)
 func Possessive(word string) string {
+	return defaultEngine.Possessive(word)
+}
+
+// Possessive returns the possessive form of an English noun.
+//
+// Rules applied:
+//   - Singular nouns: add 's (cat → cat's)
+//   - Plural nouns ending in s: add only ' (cats → cats')
+//   - Plural nouns not ending in s: add 's (children → children's)
+//   - Singular nouns ending in s: add 's or ' based on SetPossessiveStyle setting
+//   - Words already in possessive form are returned unchanged
+//
+// Examples:
+//   - e.Possessive("cat") returns "cat's"
+//   - e.Possessive("cats") returns "cats'"
+//   - e.Possessive("children") returns "children's"
+//   - e.Possessive("James") returns "James's" (with PossessiveModern)
+//   - e.Possessive("James") returns "James'" (with PossessiveTraditional)
+func (e *Engine) Possessive(word string) string {
 	if word == "" {
 		return ""
 	}
@@ -120,6 +151,11 @@ func Possessive(word string) string {
 	if isAlreadyPossessive(word) {
 		return word
 	}
+
+	// Read the possessive style once at the start
+	e.mu.RLock()
+	style := e.possessiveStyle
+	e.mu.RUnlock()
 
 	// Check if the word ends in s (case-insensitive, no allocation)
 	endsInS := endsWithS(word)
@@ -141,7 +177,7 @@ func Possessive(word string) string {
 
 	// Words ending in double-s are typically singular (boss, class, glass, dress, etc.)
 	if strings.HasSuffix(lower, "ss") {
-		if possessiveStyle == PossessiveTraditional {
+		if style == PossessiveTraditional {
 			return word + "'"
 		}
 		return word + matchSuffix(word, "'s")
@@ -149,7 +185,7 @@ func Possessive(word string) string {
 
 	// Check for known singular words ending in s
 	if singularEndsInS[lower] {
-		if possessiveStyle == PossessiveTraditional {
+		if style == PossessiveTraditional {
 			return word + "'"
 		}
 		return word + matchSuffix(word, "'s")
@@ -165,7 +201,7 @@ func Possessive(word string) string {
 			return word + "'"
 		}
 		// Proper name, not a plural - treat as singular ending in s
-		if possessiveStyle == PossessiveTraditional {
+		if style == PossessiveTraditional {
 			return word + "'"
 		}
 		return word + matchSuffix(word, "'s")
@@ -177,7 +213,7 @@ func Possessive(word string) string {
 	}
 
 	// Default: singular ending in s
-	if possessiveStyle == PossessiveTraditional {
+	if style == PossessiveTraditional {
 		return word + "'"
 	}
 	return word + matchSuffix(word, "'s")

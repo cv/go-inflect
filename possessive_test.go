@@ -141,6 +141,45 @@ func TestPossessiveWithStyle(t *testing.T) {
 	}
 }
 
+func TestEnginePossessive(t *testing.T) {
+	e := inflect.NewEngine()
+
+	// Test default style (modern)
+	assert.Equal(t, "cat's", e.Possessive("cat"))
+	assert.Equal(t, "cats'", e.Possessive("cats"))
+	assert.Equal(t, "James's", e.Possessive("James"))
+	assert.Equal(t, "boss's", e.Possessive("boss"))
+	assert.Equal(t, "children's", e.Possessive("children"))
+
+	// Test traditional style
+	e.SetPossessiveStyle(inflect.PossessiveTraditional)
+	assert.Equal(t, inflect.PossessiveTraditional, e.GetPossessiveStyle())
+	assert.Equal(t, "James'", e.Possessive("James"))
+	assert.Equal(t, "boss'", e.Possessive("boss"))
+
+	// Non-s endings should still get 's
+	assert.Equal(t, "cat's", e.Possessive("cat"))
+	assert.Equal(t, "children's", e.Possessive("children"))
+
+	// Test switching back to modern style
+	e.SetPossessiveStyle(inflect.PossessiveModern)
+	assert.Equal(t, inflect.PossessiveModern, e.GetPossessiveStyle())
+	assert.Equal(t, "James's", e.Possessive("James"))
+}
+
+func TestEnginePossessiveIndependence(t *testing.T) {
+	// Test that different engines have independent possessive style settings
+	e1 := inflect.NewEngine()
+	e2 := inflect.NewEngine()
+
+	e1.SetPossessiveStyle(inflect.PossessiveTraditional)
+	e2.SetPossessiveStyle(inflect.PossessiveModern)
+
+	// Each engine should use its own style
+	assert.Equal(t, "James'", e1.Possessive("James"))
+	assert.Equal(t, "James's", e2.Possessive("James"))
+}
+
 func BenchmarkPossessive(b *testing.B) {
 	benchmarks := []struct {
 		name  string
