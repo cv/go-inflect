@@ -1,6 +1,13 @@
 # go-inflect
 
-A Go port of the [Python inflect](https://github.com/jaraco/inflect) library for English language inflection.
+A Go port of the Python [inflect](https://github.com/jaraco/inflect) library for English word inflection.
+
+- **100+ functions** covering pluralization, singularization, articles, numbers, verbs, and more
+- **Minimal dependencies** - only `golang.org/x/text` for Unicode normalization
+- **Drop-in replacement** for `jinzhu/inflection` and `go-openapi/inflect`
+- **Case-preserving** - "CAT" → "CATS", "Child" → "Children"
+- **Extensive testing** - benchmarks, fuzz tests, and high coverage
+- **Battle-tested rules** - ported from the mature Python inflect library
 
 ## Installation
 
