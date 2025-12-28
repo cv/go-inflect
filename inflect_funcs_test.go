@@ -742,3 +742,26 @@ func TestInflectSingularNoun(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkInflect(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		input string
+	}{
+		{"no_functions", "plain text without any functions"},
+		{"single_plural", "I saw plural('cat')"},
+		{"plural_with_count", "I saw plural('cat', 3)"},
+		{"multiple_functions", "plural_noun('I') saw plural('cat', 2)"},
+		{"ordinal", "This is the ordinal(1) item"},
+		{"complex", "plural_noun('I') saw plural_adj('this') plural('cat', 5) ordinal(3) time"},
+		{"nested_quotes", "an('apple') and an('orange')"},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.Inflect(bm.input)
+			}
+		})
+	}
+}
