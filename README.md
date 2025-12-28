@@ -121,7 +121,9 @@ inflect.CountingWord(5)           // "five times"
 | `WordToOrdinal(s)` | "one" → "first", "1" → "1st" |
 | `OrdinalToCardinal(s)` | "1st" → "1", "first" → "one" |
 | `CountingWord(n)` | 1 → "once", 2 → "twice", 5 → "five times" |
+| `CountingWordThreshold(n, t)` | Words if n < t, else "n times" |
 | `FractionToWords(num, den)` | (3, 4) → "three quarters" |
+| `FractionToWordsWithFourths(n, d)` | (1, 4) → "one fourth" |
 | `CurrencyToWords(amount, code)` | (1.50, "USD") → "one dollar and fifty cents" |
 | `No(word, count)` | "no errors" or "3 errors" |
 
@@ -132,6 +134,8 @@ inflect.CountingWord(5)           // "five times"
 | `Join(words)` | Join with "and" and Oxford comma |
 | `JoinWithConj(words, conj)` | Custom conjunction ("or", "and/or") |
 | `JoinNoOxford(words)` | British style without Oxford comma |
+| `JoinWithSep(words, conj, sep)` | Custom separator |
+| `JoinWithAutoSep(words, conj)` | Auto `;` if items contain commas |
 
 ### Comparison
 
