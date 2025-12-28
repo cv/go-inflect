@@ -1657,3 +1657,48 @@ func TestInflectNewFunctionsEdgeCasesExtended(t *testing.T) {
 		})
 	}
 }
+
+func TestInflectJoin(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "three items", input: "join('a', 'b', 'c')", expected: "a, b, and c"},
+		{name: "two items", input: "join('a', 'b')", expected: "a and b"},
+		{name: "one item", input: "join('a')", expected: "a"},
+		{name: "no args", input: "join()", expected: "join()"},
+		{name: "in sentence", input: "I like join('apples', 'oranges', 'bananas')", expected: "I like apples, oranges, and bananas"},
+		{name: "four items", input: "join('w', 'x', 'y', 'z')", expected: "w, x, y, and z"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectJoinWith(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "or conjunction", input: "join_with('or', 'a', 'b', 'c')", expected: "a, b, or c"},
+		{name: "and conjunction", input: "join_with('and', 'a', 'b', 'c')", expected: "a, b, and c"},
+		{name: "two items", input: "join_with('or', 'a', 'b')", expected: "a or b"},
+		{name: "one item", input: "join_with('or', 'a')", expected: "a"},
+		{name: "no args", input: "join_with()", expected: "join_with()"},
+		{name: "only conjunction", input: "join_with('or')", expected: "join_with('or')"},
+		{name: "in sentence", input: "Choose join_with('or', 'red', 'blue', 'green')", expected: "Choose red, blue, or green"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}

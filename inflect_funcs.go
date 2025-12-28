@@ -86,6 +86,10 @@ var inflectFuncPattern = regexp.MustCompile(`(\w+)\(([^)]*)\)`)
 //   - compare_verbs(verb1, verb2) - compares verbs for singular/plural equality
 //   - compare_adjs(adj1, adj2) - compares adjectives for singular/plural equality
 //
+// List joining:
+//   - join('a', 'b', 'c') - joins with Oxford comma: "a, b, and c"
+//   - join_with('or', 'a', 'b', 'c') - joins with custom conjunction: "a, b, or c"
+//
 // Other:
 //   - word_count(text) - counts words in text, returns count as string
 //
@@ -179,6 +183,10 @@ var inflectFuncs = map[string]inflectFunc{
 
 	// Other
 	"word_count": processWordCount,
+
+	// List joining
+	"join":      processJoin,
+	"join_with": processJoinWith,
 }
 
 // processInflectCall processes a single function call match and returns
@@ -1004,4 +1012,20 @@ func processWordCount(args []string, original string) string {
 		return original
 	}
 	return strconv.Itoa(WordCount(args[0]))
+}
+
+// processJoin handles join('a', 'b', 'c') -> "a, b, and c".
+func processJoin(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return Join(args)
+}
+
+// processJoinWith handles join_with('or', 'a', 'b', 'c') -> "a, b, or c".
+func processJoinWith(args []string, original string) string {
+	if len(args) < 2 {
+		return original
+	}
+	return JoinWithConj(args[1:], args[0])
 }
