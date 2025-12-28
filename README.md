@@ -316,8 +316,10 @@ bench-compare                  Compare against baseline
 bench-save                     Save benchmark baseline
 build                          Build the project
 deps                           Download dependencies
+fuzz                           Run all fuzz tests (10s each)
 help                           Print help message
 lint                           Run linter
+reference                      Generate reference documentation
 test                           Run tests with race detection and coverage
 ```
 
