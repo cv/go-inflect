@@ -1102,3 +1102,145 @@ func ExampleCamelCase() {
 	// httpServer
 	// helloWorld
 }
+
+// Compatibility aliases for github.com/jinzhu/inflection
+
+func ExampleAddIrregular() {
+	inflect.AddIrregular("octopus", "octopodes")
+	fmt.Println(inflect.Plural("octopus"))
+	fmt.Println(inflect.Singular("octopodes"))
+	// Output:
+	// octopodes
+	// octopus
+}
+
+func ExampleAddUncountable() {
+	inflect.AddUncountable("rice", "wheat")
+	fmt.Println(inflect.Plural("rice"))
+	fmt.Println(inflect.Plural("wheat"))
+	// Output:
+	// rice
+	// wheat
+}
+
+// Compatibility aliases for github.com/go-openapi/inflect
+
+func ExamplePluralize() {
+	fmt.Println(inflect.Pluralize("cat"))
+	fmt.Println(inflect.Pluralize("child"))
+	fmt.Println(inflect.Pluralize("Person"))
+	// Output:
+	// cats
+	// children
+	// People
+}
+
+func ExampleSingularize() {
+	fmt.Println(inflect.Singularize("cats"))
+	fmt.Println(inflect.Singularize("children"))
+	fmt.Println(inflect.Singularize("People"))
+	// Output:
+	// cat
+	// child
+	// Person
+}
+
+func ExampleCamelize() {
+	fmt.Println(inflect.Camelize("hello_world"))
+	fmt.Println(inflect.Camelize("foo-bar"))
+	fmt.Println(inflect.Camelize("get_http_response"))
+	// Output:
+	// HelloWorld
+	// FooBar
+	// GetHttpResponse
+}
+
+func ExampleCamelizeDownFirst() {
+	fmt.Println(inflect.CamelizeDownFirst("hello_world"))
+	fmt.Println(inflect.CamelizeDownFirst("foo-bar"))
+	fmt.Println(inflect.CamelizeDownFirst("get_http_response"))
+	// Output:
+	// helloWorld
+	// fooBar
+	// getHttpResponse
+}
+
+// Rails-style helper functions
+
+func ExampleHumanize() {
+	fmt.Println(inflect.Humanize("employee_salary"))
+	fmt.Println(inflect.Humanize("author_id"))
+	fmt.Println(inflect.Humanize("XMLParser"))
+	// Output:
+	// Employee salary
+	// Author
+	// Xml parser
+}
+
+func ExampleForeignKey() {
+	fmt.Println(inflect.ForeignKey("Person"))
+	fmt.Println(inflect.ForeignKey("AdminUser"))
+	fmt.Println(inflect.ForeignKey("XMLParser"))
+	// Output:
+	// person_id
+	// admin_user_id
+	// xml_parser_id
+}
+
+func ExampleForeignKeyCondensed() {
+	fmt.Println(inflect.ForeignKeyCondensed("Person"))
+	fmt.Println(inflect.ForeignKeyCondensed("AdminUser"))
+	// Output:
+	// personid
+	// admin_userid
+}
+
+func ExampleTableize() {
+	fmt.Println(inflect.Tableize("Person"))
+	fmt.Println(inflect.Tableize("RawScaledScorer"))
+	fmt.Println(inflect.Tableize("Child"))
+	// Output:
+	// people
+	// raw_scaled_scorers
+	// children
+}
+
+func ExampleParameterize() {
+	fmt.Println(inflect.Parameterize("Hello World!"))
+	fmt.Println(inflect.Parameterize("café au lait"))
+	fmt.Println(inflect.Parameterize("  Multiple   Spaces  "))
+	// Output:
+	// hello-world
+	// cafe-au-lait
+	// multiple-spaces
+}
+
+func ExampleParameterizeJoin() {
+	fmt.Println(inflect.ParameterizeJoin("Hello World!", "_"))
+	fmt.Println(inflect.ParameterizeJoin("Hello World!", "-"))
+	fmt.Println(inflect.ParameterizeJoin("Hello World!", ""))
+	// Output:
+	// hello_world
+	// hello-world
+	// helloworld
+}
+
+func ExampleTypeify() {
+	fmt.Println(inflect.Typeify("users"))
+	fmt.Println(inflect.Typeify("raw_scaled_scorers"))
+	fmt.Println(inflect.Typeify("people"))
+	// Output:
+	// User
+	// RawScaledScorer
+	// Person
+}
+
+func ExampleAsciify() {
+	fmt.Println(inflect.Asciify("café"))
+	fmt.Println(inflect.Asciify("naïve"))
+	fmt.Println(inflect.Asciify("Crème brûlée"))
+	// Output:
+	// cafe
+	// naive
+	// Creme brulee
+}
