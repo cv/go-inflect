@@ -392,3 +392,235 @@ func TestEngineIsolation(t *testing.T) {
 		t.Error("Modifying e1 should not affect e2")
 	}
 }
+
+func TestEnginePluralNoun(t *testing.T) {
+	e := NewEngine()
+
+	// Test basic functionality
+	tests := []struct {
+		name     string
+		word     string
+		count    []int
+		expected string
+	}{
+		{name: "I -> We", word: "I", expected: "We"},
+		{name: "cat -> cats", word: "cat", expected: "cats"},
+		{name: "cat count=1 singular", word: "cat", count: []int{1}, expected: "cat"},
+		{name: "cat count=2 plural", word: "cat", count: []int{2}, expected: "cats"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got string
+			if len(tt.count) > 0 {
+				got = e.PluralNoun(tt.word, tt.count[0])
+			} else {
+				got = e.PluralNoun(tt.word)
+			}
+			if got != tt.expected {
+				t.Errorf("PluralNoun(%q, %v) = %q, want %q", tt.word, tt.count, got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestEnginePluralVerb(t *testing.T) {
+	e := NewEngine()
+
+	// Test basic functionality
+	tests := []struct {
+		name     string
+		word     string
+		count    []int
+		expected string
+	}{
+		{name: "is -> are", word: "is", expected: "are"},
+		{name: "was -> were", word: "was", expected: "were"},
+		{name: "is count=1 singular", word: "is", count: []int{1}, expected: "is"},
+		{name: "is count=2 plural", word: "is", count: []int{2}, expected: "are"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got string
+			if len(tt.count) > 0 {
+				got = e.PluralVerb(tt.word, tt.count[0])
+			} else {
+				got = e.PluralVerb(tt.word)
+			}
+			if got != tt.expected {
+				t.Errorf("PluralVerb(%q, %v) = %q, want %q", tt.word, tt.count, got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestEnginePluralAdj(t *testing.T) {
+	e := NewEngine()
+
+	// Test basic functionality
+	tests := []struct {
+		name     string
+		word     string
+		count    []int
+		expected string
+	}{
+		{name: "this -> these", word: "this", expected: "these"},
+		{name: "that -> those", word: "that", expected: "those"},
+		{name: "this count=1 singular", word: "this", count: []int{1}, expected: "this"},
+		{name: "this count=2 plural", word: "this", count: []int{2}, expected: "these"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got string
+			if len(tt.count) > 0 {
+				got = e.PluralAdj(tt.word, tt.count[0])
+			} else {
+				got = e.PluralAdj(tt.word)
+			}
+			if got != tt.expected {
+				t.Errorf("PluralAdj(%q, %v) = %q, want %q", tt.word, tt.count, got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestEngineSingularNoun(t *testing.T) {
+	e := NewEngine()
+
+	// Test basic functionality with default gender (t)
+	tests := []struct {
+		name     string
+		word     string
+		count    []int
+		expected string
+	}{
+		{name: "we -> I", word: "we", expected: "I"},
+		{name: "cats -> cat", word: "cats", expected: "cat"},
+		{name: "cats count=1 singular", word: "cats", count: []int{1}, expected: "cat"},
+		{name: "cats count=2 plural", word: "cats", count: []int{2}, expected: "cats"},
+		{name: "they -> they (default gender t)", word: "they", expected: "they"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got string
+			if len(tt.count) > 0 {
+				got = e.SingularNoun(tt.word, tt.count[0])
+			} else {
+				got = e.SingularNoun(tt.word)
+			}
+			if got != tt.expected {
+				t.Errorf("SingularNoun(%q, %v) = %q, want %q", tt.word, tt.count, got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestEngineSingularNounWithGender(t *testing.T) {
+	// Test gender independence between engines
+	e1 := NewEngine()
+	e2 := NewEngine()
+
+	e1.SetGender("m")
+	e2.SetGender("f")
+
+	// e1 should use masculine gender
+	if got := e1.SingularNoun("they"); got != "he" {
+		t.Errorf("e1.SingularNoun(\"they\") with masculine = %q, want \"he\"", got)
+	}
+
+	// e2 should use feminine gender
+	if got := e2.SingularNoun("they"); got != "she" {
+		t.Errorf("e2.SingularNoun(\"they\") with feminine = %q, want \"she\"", got)
+	}
+}
+
+func TestEngineNo(t *testing.T) {
+	e := NewEngine()
+
+	tests := []struct {
+		name     string
+		word     string
+		count    int
+		expected string
+	}{
+		{name: "no errors", word: "error", count: 0, expected: "no errors"},
+		{name: "1 error", word: "error", count: 1, expected: "1 error"},
+		{name: "2 errors", word: "error", count: 2, expected: "2 errors"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := e.No(tt.word, tt.count)
+			if got != tt.expected {
+				t.Errorf("No(%q, %d) = %q, want %q", tt.word, tt.count, got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestEngineNoWithClassicalZero(t *testing.T) {
+	e := NewEngine()
+	e.ClassicalZero(true)
+
+	if got := e.No("error", 0); got != "no error" {
+		t.Errorf("No(\"error\", 0) with ClassicalZero = %q, want \"no error\"", got)
+	}
+}
+
+func TestEngineNum(t *testing.T) {
+	e := NewEngine()
+
+	// Test setting and getting
+	if got := e.Num(5); got != 5 {
+		t.Errorf("Num(5) = %d, want 5", got)
+	}
+	if got := e.GetNum(); got != 5 {
+		t.Errorf("GetNum() = %d, want 5", got)
+	}
+
+	// Test clearing
+	if got := e.Num(0); got != 0 {
+		t.Errorf("Num(0) = %d, want 0", got)
+	}
+	if got := e.GetNum(); got != 0 {
+		t.Errorf("GetNum() after Num(0) = %d, want 0", got)
+	}
+
+	// Test independence between engines
+	e1 := NewEngine()
+	e2 := NewEngine()
+
+	e1.Num(10)
+	e2.Num(20)
+
+	if got := e1.GetNum(); got != 10 {
+		t.Errorf("e1.GetNum() = %d, want 10", got)
+	}
+	if got := e2.GetNum(); got != 20 {
+		t.Errorf("e2.GetNum() = %d, want 20", got)
+	}
+}
+
+func TestEngineGetGender(t *testing.T) {
+	e := NewEngine()
+
+	// Test default gender
+	if got := e.GetGender(); got != "t" {
+		t.Errorf("GetGender() = %q, want \"t\"", got)
+	}
+
+	// Test setting gender
+	e.SetGender("m")
+	if got := e.GetGender(); got != "m" {
+		t.Errorf("GetGender() after SetGender(\"m\") = %q, want \"m\"", got)
+	}
+
+	// Test invalid gender is ignored
+	e.SetGender("invalid")
+	if got := e.GetGender(); got != "m" {
+		t.Errorf("GetGender() after SetGender(\"invalid\") = %q, want \"m\"", got)
+	}
+}

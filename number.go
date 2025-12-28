@@ -387,21 +387,39 @@ func FormatNumber(n int) string {
 //   - No("error", 0) returns "no error"
 //   - No("child", 0) returns "no child"
 func No(word string, count int) string {
+	return defaultEngine.No(word, count)
+}
+
+// No returns "no" with the word and count.
+//
+// When count is 0, it returns "no" followed by the plural form of the word
+// (or singular if ClassicalZero is true).
+// When count is 1, it returns "1 word".
+// Otherwise, it returns "count words" (pluralized).
+//
+// Examples:
+//   - e.No("error", 0) returns "no errors" (default)
+//   - e.No("error", 1) returns "1 error"
+//   - e.No("error", 2) returns "2 errors"
+//   - e.No("child", 0) returns "no children" (default)
+//   - e.No("child", 1) returns "1 child"
+//   - e.No("child", 3) returns "3 children"
+//
+// With e.SetClassicalZero(true):
+//   - e.No("error", 0) returns "no error"
+//   - e.No("child", 0) returns "no child"
+func (e *Engine) No(word string, count int) string {
 	if count == 0 {
-		if defaultEngine.IsClassicalZero() {
+		if e.IsClassicalZero() {
 			return "no " + word
 		}
-		return "no " + Plural(word)
+		return "no " + e.Plural(word)
 	}
 	if count == 1 || count == -1 {
 		return fmt.Sprintf("%d %s", count, word)
 	}
-	return fmt.Sprintf("%d %s", count, Plural(word))
+	return fmt.Sprintf("%d %s", count, e.Plural(word))
 }
-
-// defaultNum stores the default count for number-related functions.
-// A value of 0 indicates no default is set.
-var defaultNum int
 
 // Num stores and retrieves a default count for number-related operations.
 //
@@ -414,12 +432,28 @@ var defaultNum int
 //   - Num(0) clears the default count, returns 0
 //   - Num() clears the default count, returns 0
 func Num(n ...int) int {
+	return defaultEngine.Num(n...)
+}
+
+// Num stores and retrieves a default count for number-related operations.
+//
+// When called with a positive integer, it stores that value as the default
+// count and returns it. When called with 0 or no arguments, it clears the
+// default count and returns 0.
+//
+// Examples:
+//   - e.Num(5) stores 5 as default count, returns 5
+//   - e.Num(0) clears the default count, returns 0
+//   - e.Num() clears the default count, returns 0
+func (e *Engine) Num(n ...int) int {
+	e.mu.Lock()
+	defer e.mu.Unlock()
 	if len(n) == 0 || n[0] == 0 {
-		defaultNum = 0
+		e.defaultNum = 0
 		return 0
 	}
-	defaultNum = n[0]
-	return defaultNum
+	e.defaultNum = n[0]
+	return e.defaultNum
 }
 
 // GetNum retrieves the current default count.
@@ -431,5 +465,19 @@ func Num(n ...int) int {
 //   - After Num(0) or Num(): GetNum() returns 0
 //   - Before any Num() call: GetNum() returns 0
 func GetNum() int {
-	return defaultNum
+	return defaultEngine.GetNum()
+}
+
+// GetNum retrieves the current default count.
+//
+// Returns 0 if no default has been set or if it was cleared.
+//
+// Examples:
+//   - After e.Num(5): e.GetNum() returns 5
+//   - After e.Num(0) or e.Num(): e.GetNum() returns 0
+//   - Before any e.Num() call: e.GetNum() returns 0
+func (e *Engine) GetNum() int {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	return e.defaultNum
 }

@@ -1,13 +1,8 @@
 package inflect
 
-// gender stores the current gender for singular third-person pronouns.
-// Valid values: 'm' (masculine), 'f' (feminine), 'n' (neuter), 't' (they/singular they).
-// Default is 't' (singular they).
-var gender = "t"
-
 // Gender sets the gender for singular third-person pronouns.
 //
-// The gender affects pronoun selection in Singular():
+// The gender affects pronoun selection in SingularNoun():
 //   - Gender("m") - masculine: they -> he, them -> him, their -> his
 //   - Gender("f") - feminine: they -> she, them -> her, their -> hers
 //   - Gender("n") - neuter: they -> it, them -> it, their -> its
@@ -26,9 +21,35 @@ var gender = "t"
 //	Gender("invalid")
 //	GetGender() // returns "f" (unchanged)
 func Gender(g string) {
+	defaultEngine.SetGender(g)
+}
+
+// SetGender sets the gender for singular third-person pronouns.
+//
+// The gender affects pronoun selection in SingularNoun():
+//   - SetGender("m") - masculine: they -> he, them -> him, their -> his
+//   - SetGender("f") - feminine: they -> she, them -> her, their -> hers
+//   - SetGender("n") - neuter: they -> it, them -> it, their -> its
+//   - SetGender("t") - they (singular they): they -> they, them -> them, their -> their
+//
+// The default gender is "t" (singular they).
+//
+// Invalid gender values are ignored; the gender remains unchanged.
+//
+// Examples:
+//
+//	e.SetGender("m")
+//	e.GetGender() // returns "m"
+//	e.SetGender("f")
+//	e.GetGender() // returns "f"
+//	e.SetGender("invalid")
+//	e.GetGender() // returns "f" (unchanged)
+func (e *Engine) SetGender(g string) {
 	switch g {
 	case "m", "f", "n", "t":
-		gender = g
+		e.mu.Lock()
+		e.gender = g
+		e.mu.Unlock()
 	}
 }
 
@@ -46,5 +67,24 @@ func Gender(g string) {
 //	Gender("m")
 //	GetGender() // returns "m"
 func GetGender() string {
-	return gender
+	return defaultEngine.GetGender()
+}
+
+// GetGender returns the current gender setting for singular third-person pronouns.
+//
+// Returns one of:
+//   - "m" - masculine
+//   - "f" - feminine
+//   - "n" - neuter
+//   - "t" - they (singular they, the default)
+//
+// Examples:
+//
+//	e.GetGender() // returns "t" (default)
+//	e.SetGender("m")
+//	e.GetGender() // returns "m"
+func (e *Engine) GetGender() string {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	return e.gender
 }

@@ -521,6 +521,31 @@ func processSuperlative(args []string, original string) string {
 //	PluralNoun("cat", 1) returns "cat"
 //	PluralNoun("cat", 2) returns "cats"
 func PluralNoun(word string, count ...int) string {
+	return defaultEngine.PluralNoun(word, count...)
+}
+
+// PluralNoun returns the plural form of an English noun or pronoun.
+//
+// This method handles:
+//   - Pronouns in nominative case: "I" -> "we", "he"/"she"/"it" -> "they"
+//   - Pronouns in accusative case: "me" -> "us", "him"/"her" -> "them"
+//   - Possessive pronouns: "my" -> "our", "mine" -> "ours", "his"/"her"/"its" -> "their"
+//   - Reflexive pronouns: "myself" -> "ourselves", "himself"/"herself"/"itself" -> "themselves"
+//   - Regular nouns: defers to Plural()
+//
+// If count is provided and equals 1 or -1, returns the singular form.
+// If count is not 1, returns the plural form.
+// If no count is provided, returns the plural form.
+//
+// Examples:
+//
+//	e.PluralNoun("I") returns "we"
+//	e.PluralNoun("me") returns "us"
+//	e.PluralNoun("my") returns "our"
+//	e.PluralNoun("cat") returns "cats"
+//	e.PluralNoun("cat", 1) returns "cat"
+//	e.PluralNoun("cat", 2) returns "cats"
+func (e *Engine) PluralNoun(word string, count ...int) string {
 	if word == "" {
 		return ""
 	}
@@ -544,7 +569,7 @@ func PluralNoun(word string, count ...int) string {
 	}
 
 	// Fall back to regular Plural() for nouns
-	return prefix + Plural(trimmed) + suffix
+	return prefix + e.Plural(trimmed) + suffix
 }
 
 // PluralVerb returns the plural form of an English verb.
@@ -569,6 +594,31 @@ func PluralNoun(word string, count ...int) string {
 //	PluralVerb("is", 1) returns "is"
 //	PluralVerb("is", 2) returns "are"
 func PluralVerb(word string, count ...int) string {
+	return defaultEngine.PluralVerb(word, count...)
+}
+
+// PluralVerb returns the plural form of an English verb.
+//
+// This method handles:
+//   - Auxiliary verbs: "is" -> "are", "was" -> "were", "has" -> "have"
+//   - Contractions: "isn't" -> "aren't", "doesn't" -> "don't", "hasn't" -> "haven't"
+//   - Modal verbs (unchanged): "can", "could", "may", "might", "must", "shall", "should", "will", "would"
+//   - Regular verbs in third person singular: removes -s/-es suffix
+//
+// If count is provided and equals 1 or -1, returns the singular form.
+// If count is not 1, returns the plural form.
+// If no count is provided, returns the plural form.
+//
+// Examples:
+//
+//	e.PluralVerb("is") returns "are"
+//	e.PluralVerb("was") returns "were"
+//	e.PluralVerb("has") returns "have"
+//	e.PluralVerb("doesn't") returns "don't"
+//	e.PluralVerb("runs") returns "run"
+//	e.PluralVerb("is", 1) returns "is"
+//	e.PluralVerb("is", 2) returns "are"
+func (e *Engine) PluralVerb(word string, count ...int) string {
 	if word == "" {
 		return ""
 	}
@@ -602,9 +652,9 @@ func PluralVerb(word string, count ...int) string {
 	}
 
 	// Check custom verb definitions
-	defaultEngine.mu.RLock()
-	plural, ok := defaultEngine.customVerbs[lower]
-	defaultEngine.mu.RUnlock()
+	e.mu.RLock()
+	plural, ok := e.customVerbs[lower]
+	e.mu.RUnlock()
 	if ok {
 		return prefix + matchCase(trimmed, plural) + suffix
 	}
@@ -669,6 +719,30 @@ func PluralVerb(word string, count ...int) string {
 //	PluralAdj("this", 1) returns "this"
 //	PluralAdj("this", 2) returns "these"
 func PluralAdj(word string, count ...int) string {
+	return defaultEngine.PluralAdj(word, count...)
+}
+
+// PluralAdj returns the plural form of an English adjective.
+//
+// This method handles:
+//   - Demonstrative adjectives: "this" -> "these", "that" -> "those"
+//   - Indefinite articles: "a" -> "some", "an" -> "some"
+//   - Possessive adjectives: "my" -> "our", "his"/"her"/"its" -> "their"
+//
+// If count is provided and equals 1 or -1, returns the singular form.
+// If count is not 1, returns the plural form.
+// If no count is provided, returns the plural form.
+//
+// Examples:
+//
+//	e.PluralAdj("this") returns "these"
+//	e.PluralAdj("that") returns "those"
+//	e.PluralAdj("a") returns "some"
+//	e.PluralAdj("an") returns "some"
+//	e.PluralAdj("my") returns "our"
+//	e.PluralAdj("this", 1) returns "this"
+//	e.PluralAdj("this", 2) returns "these"
+func (e *Engine) PluralAdj(word string, count ...int) string {
 	if word == "" {
 		return ""
 	}
@@ -686,8 +760,11 @@ func PluralAdj(word string, count ...int) string {
 		if singular, ok := adjPluralToSingular[lower]; ok {
 			return prefix + matchCase(trimmed, singular) + suffix
 		}
+		e.mu.RLock()
+		g := e.gender
+		e.mu.RUnlock()
 		if genderMap, ok := adjPluralToSingularByGender[lower]; ok {
-			if singular, ok := genderMap[gender]; ok {
+			if singular, ok := genderMap[g]; ok {
 				return prefix + matchCase(trimmed, singular) + suffix
 			}
 		}
@@ -702,9 +779,9 @@ func PluralAdj(word string, count ...int) string {
 	}
 
 	// Check custom adjective definitions
-	defaultEngine.mu.RLock()
-	plural, ok := defaultEngine.customAdjs[lower]
-	defaultEngine.mu.RUnlock()
+	e.mu.RLock()
+	plural, ok := e.customAdjs[lower]
+	e.mu.RUnlock()
 	if ok {
 		return prefix + matchCase(trimmed, plural) + suffix
 	}
@@ -742,6 +819,38 @@ func PluralAdj(word string, count ...int) string {
 //	SingularNoun("cats", 1) returns "cat"
 //	SingularNoun("cats", 2) returns "cats"
 func SingularNoun(word string, count ...int) string {
+	return defaultEngine.SingularNoun(word, count...)
+}
+
+// SingularNoun returns the singular form of an English noun or pronoun.
+//
+// This method handles:
+//   - Pronouns in nominative case: "we" -> "I", "they" -> he/she/it/they (depends on gender)
+//   - Pronouns in accusative case: "us" -> "me", "them" -> him/her/it/them (depends on gender)
+//   - Possessive pronouns: "our" -> "my", "ours" -> "mine", "their" -> his/her/its/their
+//   - Reflexive pronouns: "ourselves" -> "myself", "themselves" -> himself/herself/itself/themself
+//   - Regular nouns: defers to Singular()
+//
+// Third-person singular pronouns use the gender set by SetGender():
+//   - SetGender("m"): masculine - "they" -> "he"
+//   - SetGender("f"): feminine - "they" -> "she"
+//   - SetGender("n"): neuter - "they" -> "it"
+//   - SetGender("t"): they (singular they) - "they" -> "they"
+//
+// If count is provided and equals 1 or -1, returns the singular form.
+// If count is not 1, returns the plural form.
+// If no count is provided, returns the singular form.
+//
+// Examples:
+//
+//	e.SingularNoun("we") returns "I"
+//	e.SingularNoun("us") returns "me"
+//	e.SingularNoun("our") returns "my"
+//	e.SingularNoun("they") returns "it" (or he/she/they based on gender)
+//	e.SingularNoun("cats") returns "cat"
+//	e.SingularNoun("cats", 1) returns "cat"
+//	e.SingularNoun("cats", 2) returns "cats"
+func (e *Engine) SingularNoun(word string, count ...int) string {
 	if word == "" {
 		return ""
 	}
@@ -759,36 +868,41 @@ func SingularNoun(word string, count ...int) string {
 
 	lower := strings.ToLower(trimmed)
 
+	// Read gender once with lock
+	e.mu.RLock()
+	g := e.gender
+	e.mu.RUnlock()
+
 	// Check for nominative pronouns
 	if genderMap, ok := pronounNominativeSingularByGender[lower]; ok {
-		if singular, ok := genderMap[gender]; ok {
+		if singular, ok := genderMap[g]; ok {
 			return prefix + matchCase(trimmed, singular) + suffix
 		}
 	}
 
 	// Check for accusative pronouns
 	if genderMap, ok := pronounAccusativeSingularByGender[lower]; ok {
-		if singular, ok := genderMap[gender]; ok {
+		if singular, ok := genderMap[g]; ok {
 			return prefix + matchCase(trimmed, singular) + suffix
 		}
 	}
 
 	// Check for possessive pronouns
 	if genderMap, ok := pronounPossessiveSingularByGender[lower]; ok {
-		if singular, ok := genderMap[gender]; ok {
+		if singular, ok := genderMap[g]; ok {
 			return prefix + matchCase(trimmed, singular) + suffix
 		}
 	}
 
 	// Check for reflexive pronouns
 	if genderMap, ok := pronounReflexiveSingularByGender[lower]; ok {
-		if singular, ok := genderMap[gender]; ok {
+		if singular, ok := genderMap[g]; ok {
 			return prefix + matchCase(trimmed, singular) + suffix
 		}
 	}
 
 	// Fall back to regular Singular() for nouns
-	return prefix + Singular(trimmed) + suffix
+	return prefix + e.Singular(trimmed) + suffix
 }
 
 // processAdverb handles adverb('adj').
