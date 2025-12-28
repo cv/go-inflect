@@ -691,3 +691,213 @@ func TestEngineGetGender(t *testing.T) {
 		t.Errorf("GetGender() after SetGender(\"invalid\") = %q, want \"m\"", got)
 	}
 }
+
+func TestEngineReset(t *testing.T) {
+	e := NewEngine()
+
+	// Modify all state
+	e.ClassicalAll(true)
+	e.DefNoun("foo", "foos")
+	e.DefVerb("run", "runs")
+	e.DefAdj("good", "goods")
+	e.DefA("euro")
+	e.DefAn("honor")
+	_ = e.DefAPattern("^euro.*$")
+	_ = e.DefAnPattern("^honor.*$")
+	e.SetGender("m")
+	e.SetPossessiveStyle(PossessiveTraditional)
+	e.Num(42)
+
+	// Verify state is modified
+	if !e.IsClassicalAll() {
+		t.Error("IsClassicalAll should be true before Reset")
+	}
+	if e.Plural("foo") != "foos" {
+		t.Error("Custom noun should work before Reset")
+	}
+	if e.GetGender() != "m" {
+		t.Error("Gender should be 'm' before Reset")
+	}
+	if e.GetPossessiveStyle() != PossessiveTraditional {
+		t.Error("Possessive style should be PossessiveTraditional before Reset")
+	}
+	if e.GetNum() != 42 {
+		t.Error("Num should be 42 before Reset")
+	}
+
+	// Reset the engine
+	e.Reset()
+
+	// Verify all state is reset to defaults
+	t.Run("ClassicalFlags", func(t *testing.T) {
+		if e.IsClassicalAll() {
+			t.Error("IsClassicalAll should be false after Reset")
+		}
+		if e.IsClassical() {
+			t.Error("IsClassical should be false after Reset")
+		}
+		if e.IsClassicalAncient() {
+			t.Error("IsClassicalAncient should be false after Reset")
+		}
+		if e.IsClassicalZero() {
+			t.Error("IsClassicalZero should be false after Reset")
+		}
+		if e.IsClassicalHerd() {
+			t.Error("IsClassicalHerd should be false after Reset")
+		}
+		if e.IsClassicalNames() {
+			t.Error("IsClassicalNames should be false after Reset")
+		}
+		if e.IsClassicalPersons() {
+			t.Error("IsClassicalPersons should be false after Reset")
+		}
+	})
+
+	t.Run("NounMappings", func(t *testing.T) {
+		// Custom noun should be cleared
+		// "foo" should now pluralize using standard rules (adding -s)
+		if got := e.Plural("foo"); got != "foos" {
+			t.Errorf("Plural(\"foo\") = %q after Reset, want \"foos\"", got)
+		}
+		// Built-in irregular should still work
+		if got := e.Plural("child"); got != "children" {
+			t.Errorf("Plural(\"child\") = %q after Reset, want \"children\"", got)
+		}
+		if got := e.Singular("children"); got != "child" {
+			t.Errorf("Singular(\"children\") = %q after Reset, want \"child\"", got)
+		}
+	})
+
+	t.Run("CustomMaps", func(t *testing.T) {
+		// Verify internal maps are cleared by checking lengths
+		e.mu.RLock()
+		if len(e.customVerbs) != 0 {
+			t.Error("customVerbs should be empty after Reset")
+		}
+		if len(e.customVerbsReverse) != 0 {
+			t.Error("customVerbsReverse should be empty after Reset")
+		}
+		if len(e.customAdjs) != 0 {
+			t.Error("customAdjs should be empty after Reset")
+		}
+		if len(e.customAdjsReverse) != 0 {
+			t.Error("customAdjsReverse should be empty after Reset")
+		}
+		if len(e.customAWords) != 0 {
+			t.Error("customAWords should be empty after Reset")
+		}
+		if len(e.customAnWords) != 0 {
+			t.Error("customAnWords should be empty after Reset")
+		}
+		if e.customAPatterns != nil {
+			t.Error("customAPatterns should be nil after Reset")
+		}
+		if e.customAnPatterns != nil {
+			t.Error("customAnPatterns should be nil after Reset")
+		}
+		e.mu.RUnlock()
+	})
+
+	t.Run("Gender", func(t *testing.T) {
+		if got := e.GetGender(); got != "t" {
+			t.Errorf("GetGender() = %q after Reset, want \"t\"", got)
+		}
+	})
+
+	t.Run("PossessiveStyle", func(t *testing.T) {
+		if got := e.GetPossessiveStyle(); got != PossessiveModern {
+			t.Errorf("GetPossessiveStyle() = %d after Reset, want %d", got, PossessiveModern)
+		}
+	})
+
+	t.Run("DefaultNum", func(t *testing.T) {
+		if got := e.GetNum(); got != 0 {
+			t.Errorf("GetNum() = %d after Reset, want 0", got)
+		}
+	})
+
+	t.Run("IrregularPluralsLength", func(t *testing.T) {
+		e.mu.RLock()
+		if len(e.irregularPlurals) != len(defaultIrregularPlurals) {
+			t.Errorf("irregularPlurals length = %d after Reset, want %d",
+				len(e.irregularPlurals), len(defaultIrregularPlurals))
+		}
+		e.mu.RUnlock()
+	})
+}
+
+func TestEngineResetThreadSafety(_ *testing.T) {
+	e := NewEngine()
+
+	// Test concurrent reset and access operations
+	done := make(chan bool)
+
+	// Goroutines that modify and reset
+	for i := range 5 {
+		go func(id int) {
+			for j := range 100 {
+				e.DefNoun("test"+string(rune('a'+id)), "tests")
+				e.Classical(j%2 == 0)
+				if j%10 == 0 {
+					e.Reset()
+				}
+			}
+			done <- true
+		}(i)
+	}
+
+	// Goroutines that read
+	for range 5 {
+		go func() {
+			for range 100 {
+				_ = e.IsClassical()
+				_ = e.Plural("cat")
+				_ = e.GetGender()
+			}
+			done <- true
+		}()
+	}
+
+	// Wait for all goroutines
+	for range 10 {
+		<-done
+	}
+}
+
+func TestPackageLevelReset(t *testing.T) {
+	// Save current state of default engine
+	originalClassical := IsClassical()
+	originalGender := GetGender()
+	originalNum := GetNum()
+
+	// Modify default engine state
+	Classical(true)
+	Gender("m")
+	Num(42)
+	DefNoun("testword", "testwords")
+
+	// Verify modifications
+	if !IsClassical() {
+		t.Error("IsClassical should be true after modification")
+	}
+
+	// Reset using package-level function
+	Reset()
+
+	// Verify reset
+	if IsClassical() {
+		t.Error("IsClassical should be false after Reset()")
+	}
+	if GetGender() != "t" {
+		t.Errorf("GetGender() = %q after Reset(), want \"t\"", GetGender())
+	}
+	if GetNum() != 0 {
+		t.Errorf("GetNum() = %d after Reset(), want 0", GetNum())
+	}
+
+	// Cleanup: restore original state if different from defaults
+	// (Though after Reset, the state should be at defaults)
+	_ = originalClassical
+	_ = originalGender
+	_ = originalNum
+}

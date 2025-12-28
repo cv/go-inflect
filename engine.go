@@ -246,3 +246,64 @@ func (e *Engine) Clone() *Engine {
 		defaultNum:         e.defaultNum,
 	}
 }
+
+// Reset restores the Engine to its default state.
+// This clears all custom definitions and resets all options to defaults.
+//
+// All state is reset to match the values from NewEngine():
+//   - All classical flags are set to false
+//   - irregularPlurals is restored from defaultIrregularPlurals
+//   - singularIrregulars is rebuilt as the reverse of irregularPlurals
+//   - All custom maps (verbs, adjectives, article patterns) are cleared
+//   - Gender is reset to "t" (singular they)
+//   - Possessive style is reset to PossessiveModern
+//   - Default number is reset to 0
+//
+// Example:
+//
+//	e := NewEngine()
+//	e.Classical(true)
+//	e.DefNoun("foo", "foos")
+//	e.Reset()
+//	e.IsClassical() // returns false
+//	e.Plural("foo") // returns "foos" (standard rule, custom removed)
+func (e *Engine) Reset() {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	// Reset classical options
+	e.classicalMode = false
+	e.classicalAll = false
+	e.classicalZero = false
+	e.classicalHerd = false
+	e.classicalNames = false
+	e.classicalAncient = false
+	e.classicalPersons = false
+
+	// Reset noun mappings
+	e.irregularPlurals = copyMap(defaultIrregularPlurals)
+	// Build singularIrregulars as reverse of irregularPlurals
+	e.singularIrregulars = make(map[string]string, len(e.irregularPlurals))
+	for singular, plural := range e.irregularPlurals {
+		e.singularIrregulars[plural] = singular
+	}
+
+	// Reset custom definitions
+	e.customVerbs = make(map[string]string)
+	e.customVerbsReverse = make(map[string]string)
+	e.customAdjs = make(map[string]string)
+	e.customAdjsReverse = make(map[string]string)
+
+	// Reset article patterns
+	e.customAWords = make(map[string]bool)
+	e.customAnWords = make(map[string]bool)
+	e.customAPatterns = nil
+	e.customAnPatterns = nil
+
+	// Reset gender
+	e.gender = "t"
+
+	// Reset other state
+	e.defaultNum = 0
+	e.possessiveStyle = PossessiveModern
+}

@@ -149,4 +149,5 @@ linters:
           - gocyclo
           - gocognit
           - dupl
-          - dupword  # Test data legitimately contains repeated words
+          - dupword   # Test data legitimately contains repeated words
+          - goconst   # Test data legitimately contains repeated strings

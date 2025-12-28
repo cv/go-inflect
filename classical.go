@@ -28,6 +28,23 @@ func DefaultEngine() *Engine {
 	return defaultEngine
 }
 
+// Reset restores the default Engine to its initial state.
+// This clears all custom definitions and resets all options to defaults.
+//
+// This is equivalent to calling defaultEngine.Reset() and affects all
+// subsequent package-level function calls.
+//
+// Example:
+//
+//	inflect.Classical(true)
+//	inflect.DefNoun("foo", "foos")
+//	inflect.Reset()
+//	inflect.IsClassical() // returns false
+//	inflect.Plural("foo") // returns "foos" (standard rule, custom removed)
+func Reset() {
+	defaultEngine.Reset()
+}
+
 // ClassicalAll enables or disables all classical pluralization options at once.
 //
 // This is a master switch that sets all classical options:
