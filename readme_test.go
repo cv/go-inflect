@@ -70,4 +70,5 @@ func TestREADMEGender(t *testing.T) {
 func TestREADMEInflect(t *testing.T) {
 	assert.Equal(t, "I saw cats", inflect.Inflect("I saw plural('cat', 3)"), "Inflect plural")
 	assert.Equal(t, "This is the 1st item", inflect.Inflect("This is the ordinal(1) item"), "Inflect ordinal")
+	assert.Equal(t, "We saw these cats", inflect.Inflect("plural_noun('I') saw plural_adj('this') plural('cat')"), "Inflect POS functions")
 }

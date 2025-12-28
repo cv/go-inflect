@@ -204,7 +204,13 @@ inflect.Inflect("I saw plural('cat', 3)")
 
 inflect.Inflect("This is the ordinal(1) item")
 // "This is the 1st item"
+
+inflect.Inflect("plural_noun('I') saw plural_adj('this') plural('cat')")
+// "We saw these cats"
 ```
+
+Supported functions: `plural`, `singular`, `an`/`a`, `ordinal`, `num`,
+`plural_noun`, `plural_verb`, `plural_adj`, `singular_noun` (all with optional count parameter).
 
 ## Features
 

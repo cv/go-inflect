@@ -16,11 +16,25 @@ var inflectFuncPattern = regexp.MustCompile(`(\w+)\(([^)]*)\)`)
 // with their inflected results.
 //
 // Supported function calls:
+//
+// Basic inflection:
 //   - plural('word') - returns the plural form of the word
 //   - plural('word', n) - returns plural if n != 1, singular otherwise
 //   - singular('word') - returns the singular form of the word
 //   - an('word') - returns the word with appropriate article ("a" or "an")
 //   - a('word') - alias for an()
+//
+// Part-of-speech specific:
+//   - plural_noun('word') - pluralizes nouns/pronouns ("I" -> "we")
+//   - plural_noun('word', n) - with count
+//   - plural_verb('word') - pluralizes verbs ("is" -> "are")
+//   - plural_verb('word', n) - with count
+//   - plural_adj('word') - pluralizes adjectives ("this" -> "these")
+//   - plural_adj('word', n) - with count
+//   - singular_noun('word') - singularizes nouns/pronouns
+//   - singular_noun('word', n) - with count
+//
+// Numbers:
 //   - ordinal(n) - returns ordinal form like "1st", "2nd", "3rd"
 //   - num(n) - returns the number as a string
 //
@@ -29,6 +43,8 @@ var inflectFuncPattern = regexp.MustCompile(`(\w+)\(([^)]*)\)`)
 //   - Inflect("I saw an('apple')") -> "I saw an apple"
 //   - Inflect("There are num(3) plural('error', 3)") -> "There are 3 errors"
 //   - Inflect("This is the ordinal(1) item") -> "This is the 1st item"
+//   - Inflect("plural_noun('I') saw it") -> "We saw it"
+//   - Inflect("The cat plural_verb('is') happy") -> "The cat are happy"
 func Inflect(text string) string {
 	return inflectFuncPattern.ReplaceAllStringFunc(text, processInflectCall)
 }
