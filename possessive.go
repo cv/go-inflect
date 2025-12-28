@@ -1,6 +1,10 @@
 package inflect
 
-import "strings"
+import (
+	"strings"
+	"unicode"
+	"unicode/utf8"
+)
 
 // PossessiveStyleType represents the style for forming possessives of words ending in s.
 type PossessiveStyleType int
@@ -31,6 +35,67 @@ func GetPossessiveStyle() PossessiveStyleType {
 	return possessiveStyle
 }
 
+// Package-level maps to avoid allocation on each call.
+var (
+	// irregularPluralNoS contains known irregular plurals that don't end in s.
+	irregularPluralNoS = map[string]bool{
+		"children": true, "men": true, "women": true, "people": true,
+		"mice": true, "geese": true, "feet": true, "teeth": true,
+		"oxen": true, "lice": true, "dice": true,
+	}
+
+	// singularEndsInS contains common singular words ending in s that shouldn't be treated as plural.
+	singularEndsInS = map[string]bool{
+		"bus": true, "gas": true, "lens": true, "atlas": true,
+		"iris": true, "plus": true, "minus": true, "virus": true,
+		"bonus": true, "focus": true, "campus": true, "census": true,
+		"corpus": true, "genius": true, "nexus": true, "oasis": true,
+		"basis": true, "thesis": true, "crisis": true, "analysis": true,
+		"diagnosis": true, "hypothesis": true, "parenthesis": true,
+		"synopsis": true, "emphasis": true, "cosmos": true, "chaos": true,
+		"ethos": true, "pathos": true, "logos": true, "status": true,
+		"apparatus": true, "hiatus": true, "impetus": true, "radius": true,
+		"nucleus": true, "syllabus": true, "stimulus": true, "fungus": true,
+		"cactus": true, "octopus": true, "platypus": true, "walrus": true,
+		"yes": true, "no": true, "us": true, "this": true, "thus": true,
+	}
+
+	// commonNouns contains common nouns we know about (a sample - most validation is heuristic).
+	commonNouns = map[string]bool{
+		"cat": true, "dog": true, "book": true, "car": true, "house": true,
+		"boy": true, "girl": true, "man": true, "woman": true, "child": true,
+		"tree": true, "bird": true, "fish": true, "day": true, "night": true,
+		"hand": true, "foot": true, "head": true, "eye": true, "ear": true,
+		"door": true, "window": true, "table": true, "chair": true, "bed": true,
+		"teacher": true, "student": true, "parent": true, "friend": true,
+		"city": true, "country": true, "state": true, "street": true,
+		"box": true, "bag": true, "ball": true, "cup": true, "glass": true,
+		"paper": true, "pen": true, "key": true, "phone": true, "computer": true,
+	}
+
+	// truncatedNames contains known truncated name patterns that should NOT be considered common nouns.
+	// These are singularized forms of common names.
+	truncatedNames = map[string]bool{
+		// From -es names
+		"jame": true, "charle": true, "jone": true, "mose": true, "jesu": true,
+		"thoma": true, "jess": true, "ross": true, "walle": true, "jule": true,
+		"mile": true, "gile": true, "style": true, "kyle": true, "achille": true,
+		// From -s names
+		"william": true, "adam": true, "lewi": true, "davi": true, "elli": true,
+		"harri": true, "morri": true, "denni": true, "franci": true, "chri": true,
+		// Short truncated forms
+		"mos": true, "ros": true, "gus": true,
+	}
+
+	// validShortA contains valid short words ending in 'a'.
+	validShortA = map[string]bool{
+		"data": true, "sofa": true, "mega": true, "soda": true, "mama": true,
+		"papa": true, "diva": true, "yoga": true, "cola": true, "area": true,
+		"idea": true, "lava": true, "toga": true, "tuna": true, "visa": true,
+		"beta": true, "meta": true, "aqua": true, "aura": true, "era": true,
+	}
+)
+
 // Possessive returns the possessive form of an English noun.
 //
 // Rules applied:
@@ -51,103 +116,85 @@ func Possessive(word string) string {
 		return ""
 	}
 
-	// Check if already possessive
+	// Check if already possessive (no allocation needed)
 	if isAlreadyPossessive(word) {
 		return word
 	}
 
-	lower := strings.ToLower(word)
+	// Check if the word ends in s (case-insensitive, no allocation)
+	endsInS := endsWithS(word)
 
-	// Check if the word ends in s
-	endsInS := strings.HasSuffix(lower, "s")
-
-	// Determine if the word is a "true" plural (not just a singular ending in s)
-	// We check by seeing if pluralizing the singular form gives us the original word
-	isPluralForm := isTruePlural(word, lower)
-
-	// Handle plural nouns ending in s: add only '
-	if isPluralForm && endsInS {
-		return word + "'"
-	}
-
-	// Handle plural nouns not ending in s (children, men, etc.): add 's
-	if isPluralForm {
+	// Fast path for simple singular words not ending in s
+	if !endsInS {
+		// Check for irregular plurals that don't end in s
+		lower := strings.ToLower(word)
+		if irregularPluralNoS[lower] {
+			// Plural noun not ending in s: add 's
+			return word + matchSuffix(word, "'s")
+		}
+		// Simple singular: add 's
 		return word + matchSuffix(word, "'s")
 	}
 
-	// Singular noun ending in s
-	if endsInS {
+	// Word ends in s - need to determine if plural or singular
+	lower := strings.ToLower(word)
+
+	// Words ending in double-s are typically singular (boss, class, glass, dress, etc.)
+	if strings.HasSuffix(lower, "ss") {
 		if possessiveStyle == PossessiveTraditional {
 			return word + "'"
 		}
 		return word + matchSuffix(word, "'s")
 	}
 
-	// Default: add 's
+	// Check for known singular words ending in s
+	if singularEndsInS[lower] {
+		if possessiveStyle == PossessiveTraditional {
+			return word + "'"
+		}
+		return word + matchSuffix(word, "'s")
+	}
+
+	// Proper names ending in s are typically singular
+	if isProperName(word) {
+		// Check if this might be a plural of a common noun (like "Cats")
+		singular := Singular(word)
+		singularLower := strings.ToLower(singular)
+		if singularLower != lower && isLikelyCommonNoun(singularLower) {
+			// It's actually a plural of a common noun
+			return word + "'"
+		}
+		// Proper name, not a plural - treat as singular ending in s
+		if possessiveStyle == PossessiveTraditional {
+			return word + "'"
+		}
+		return word + matchSuffix(word, "'s")
+	}
+
+	// Check if it's a true plural
+	if isTruePluralEndsInS(word, lower) {
+		return word + "'"
+	}
+
+	// Default: singular ending in s
+	if possessiveStyle == PossessiveTraditional {
+		return word + "'"
+	}
 	return word + matchSuffix(word, "'s")
 }
 
-// isTruePlural determines if a word is actually a plural form (not just a singular ending in s).
-func isTruePlural(word, lower string) bool {
-	// Check for known irregular plurals that don't end in s
-	irregularPluralNoS := map[string]bool{
-		"children": true, "men": true, "women": true, "people": true,
-		"mice": true, "geese": true, "feet": true, "teeth": true,
-		"oxen": true, "lice": true, "dice": true,
-	}
-	if irregularPluralNoS[lower] {
-		return true
-	}
-
-	// Words ending in double-s are typically singular (boss, class, glass, dress, etc.)
-	if strings.HasSuffix(lower, "ss") {
+// endsWithS checks if a word ends with 's' or 'S' without allocation.
+func endsWithS(word string) bool {
+	if word == "" {
 		return false
 	}
-
-	// Proper names (capitalized) ending in s are typically singular
-	// But we need to check if it might be a common noun made plural (like "Cats")
-	if isProperName(word) && strings.HasSuffix(lower, "s") {
-		// Check if this is a known common word in plural form
-		singular := Singular(word)
-		singularLower := strings.ToLower(singular)
-
-		// Only consider it a plural if the singular is a known common word
-		// We check this by seeing if the singular exists in common word patterns
-		if singularLower != lower && isLikelyCommonNoun(singularLower) {
-			return true // It's actually a plural of a common noun
-		}
-		return false // Proper name, not a plural
-	}
-
-	// Common singular words ending in s that shouldn't be treated as plural
-	singularEndsInS := map[string]bool{
-		"bus": true, "gas": true, "lens": true, "atlas": true,
-		"iris": true, "plus": true, "minus": true, "virus": true,
-		"bonus": true, "focus": true, "campus": true, "census": true,
-		"corpus": true, "genius": true, "nexus": true, "oasis": true,
-		"basis": true, "thesis": true, "crisis": true, "analysis": true,
-		"diagnosis": true, "hypothesis": true, "parenthesis": true,
-		"synopsis": true, "emphasis": true, "cosmos": true, "chaos": true,
-		"ethos": true, "pathos": true, "logos": true, "status": true,
-		"apparatus": true, "hiatus": true, "impetus": true, "radius": true,
-		"nucleus": true, "syllabus": true, "stimulus": true, "fungus": true,
-		"cactus": true, "octopus": true, "platypus": true, "walrus": true,
-		"yes": true, "no": true, "us": true, "this": true, "thus": true,
-	}
-	if singularEndsInS[lower] {
-		return false
-	}
-
-	// For words ending in s, check if they follow common plural patterns
-	if strings.HasSuffix(lower, "s") {
-		return checkPluralPatterns(word, lower)
-	}
-
-	return false
+	lastByte := word[len(word)-1]
+	return lastByte == 's' || lastByte == 'S'
 }
 
-// checkPluralPatterns checks if a word ending in 's' follows plural patterns.
-func checkPluralPatterns(word, lower string) bool {
+// isTruePluralEndsInS determines if a word ending in s is actually a plural form.
+// This is called only for words that end in 's' and are not proper names.
+func isTruePluralEndsInS(word, lower string) bool {
 	// Try to get the singular form
 	singular := Singular(word)
 	singularLower := strings.ToLower(singular)
@@ -208,67 +255,43 @@ func isLikelyCommonNoun(word string) bool {
 		return false
 	}
 
-	// Common nouns we know about (a sample - most validation is heuristic)
-	commonNouns := map[string]bool{
-		"cat": true, "dog": true, "book": true, "car": true, "house": true,
-		"boy": true, "girl": true, "man": true, "woman": true, "child": true,
-		"tree": true, "bird": true, "fish": true, "day": true, "night": true,
-		"hand": true, "foot": true, "head": true, "eye": true, "ear": true,
-		"door": true, "window": true, "table": true, "chair": true, "bed": true,
-		"teacher": true, "student": true, "parent": true, "friend": true,
-		"city": true, "country": true, "state": true, "street": true,
-		"box": true, "bag": true, "ball": true, "cup": true, "glass": true,
-		"paper": true, "pen": true, "key": true, "phone": true, "computer": true,
-	}
+	// Check known common nouns
 	if commonNouns[word] {
 		return true
 	}
 
-	// Known truncated name patterns that should NOT be considered common nouns
-	// These are singularized forms of common names
-	truncatedNames := map[string]bool{
-		// From -es names
-		"jame": true, "charle": true, "jone": true, "mose": true, "jesu": true,
-		"thoma": true, "jess": true, "ross": true, "walle": true, "jule": true,
-		"mile": true, "gile": true, "style": true, "kyle": true, "achille": true,
-		// From -s names
-		"william": true, "adam": true, "lewi": true, "davi": true, "elli": true,
-		"harri": true, "morri": true, "denni": true, "franci": true, "chri": true,
-		// Short truncated forms
-		"mos": true, "ros": true, "gus": true,
-	}
+	// Check known truncated name patterns
 	if truncatedNames[word] {
 		return false
 	}
 
 	// Check for truncated patterns that indicate non-words
-	lastChar := rune(word[len(word)-1])
+	lastRune, _ := utf8.DecodeLastRuneInString(word)
 
 	// Words ending in 'i' or 'u' alone are rare in English common nouns
-	if lastChar == 'i' || lastChar == 'u' {
+	if lastRune == 'i' || lastRune == 'u' {
 		return false
 	}
 
 	// Short words ending in 'a' are often truncated names (thoma, anna → ann)
-	if lastChar == 'a' && len(word) <= 5 {
-		validShortA := map[string]bool{
-			"data": true, "sofa": true, "mega": true, "soda": true, "mama": true,
-			"papa": true, "diva": true, "yoga": true, "cola": true, "area": true,
-			"idea": true, "lava": true, "toga": true, "tuna": true, "visa": true,
-			"beta": true, "meta": true, "aqua": true, "aura": true, "era": true,
-		}
+	if lastRune == 'a' && len(word) <= 5 {
 		if !validShortA[word] {
 			return false
 		}
 	}
 
 	// Words ending in 'e' with consonant clusters are often truncated
-	if lastChar == 'e' && len(word) >= 4 {
-		secondLastChar := rune(word[len(word)-2])
-		thirdLastChar := rune(word[len(word)-3])
-		// Consonant + consonant + e is suspicious (charle, achille)
-		if !isVowel(secondLastChar) && !isVowel(thirdLastChar) {
-			return false
+	if lastRune == 'e' && len(word) >= 4 {
+		// Get the second and third last runes
+		remaining := word[:len(word)-1]
+		secondLastRune, size := utf8.DecodeLastRuneInString(remaining)
+		if size > 0 {
+			remaining = remaining[:len(remaining)-size]
+			thirdLastRune, _ := utf8.DecodeLastRuneInString(remaining)
+			// Consonant + consonant + e is suspicious (charle, achille)
+			if !isVowel(secondLastRune) && !isVowel(thirdLastRune) {
+				return false
+			}
 		}
 	}
 
@@ -282,16 +305,20 @@ func looksLikeCompleteWord(word string) bool {
 		return false
 	}
 
-	secondLastChar := rune(word[len(word)-2])
+	// Get second last character
+	remaining := word[:len(word)-1]
+	secondLastRune, _ := utf8.DecodeLastRuneInString(remaining)
+
+	// Get last character
+	lastRune, _ := utf8.DecodeLastRuneInString(word)
+	lastLower := unicode.ToLower(lastRune)
 
 	// Words typically don't end in these consonants without a vowel before them
-	invalidEndings := []string{"b", "c", "d", "f", "g", "h", "j", "k", "m", "p", "q", "v", "w", "z"}
-	for _, ending := range invalidEndings {
-		if strings.HasSuffix(word, ending) {
-			// Check if the word has a vowel before the ending
-			if !isVowel(secondLastChar) {
-				return false
-			}
+	switch lastLower {
+	case 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'm', 'p', 'q', 'v', 'w', 'z':
+		// Check if the word has a vowel before the ending
+		if !isVowel(secondLastRune) {
+			return false
 		}
 	}
 
