@@ -172,19 +172,19 @@ func Plural(word string) string {
 	// Check for classical proper name handling when classicalNames is enabled.
 	// Proper names (capitalized words) ending in 's' remain unchanged.
 	// Examples: Jones -> Jones, Williams -> Williams
-	if classicalNames && isProperNameEndingInS(word) {
+	if defaultEngine.IsClassicalNames() && isProperNameEndingInS(word) {
 		return word
 	}
 
 	// Check for classical Latin/Greek plurals when classicalAncient is enabled
-	if classicalAncient || classicalMode {
+	if defaultEngine.IsClassical() {
 		if plural, ok := classicalLatinPlurals[lower]; ok {
 			return matchCase(word, plural)
 		}
 	}
 
 	// Handle classicalPersons: person -> persons (instead of people)
-	if classicalPersons && lower == "person" {
+	if defaultEngine.IsClassicalPersons() && lower == "person" {
 		return matchCase(word, "persons")
 	}
 
@@ -200,7 +200,7 @@ func Plural(word string) string {
 
 	// Check for herd animals (affected by classicalHerd flag)
 	if herdAnimals[lower] {
-		if classicalHerd {
+		if defaultEngine.IsClassicalHerd() {
 			return word // unchanged in classical mode
 		}
 		// Modern mode: apply standard suffix rules (adds -s or -es)

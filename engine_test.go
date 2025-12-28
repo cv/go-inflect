@@ -197,3 +197,198 @@ func TestEngineCloneWithPatterns(t *testing.T) {
 		t.Error("Clone: modifying clone's customAPatterns slice should not affect original")
 	}
 }
+
+func TestEngineClassicalMethods(t *testing.T) {
+	t.Run("ClassicalAll", func(t *testing.T) {
+		e := NewEngine()
+
+		// Default should be false
+		if e.IsClassicalAll() {
+			t.Error("IsClassicalAll should be false by default")
+		}
+
+		// Enable all
+		e.ClassicalAll(true)
+		if !e.IsClassicalAll() {
+			t.Error("IsClassicalAll should be true after ClassicalAll(true)")
+		}
+		if !e.IsClassicalAncient() {
+			t.Error("IsClassicalAncient should be true after ClassicalAll(true)")
+		}
+		if !e.IsClassicalZero() {
+			t.Error("IsClassicalZero should be true after ClassicalAll(true)")
+		}
+		if !e.IsClassicalHerd() {
+			t.Error("IsClassicalHerd should be true after ClassicalAll(true)")
+		}
+		if !e.IsClassicalNames() {
+			t.Error("IsClassicalNames should be true after ClassicalAll(true)")
+		}
+		if !e.IsClassicalPersons() {
+			t.Error("IsClassicalPersons should be true after ClassicalAll(true)")
+		}
+
+		// Disable all
+		e.ClassicalAll(false)
+		if e.IsClassicalAll() {
+			t.Error("IsClassicalAll should be false after ClassicalAll(false)")
+		}
+	})
+
+	t.Run("Classical", func(t *testing.T) {
+		e := NewEngine()
+
+		e.Classical(true)
+		if !e.IsClassical() {
+			t.Error("IsClassical should be true after Classical(true)")
+		}
+		if !e.IsClassicalAll() {
+			t.Error("IsClassicalAll should be true after Classical(true)")
+		}
+
+		e.Classical(false)
+		if e.IsClassical() {
+			t.Error("IsClassical should be false after Classical(false)")
+		}
+	})
+
+	t.Run("ClassicalAncient", func(t *testing.T) {
+		e := NewEngine()
+
+		if e.IsClassicalAncient() {
+			t.Error("IsClassicalAncient should be false by default")
+		}
+
+		e.ClassicalAncient(true)
+		if !e.IsClassicalAncient() {
+			t.Error("IsClassicalAncient should be true after ClassicalAncient(true)")
+		}
+		if !e.IsClassical() {
+			t.Error("IsClassical should be true when ClassicalAncient is enabled")
+		}
+
+		e.ClassicalAncient(false)
+		if e.IsClassicalAncient() {
+			t.Error("IsClassicalAncient should be false after ClassicalAncient(false)")
+		}
+	})
+
+	t.Run("ClassicalZero", func(t *testing.T) {
+		e := NewEngine()
+
+		if e.IsClassicalZero() {
+			t.Error("IsClassicalZero should be false by default")
+		}
+
+		e.ClassicalZero(true)
+		if !e.IsClassicalZero() {
+			t.Error("IsClassicalZero should be true after ClassicalZero(true)")
+		}
+
+		e.ClassicalZero(false)
+		if e.IsClassicalZero() {
+			t.Error("IsClassicalZero should be false after ClassicalZero(false)")
+		}
+	})
+
+	t.Run("ClassicalHerd", func(t *testing.T) {
+		e := NewEngine()
+
+		if e.IsClassicalHerd() {
+			t.Error("IsClassicalHerd should be false by default")
+		}
+
+		e.ClassicalHerd(true)
+		if !e.IsClassicalHerd() {
+			t.Error("IsClassicalHerd should be true after ClassicalHerd(true)")
+		}
+
+		e.ClassicalHerd(false)
+		if e.IsClassicalHerd() {
+			t.Error("IsClassicalHerd should be false after ClassicalHerd(false)")
+		}
+	})
+
+	t.Run("ClassicalNames", func(t *testing.T) {
+		e := NewEngine()
+
+		if e.IsClassicalNames() {
+			t.Error("IsClassicalNames should be false by default")
+		}
+
+		e.ClassicalNames(true)
+		if !e.IsClassicalNames() {
+			t.Error("IsClassicalNames should be true after ClassicalNames(true)")
+		}
+
+		e.ClassicalNames(false)
+		if e.IsClassicalNames() {
+			t.Error("IsClassicalNames should be false after ClassicalNames(false)")
+		}
+	})
+
+	t.Run("ClassicalPersons", func(t *testing.T) {
+		e := NewEngine()
+
+		if e.IsClassicalPersons() {
+			t.Error("IsClassicalPersons should be false by default")
+		}
+
+		e.ClassicalPersons(true)
+		if !e.IsClassicalPersons() {
+			t.Error("IsClassicalPersons should be true after ClassicalPersons(true)")
+		}
+
+		e.ClassicalPersons(false)
+		if e.IsClassicalPersons() {
+			t.Error("IsClassicalPersons should be false after ClassicalPersons(false)")
+		}
+	})
+
+	t.Run("Independence", func(t *testing.T) {
+		e := NewEngine()
+
+		// Enable individual flags and verify they don't affect others
+		e.ClassicalAncient(true)
+		if e.IsClassicalPersons() {
+			t.Error("ClassicalAncient should not affect ClassicalPersons")
+		}
+		if e.IsClassicalHerd() {
+			t.Error("ClassicalAncient should not affect ClassicalHerd")
+		}
+
+		e.ClassicalAncient(false)
+		e.ClassicalPersons(true)
+		if e.IsClassicalAncient() {
+			t.Error("ClassicalPersons should not affect ClassicalAncient")
+		}
+
+		// After enabling all, disabling one should not affect others
+		e.ClassicalAll(true)
+		e.ClassicalAncient(false)
+		if !e.IsClassicalPersons() {
+			t.Error("Disabling ClassicalAncient should not affect ClassicalPersons")
+		}
+		if !e.IsClassicalHerd() {
+			t.Error("Disabling ClassicalAncient should not affect ClassicalHerd")
+		}
+		if e.IsClassicalAll() {
+			t.Error("IsClassicalAll should be false after disabling one flag")
+		}
+	})
+}
+
+func TestEngineIsolation(t *testing.T) {
+	// Verify that different Engine instances are isolated
+	e1 := NewEngine()
+	e2 := NewEngine()
+
+	e1.ClassicalAll(true)
+
+	if e2.IsClassicalAll() {
+		t.Error("Modifying e1 should not affect e2")
+	}
+	if e2.IsClassicalAncient() {
+		t.Error("Modifying e1 should not affect e2")
+	}
+}

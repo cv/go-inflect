@@ -388,7 +388,7 @@ func FormatNumber(n int) string {
 //   - No("child", 0) returns "no child"
 func No(word string, count int) string {
 	if count == 0 {
-		if classicalZero {
+		if defaultEngine.IsClassicalZero() {
 			return "no " + word
 		}
 		return "no " + Plural(word)
