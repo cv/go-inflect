@@ -160,6 +160,17 @@ var defaultIrregularPlurals = map[string]string{
 //   - Plural("child") returns "children"
 //   - Plural("sheep") returns "sheep"
 func Plural(word string) string {
+	return defaultEngine.Plural(word)
+}
+
+// Plural returns the plural form of an English noun.
+//
+// Examples:
+//   - e.Plural("cat") returns "cats"
+//   - e.Plural("box") returns "boxes"
+//   - e.Plural("child") returns "children"
+//   - e.Plural("sheep") returns "sheep"
+func (e *Engine) Plural(word string) string {
 	if word == "" {
 		return ""
 	}
@@ -169,26 +180,26 @@ func Plural(word string) string {
 	// Check for classical proper name handling when classicalNames is enabled.
 	// Proper names (capitalized words) ending in 's' remain unchanged.
 	// Examples: Jones -> Jones, Williams -> Williams
-	if defaultEngine.IsClassicalNames() && isProperNameEndingInS(word) {
+	if e.IsClassicalNames() && isProperNameEndingInS(word) {
 		return word
 	}
 
 	// Check for classical Latin/Greek plurals when classicalAncient is enabled
-	if defaultEngine.IsClassical() {
+	if e.IsClassical() {
 		if plural, ok := classicalLatinPlurals[lower]; ok {
 			return matchCase(word, plural)
 		}
 	}
 
 	// Handle classicalPersons: person -> persons (instead of people)
-	if defaultEngine.IsClassicalPersons() && lower == "person" {
+	if e.IsClassicalPersons() && lower == "person" {
 		return matchCase(word, "persons")
 	}
 
 	// Check for irregular plurals first
-	defaultEngine.mu.RLock()
-	plural, ok := defaultEngine.irregularPlurals[lower]
-	defaultEngine.mu.RUnlock()
+	e.mu.RLock()
+	plural, ok := e.irregularPlurals[lower]
+	e.mu.RUnlock()
 	if ok {
 		return matchCase(word, plural)
 	}
@@ -200,7 +211,7 @@ func Plural(word string) string {
 
 	// Check for herd animals (affected by classicalHerd flag)
 	if herdAnimals[lower] {
-		if defaultEngine.IsClassicalHerd() {
+		if e.IsClassicalHerd() {
 			return word // unchanged in classical mode
 		}
 		// Modern mode: apply standard suffix rules (adds -s or -es)

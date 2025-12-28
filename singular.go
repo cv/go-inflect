@@ -15,6 +15,17 @@ var feWordBases = map[string]bool{
 //   - Singular("children") returns "child"
 //   - Singular("sheep") returns "sheep"
 func Singular(word string) string {
+	return defaultEngine.Singular(word)
+}
+
+// Singular returns the singular form of an English noun.
+//
+// Examples:
+//   - e.Singular("cats") returns "cat"
+//   - e.Singular("boxes") returns "box"
+//   - e.Singular("children") returns "child"
+//   - e.Singular("sheep") returns "sheep"
+func (e *Engine) Singular(word string) string {
 	if word == "" {
 		return ""
 	}
@@ -22,9 +33,9 @@ func Singular(word string) string {
 	lower := strings.ToLower(word)
 
 	// Check for irregular plurals first
-	defaultEngine.mu.RLock()
-	singular, ok := defaultEngine.singularIrregulars[lower]
-	defaultEngine.mu.RUnlock()
+	e.mu.RLock()
+	singular, ok := e.singularIrregulars[lower]
+	e.mu.RUnlock()
 	if ok {
 		return matchCase(word, singular)
 	}

@@ -404,7 +404,18 @@ func (e *Engine) AddUncountable(words ...string) {
 //
 //	Pluralize("cat") // returns "cats"
 func Pluralize(word string) string {
-	return Plural(word)
+	return defaultEngine.Plural(word)
+}
+
+// Pluralize is an alias for Plural, provided for compatibility with
+// github.com/go-openapi/inflect.
+//
+// Example:
+//
+//	e := NewEngine()
+//	e.Pluralize("cat") // returns "cats"
+func (e *Engine) Pluralize(word string) string {
+	return e.Plural(word)
 }
 
 // Singularize is an alias for Singular, provided for compatibility with
@@ -414,7 +425,18 @@ func Pluralize(word string) string {
 //
 //	Singularize("cats") // returns "cat"
 func Singularize(word string) string {
-	return Singular(word)
+	return defaultEngine.Singular(word)
+}
+
+// Singularize is an alias for Singular, provided for compatibility with
+// github.com/go-openapi/inflect.
+//
+// Example:
+//
+//	e := NewEngine()
+//	e.Singularize("cats") // returns "cat"
+func (e *Engine) Singularize(word string) string {
+	return e.Singular(word)
 }
 
 // Camelize is an alias for PascalCase, provided for compatibility with
