@@ -2,18 +2,6 @@ package inflect
 
 import "strings"
 
-// singularIrregulars maps plural forms to their singular forms (reverse of irregularPlurals).
-var singularIrregulars = buildSingularIrregulars()
-
-// buildSingularIrregulars builds the reverse mapping from irregularPlurals.
-func buildSingularIrregulars() map[string]string {
-	m := make(map[string]string, len(irregularPlurals))
-	for singular, plural := range irregularPlurals {
-		m[plural] = singular
-	}
-	return m
-}
-
 // feWordBases contains base words whose singular ends in -fe (plural is -ves).
 var feWordBases = map[string]bool{
 	"kni": true, "wi": true, "li": true,
@@ -34,7 +22,10 @@ func Singular(word string) string {
 	lower := strings.ToLower(word)
 
 	// Check for irregular plurals first
-	if singular, ok := singularIrregulars[lower]; ok {
+	defaultEngine.mu.RLock()
+	singular, ok := defaultEngine.singularIrregulars[lower]
+	defaultEngine.mu.RUnlock()
+	if ok {
 		return matchCase(word, singular)
 	}
 

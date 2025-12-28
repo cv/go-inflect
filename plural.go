@@ -152,9 +152,6 @@ var defaultIrregularPlurals = map[string]string{
 	"apex":        "apices",
 }
 
-// irregularPlurals maps singular forms to their irregular plural forms.
-var irregularPlurals = copyMap(defaultIrregularPlurals)
-
 // Plural returns the plural form of an English noun.
 //
 // Examples:
@@ -189,7 +186,10 @@ func Plural(word string) string {
 	}
 
 	// Check for irregular plurals first
-	if plural, ok := irregularPlurals[lower]; ok {
+	defaultEngine.mu.RLock()
+	plural, ok := defaultEngine.irregularPlurals[lower]
+	defaultEngine.mu.RUnlock()
+	if ok {
 		return matchCase(word, plural)
 	}
 

@@ -14,10 +14,28 @@ import "strings"
 //	Plural("Foo") // returns "Foos"
 //	Singular("foos") // returns "foo"
 func DefNoun(singular, plural string) {
+	defaultEngine.DefNoun(singular, plural)
+}
+
+// DefNoun defines a custom noun pluralization rule.
+//
+// The singular and plural forms are stored in lowercase, and subsequent calls
+// to Plural() and Singular() will use this custom rule with case preservation.
+//
+// Examples:
+//
+//	e := NewEngine()
+//	e.DefNoun("foo", "foos")
+//	e.Plural("foo") // returns "foos"
+//	e.Plural("Foo") // returns "Foos"
+//	e.Singular("foos") // returns "foo"
+func (e *Engine) DefNoun(singular, plural string) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
 	lower := strings.ToLower(singular)
 	lowerPlural := strings.ToLower(plural)
-	irregularPlurals[lower] = lowerPlural
-	singularIrregulars[lowerPlural] = lower
+	e.irregularPlurals[lower] = lowerPlural
+	e.singularIrregulars[lowerPlural] = lower
 }
 
 // UndefNoun removes a custom noun pluralization rule.
@@ -35,6 +53,27 @@ func DefNoun(singular, plural string) {
 //	UndefNoun("foo")
 //	Plural("foo") // returns "foos" (standard rule)
 func UndefNoun(singular string) bool {
+	return defaultEngine.UndefNoun(singular)
+}
+
+// UndefNoun removes a custom noun pluralization rule.
+//
+// This removes only user-defined rules; it cannot remove built-in irregular
+// plurals. To restore a built-in rule that was overwritten, use DefNounReset().
+//
+// Returns true if the rule was removed, false if it didn't exist or was a
+// built-in rule.
+//
+// Examples:
+//
+//	e := NewEngine()
+//	e.DefNoun("foo", "foos")
+//	e.Plural("foo") // returns "foos"
+//	e.UndefNoun("foo")
+//	e.Plural("foo") // returns "foos" (standard rule)
+func (e *Engine) UndefNoun(singular string) bool {
+	e.mu.Lock()
+	defer e.mu.Unlock()
 	lower := strings.ToLower(singular)
 
 	// Check if this is a built-in rule
@@ -43,14 +82,14 @@ func UndefNoun(singular string) bool {
 	}
 
 	// Check if the rule exists
-	plural, exists := irregularPlurals[lower]
+	plural, exists := e.irregularPlurals[lower]
 	if !exists {
 		return false
 	}
 
 	// Remove from both maps
-	delete(irregularPlurals, lower)
-	delete(singularIrregulars, plural)
+	delete(e.irregularPlurals, lower)
+	delete(e.singularIrregulars, plural)
 	return true
 }
 
@@ -67,8 +106,31 @@ func UndefNoun(singular string) bool {
 //	Plural("child") // returns "children" (restored)
 //	Plural("foo")   // returns "foos" (standard rule, custom removed)
 func DefNounReset() {
-	irregularPlurals = copyMap(defaultIrregularPlurals)
-	singularIrregulars = buildSingularIrregulars()
+	defaultEngine.DefNounReset()
+}
+
+// DefNounReset resets all noun pluralization rules to their defaults.
+//
+// This removes all custom rules added via DefNoun() and restores any
+// built-in rules that may have been overwritten.
+//
+// Example:
+//
+//	e := NewEngine()
+//	e.DefNoun("child", "childs")  // override built-in
+//	e.DefNoun("foo", "foos")      // add custom
+//	e.DefNounReset()
+//	e.Plural("child") // returns "children" (restored)
+//	e.Plural("foo")   // returns "foos" (standard rule, custom removed)
+func (e *Engine) DefNounReset() {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.irregularPlurals = copyMap(defaultIrregularPlurals)
+	// Build singularIrregulars as reverse of irregularPlurals
+	e.singularIrregulars = make(map[string]string, len(e.irregularPlurals))
+	for singular, plural := range e.irregularPlurals {
+		e.singularIrregulars[plural] = singular
+	}
 }
 
 // customVerbs stores custom verb conjugation rules (singular -> plural).
@@ -195,7 +257,19 @@ func DefAdjReset() {
 //	AddIrregular("person", "people")
 //	Plural("person") // returns "people"
 func AddIrregular(singular, plural string) {
-	DefNoun(singular, plural)
+	defaultEngine.DefNoun(singular, plural)
+}
+
+// AddIrregular is an alias for DefNoun, provided for compatibility with
+// github.com/jinzhu/inflection.
+//
+// Example:
+//
+//	e := NewEngine()
+//	e.AddIrregular("person", "people")
+//	e.Plural("person") // returns "people"
+func (e *Engine) AddIrregular(singular, plural string) {
+	e.DefNoun(singular, plural)
 }
 
 // AddUncountable marks words as uncountable (same singular and plural form),
@@ -208,8 +282,22 @@ func AddIrregular(singular, plural string) {
 //	Plural("fish")  // returns "fish"
 //	Plural("sheep") // returns "sheep"
 func AddUncountable(words ...string) {
+	defaultEngine.AddUncountable(words...)
+}
+
+// AddUncountable marks words as uncountable (same singular and plural form),
+// provided for compatibility with github.com/jinzhu/inflection and
+// github.com/go-openapi/inflect.
+//
+// Example:
+//
+//	e := NewEngine()
+//	e.AddUncountable("fish", "sheep")
+//	e.Plural("fish")  // returns "fish"
+//	e.Plural("sheep") // returns "sheep"
+func (e *Engine) AddUncountable(words ...string) {
 	for _, w := range words {
-		DefNoun(w, w)
+		e.DefNoun(w, w)
 	}
 }
 
