@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	inflect "github.com/cv/go-inflect"
 )
@@ -429,7 +430,7 @@ func TestDefAPattern(t *testing.T) {
 			inflect.DefAReset()
 
 			err := inflect.DefAPattern(tt.pattern)
-			assert.NoError(t, err, "DefAPattern(%q)", tt.pattern)
+			require.NoError(t, err, "DefAPattern(%q)", tt.pattern)
 
 			for _, input := range tt.inputs {
 				got := inflect.An(input)
@@ -474,7 +475,7 @@ func TestDefAnPattern(t *testing.T) {
 			inflect.DefAReset()
 
 			err := inflect.DefAnPattern(tt.pattern)
-			assert.NoError(t, err, "DefAnPattern(%q)", tt.pattern)
+			require.NoError(t, err, "DefAnPattern(%q)", tt.pattern)
 
 			for _, input := range tt.inputs {
 				got := inflect.An(input)
@@ -503,7 +504,7 @@ func TestUndefAPattern(t *testing.T) {
 
 		// Use "apple" which normally takes "an" but pattern forces "a"
 		err := inflect.DefAPattern("apple.*")
-		assert.NoError(t, err, "DefAPattern failed")
+		require.NoError(t, err, "DefAPattern failed")
 		assert.Equal(t, "a appleton", inflect.An("appleton"), "Before UndefAPattern")
 
 		// Remove pattern
@@ -528,7 +529,7 @@ func TestUndefAnPattern(t *testing.T) {
 
 		// Add pattern and verify it works
 		err := inflect.DefAnPattern("hero.*")
-		assert.NoError(t, err, "DefAnPattern failed")
+		require.NoError(t, err, "DefAnPattern failed")
 		assert.Equal(t, "an heroic", inflect.An("heroic"), "Before UndefAnPattern")
 
 		// Remove pattern
@@ -552,9 +553,9 @@ func TestDefAResetClearsPatterns(t *testing.T) {
 	inflect.DefA("apple")
 	inflect.DefAn("cat")
 	err := inflect.DefAPattern("euro.*")
-	assert.NoError(t, err, "DefAPattern failed")
+	require.NoError(t, err, "DefAPattern failed")
 	err = inflect.DefAnPattern("honor.*")
-	assert.NoError(t, err, "DefAnPattern failed")
+	require.NoError(t, err, "DefAnPattern failed")
 
 	// Verify patterns are working
 	assert.Equal(t, "a apple", inflect.An("apple"), "Before reset: An(apple)")
@@ -580,7 +581,7 @@ func TestPatternPrecedence(t *testing.T) {
 
 		// Add pattern first
 		err := inflect.DefAnPattern("euro.*")
-		assert.NoError(t, err, "DefAnPattern failed")
+		require.NoError(t, err, "DefAnPattern failed")
 		assert.Equal(t, "an euro", inflect.An("euro"), "With pattern only")
 
 		// Add exact word match - should take precedence
@@ -596,9 +597,9 @@ func TestPatternPrecedence(t *testing.T) {
 
 		// Both patterns match "european"
 		err := inflect.DefAnPattern("euro.*")
-		assert.NoError(t, err, "DefAnPattern failed")
+		require.NoError(t, err, "DefAnPattern failed")
 		err = inflect.DefAPattern("europ.*")
-		assert.NoError(t, err, "DefAPattern failed")
+		require.NoError(t, err, "DefAPattern failed")
 
 		// DefAPattern should take precedence
 		assert.Equal(t, "a european", inflect.An("european"))
@@ -612,7 +613,7 @@ func TestPatternCaseInsensitive(t *testing.T) {
 	defer inflect.DefAReset()
 
 	err := inflect.DefAPattern("euro.*")
-	assert.NoError(t, err, "DefAPattern failed")
+	require.NoError(t, err, "DefAPattern failed")
 
 	// Pattern should match regardless of case
 	tests := []struct {
