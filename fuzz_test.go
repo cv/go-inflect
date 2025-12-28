@@ -1133,3 +1133,177 @@ func FuzzNumberToWordsThreshold(f *testing.F) {
 		_ = NumberToWordsThreshold(n, threshold)
 	})
 }
+
+// Fuzz tests for Rails-style helper functions
+
+func FuzzHumanize(f *testing.F) {
+	seeds := []string{
+		"employee_salary", "author_id", "author_ID", "authorID",
+		"hello-world", "XMLParser", "user_name", "firstName",
+		"", " ", "a", "already humanized", "multiple__underscores",
+		"trailing_id", "UPPERCASE", "MixedCase",
+		"café_au_lait", "naïve_approach",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = Humanize(input)
+	})
+}
+
+func FuzzForeignKey(f *testing.F) {
+	seeds := []string{
+		"Person", "Message", "AdminUser", "user", "XMLParser",
+		"", " ", "a", "UPPERCASE", "MixedCase", "snake_case",
+		"café", "naïve",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = ForeignKey(input)
+		_ = ForeignKeyCondensed(input)
+	})
+}
+
+func FuzzTableize(f *testing.F) {
+	seeds := []string{
+		"Person", "RawScaledScorer", "MouseTrap", "User", "Child",
+		"admin_user", "", " ", "a", "UPPERCASE", "MixedCase",
+		"café", "naïve",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = Tableize(input)
+	})
+}
+
+func FuzzParameterize(f *testing.F) {
+	seeds := []string{
+		"Hello World!", "Hello, World!", "  Multiple   Spaces  ",
+		"Special!@#$%Characters", "Already-Dashed", "under_scored",
+		"MixedCase", "", " ", "café au lait",
+		"日本語", "über", "Crème brûlée",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = Parameterize(input)
+	})
+}
+
+func FuzzParameterizeJoin(f *testing.F) {
+	seeds := []struct {
+		word string
+		sep  string
+	}{
+		{"Hello World!", "_"}, {"Hello World!", "-"}, {"Hello World!", ""},
+		{"Multiple   Spaces", "_"}, {"café au lait", "-"},
+		{"", "-"}, {" ", "_"}, {"test", ""},
+	}
+	for _, s := range seeds {
+		f.Add(s.word, s.sep)
+	}
+
+	f.Fuzz(func(_ *testing.T, word, sep string) {
+		if !utf8.ValidString(word) || !utf8.ValidString(sep) {
+			return
+		}
+		_ = ParameterizeJoin(word, sep)
+	})
+}
+
+func FuzzTypeify(f *testing.F) {
+	seeds := []string{
+		"users", "raw_scaled_scorers", "people", "mice", "admin_users",
+		"categories", "", " ", "a", "UPPERCASE", "MixedCase",
+		"café", "naïve",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = Typeify(input)
+	})
+}
+
+func FuzzAsciify(f *testing.F) {
+	seeds := []string{
+		"café", "naïve", "résumé", "日本語", "hello", "über",
+		"Ångström", "", " ", "Crème brûlée",
+		"Привет", "مرحبا", "你好", "🎉",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = Asciify(input)
+	})
+}
+
+// Fuzz tests for compatibility aliases
+
+func FuzzPluralizeSingularize(f *testing.F) {
+	seeds := []string{
+		"cat", "cats", "child", "children", "person", "people",
+		"analysis", "analyses", "", " ", "a",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = Pluralize(input)
+		_ = Singularize(input)
+	})
+}
+
+func FuzzCamelizeVariants(f *testing.F) {
+	seeds := []string{
+		"hello_world", "foo-bar", "some_thing", "XMLParser",
+		"camelCase", "PascalCase", "snake_case", "kebab-case",
+		"", " ", "a", "ABC", "abc",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = Camelize(input)
+		_ = CamelizeDownFirst(input)
+	})
+}
