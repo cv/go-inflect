@@ -1,6 +1,7 @@
 package inflect
 
 import (
+	"math"
 	"testing"
 	"unicode/utf8"
 )
@@ -748,5 +749,166 @@ func FuzzTitleCase(f *testing.F) {
 			return
 		}
 		_ = TitleCase(input)
+	})
+}
+
+func FuzzNumberToWordsFloat(f *testing.F) {
+	// Seed with uint64 bits representation of interesting float64 values
+	// because Go's fuzz testing doesn't natively support float64
+	seeds := []uint64{
+		// Common values
+		0x0000000000000000, // 0.0
+		0x3FF0000000000000, // 1.0
+		0xBFF0000000000000, // -1.0
+		0x4024000000000000, // 10.0
+		0x40091EB851EB851F, // 3.14
+		0x4005BF0A8B145769, // 2.718
+		0x3FE0000000000000, // 0.5
+		0x3FB999999999999A, // 0.1
+		0x3FF199999999999A, // 1.1
+		0x412E848000000000, // 1000000.0
+		0xC12E848000000000, // -1000000.0
+		// Special values
+		0x7FF0000000000000, // +Inf
+		0xFFF0000000000000, // -Inf
+		0x7FF8000000000000, // NaN
+		// Very small values
+		0x3E70000000000000, // 1e-8
+		0x0010000000000000, // smallest normal positive
+		// Very large values
+		0x7FEFFFFFFFFFFFFF, // largest finite positive
+		0xFFEFFFFFFFFFFFFF, // largest finite negative
+		// Subnormal values
+		0x0000000000000001, // smallest subnormal positive
+	}
+	for _, bits := range seeds {
+		f.Add(bits)
+	}
+
+	f.Fuzz(func(_ *testing.T, bits uint64) {
+		n := math.Float64frombits(bits)
+		// Skip NaN and Inf as they may cause panics or undefined behavior
+		if math.IsNaN(n) || math.IsInf(n, 0) {
+			return
+		}
+		// Skip values that are too large to convert to int
+		if n > float64(math.MaxInt64) || n < float64(math.MinInt64) {
+			return
+		}
+		// Should not panic
+		_ = NumberToWordsFloat(n)
+	})
+}
+
+func FuzzNumberToWordsFloatWithDecimal(f *testing.F) {
+	// Seeds: uint64 bits for float64, string for decimal word
+	seeds := []struct {
+		bits    uint64
+		decimal string
+	}{
+		{0x40091EB851EB851F, "point"},   // 3.14 point
+		{0x40091EB851EB851F, "dot"},     // 3.14 dot
+		{0x40091EB851EB851F, "and"},     // 3.14 and
+		{0x3FE0000000000000, "point"},   // 0.5 point
+		{0x0000000000000000, "point"},   // 0.0 point
+		{0xBFF0000000000000, "point"},   // -1.0 point
+		{0x3FF0000000000000, ""},        // 1.0 with empty decimal word
+		{0x40091EB851EB851F, " "},       // 3.14 with space
+		{0x3FB999999999999A, "decimal"}, // 0.1 decimal
+		{0x412E848000000000, "point"},   // 1000000.0 point
+		{0x40091EB851EB851F, "café"},    // 3.14 with unicode
+	}
+	for _, s := range seeds {
+		f.Add(s.bits, s.decimal)
+	}
+
+	f.Fuzz(func(_ *testing.T, bits uint64, decimal string) {
+		if !utf8.ValidString(decimal) {
+			return
+		}
+		n := math.Float64frombits(bits)
+		// Skip NaN and Inf
+		if math.IsNaN(n) || math.IsInf(n, 0) {
+			return
+		}
+		// Skip values that are too large to convert to int
+		if n > float64(math.MaxInt64) || n < float64(math.MinInt64) {
+			return
+		}
+		// Should not panic
+		_ = NumberToWordsFloatWithDecimal(n, decimal)
+	})
+}
+
+func FuzzNumberToWordsGrouped(f *testing.F) {
+	// Seeds: n (int), groupSize (int)
+	seeds := []struct {
+		n         int
+		groupSize int
+	}{
+		// Basic cases
+		{1234, 2}, {1234, 3}, {1234, 4},
+		{123456, 2}, {123456, 3},
+		{1234567890, 3}, {1234567890, 4},
+		// Zero
+		{0, 2}, {0, 1}, {0, 0},
+		// Negative numbers
+		{-1234, 2}, {-1234, 3},
+		{-123456, 2}, {-1234567890, 3},
+		// Edge case group sizes
+		{1234, 0}, {1234, -1}, {1234, 1},
+		{1234, 100}, // group size larger than number
+		// Single digit
+		{5, 2}, {5, 1}, {5, 0},
+		// Edge case ints
+		{2147483647, 3}, {-2147483648, 3},
+		{2147483647, 2}, {-2147483648, 2},
+		{999999999, 3}, {-999999999, 3},
+		// Phone number style
+		{5551234567, 3}, {5551234567, 4},
+	}
+	for _, s := range seeds {
+		f.Add(s.n, s.groupSize)
+	}
+
+	f.Fuzz(func(_ *testing.T, n, groupSize int) {
+		// Should not panic
+		_ = NumberToWordsGrouped(n, groupSize)
+	})
+}
+
+func FuzzNumberToWordsThreshold(f *testing.F) {
+	// Seeds: n (int), threshold (int)
+	seeds := []struct {
+		n         int
+		threshold int
+	}{
+		// Below threshold
+		{1, 10}, {2, 10}, {3, 10}, {5, 10}, {9, 10},
+		// At threshold
+		{10, 10}, {100, 100}, {0, 0},
+		// Above threshold
+		{15, 10}, {100, 10}, {1000, 10},
+		// Zero
+		{0, 10}, {0, 1},
+		// Negative numbers
+		{-1, 10}, {-5, 10}, {-15, 10},
+		{-1, -10}, {-5, -10},
+		// Negative threshold
+		{5, -10}, {-5, -10}, {0, -1},
+		// Edge cases
+		{2147483647, 10}, {-2147483648, 10},
+		{10, 2147483647}, {10, -2147483648},
+		{2147483647, 2147483647}, {-2147483648, -2147483648},
+		// Large threshold
+		{1000000, 1000000}, {999999, 1000000},
+	}
+	for _, s := range seeds {
+		f.Add(s.n, s.threshold)
+	}
+
+	f.Fuzz(func(_ *testing.T, n, threshold int) {
+		// Should not panic
+		_ = NumberToWordsThreshold(n, threshold)
 	})
 }
