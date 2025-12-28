@@ -1,7 +1,7 @@
 //go:build ignore
 
-// generate_reference.go generates a CSV reference of all public functions.
-// Usage: go run tools/generate_reference.go
+// gen-reference.go generates a CSV reference of all public functions.
+// Usage: go run tools/gen-reference.go
 package main
 
 import (
@@ -53,19 +53,22 @@ var fileToGroup = map[string]string{
 	"inflect_funcs.go": "inflection",
 	"inflect.go":       "inflection",
 	"pronouns.go":      "pronouns",
+	"engine.go":        "engine",
 }
 
 func main() {
 	fset := token.NewFileSet()
 
-	// Parse all Go files with comments
-	pkgs, err := parser.ParseDir(fset, ".", nil, parser.ParseComments)
+	// Parse internal/inflect to find real implementations
+	internalDir := "internal/inflect"
+	pkgs, err := parser.ParseDir(fset, internalDir, nil, parser.ParseComments)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error parsing directory: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error parsing %s: %v\n", internalDir, err)
 		os.Exit(1)
 	}
 
-	var publicFuncs []funcInfo
+	// Collect Engine methods and package-level functions with their locations
+	implementations := make(map[string]funcInfo)
 	var tests, examples, fuzzTests, benchmarks []funcInfo
 
 	for _, pkg := range pkgs {
@@ -74,7 +77,7 @@ func main() {
 
 			ast.Inspect(file, func(n ast.Node) bool {
 				fn, ok := n.(*ast.FuncDecl)
-				if !ok || fn.Recv != nil { // Skip methods
+				if !ok {
 					return true
 				}
 
@@ -84,9 +87,10 @@ func main() {
 				}
 
 				pos := fset.Position(fn.Pos())
+				baseFile := filepath.Base(pos.Filename)
 				info := funcInfo{
 					name: name,
-					file: filepath.Base(pos.Filename),
+					file: baseFile,
 					line: pos.Line,
 				}
 
@@ -102,8 +106,70 @@ func main() {
 						tests = append(tests, info)
 					}
 				} else {
-					info.signature = formatSignature(fn)
-					info.doc = extractFirstSentence(fn.Doc)
+					// Check if this is a method on *Engine
+					if fn.Recv != nil && len(fn.Recv.List) > 0 {
+						recvType := exprToString(fn.Recv.List[0].Type)
+						if recvType == "*Engine" {
+							info.signature = formatSignature(fn)
+							info.doc = extractFirstSentence(fn.Doc)
+							implementations[name] = info
+						}
+					} else if fn.Recv == nil {
+						// Package-level function
+						info.signature = formatSignature(fn)
+						info.doc = extractFirstSentence(fn.Doc)
+						// Only add if not already present (prefer Engine methods)
+						if _, exists := implementations[name]; !exists {
+							implementations[name] = info
+						}
+					}
+				}
+
+				return true
+			})
+		}
+	}
+
+	// Now parse the root package to get public API functions
+	rootPkgs, err := parser.ParseDir(fset, ".", func(fi os.FileInfo) bool {
+		// Skip test files
+		name := fi.Name()
+		return !strings.HasSuffix(name, "_test.go")
+	}, parser.ParseComments)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error parsing root: %v\n", err)
+		os.Exit(1)
+	}
+
+	var publicFuncs []funcInfo
+
+	for _, pkg := range rootPkgs {
+		for _, file := range pkg.Files {
+			ast.Inspect(file, func(n ast.Node) bool {
+				fn, ok := n.(*ast.FuncDecl)
+				if !ok || fn.Recv != nil { // Skip methods
+					return true
+				}
+
+				name := fn.Name.Name
+				if !unicode.IsUpper(rune(name[0])) {
+					return true // Skip unexported functions
+				}
+
+				// Skip special functions that don't map to implementations
+				if name == "DefaultEngine" || name == "NewEngine" || name == "GetPossessiveStyle" {
+					return true
+				}
+
+				// Look up the implementation to get real location
+				if impl, ok := implementations[name]; ok {
+					info := funcInfo{
+						name:      name,
+						file:      impl.file,
+						line:      impl.line,
+						signature: impl.signature,
+						doc:       impl.doc,
+					}
 					publicFuncs = append(publicFuncs, info)
 				}
 
@@ -117,7 +183,7 @@ func main() {
 		return publicFuncs[i].name < publicFuncs[j].name
 	})
 
-	// Build lookup maps
+	// Build lookup maps for tests (use internal test files)
 	testMap := buildMap(tests, "Test")
 	exampleMap := buildMap(examples, "Example")
 	fuzzMap := buildMap(fuzzTests, "Fuzz")
@@ -132,12 +198,12 @@ func main() {
 			f.name,
 			f.signature,
 			f.doc,
-			fmt.Sprintf("%s:%d", f.file, f.line),
+			fmt.Sprintf("internal/inflect/%s:%d", f.file, f.line),
 			fileToGroup[f.file],
-			findLoc(f.name, exampleMap),
-			findLoc(f.name, testMap),
-			findLoc(f.name, fuzzMap),
-			findLoc(f.name, benchmarkMap),
+			findLoc(f.name, exampleMap, internalDir),
+			findLoc(f.name, testMap, internalDir),
+			findLoc(f.name, fuzzMap, internalDir),
+			findLoc(f.name, benchmarkMap, internalDir),
 		})
 	}
 	w.Flush()
@@ -243,12 +309,12 @@ func buildMap(funcs []funcInfo, prefix string) map[string]funcInfo {
 }
 
 // findLoc returns "file:line" for a test, or empty string if not found.
-func findLoc(funcName string, testMap map[string]funcInfo) string {
+func findLoc(funcName string, testMap map[string]funcInfo, baseDir string) string {
 	if t, ok := testMap[funcName]; ok {
-		return fmt.Sprintf("%s:%d", t.file, t.line)
+		return fmt.Sprintf("%s/%s:%d", baseDir, t.file, t.line)
 	}
 	if t, ok := testMap["Inflect"+funcName]; ok {
-		return fmt.Sprintf("%s:%d", t.file, t.line)
+		return fmt.Sprintf("%s/%s:%d", baseDir, t.file, t.line)
 	}
 	return ""
 }
