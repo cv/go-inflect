@@ -11,10 +11,37 @@ import (
 // Run with: go test -fuzz=FuzzPlural -fuzztime=30s
 
 func FuzzPlural(f *testing.F) {
-	// Seed corpus with interesting cases
+	// Seed corpus with interesting cases from unit tests
 	seeds := []string{
-		"cat", "dog", "child", "mouse", "fish",
-		"analysis", "cactus", "datum", "phenomenon",
+		// Regular plurals
+		"cat", "dog", "book",
+		// Sibilants (add -es)
+		"bus", "class", "bush", "church", "box", "buzz",
+		// Consonant + y -> ies
+		"city", "baby", "fly",
+		// Vowel + y -> ys
+		"boy", "day", "key",
+		// Words ending in f/fe -> ves
+		"knife", "wife", "leaf", "wolf", "roof", "chief",
+		// Words ending in o
+		"hero", "potato", "tomato", "echo", "radio", "studio", "zoo", "piano", "photo",
+		// Irregular plurals
+		"child", "foot", "tooth", "mouse", "woman", "man", "person", "ox",
+		// Latin/Greek plurals
+		"analysis", "crisis", "thesis", "cactus", "fungus", "nucleus",
+		"bacterium", "datum", "medium", "appendix", "index",
+		// Unchanged plurals
+		"sheep", "deer", "fish", "species", "series", "aircraft",
+		// Words ending in -man -> -men
+		"fireman", "policeman", "spokesman",
+		// Nationalities (unchanged)
+		"Chinese", "Japanese", "Portuguese",
+		// Classical mode words
+		"formula", "antenna", "vertebra", "alumna", "larva", "nebula", "nova",
+		"octopus", "opus", "corpus", "genus",
+		// Proper names ending in s
+		"Jones", "Williams", "Hastings", "Ross", "Burns",
+		// Edge cases
 		"", " ", "  ", "\t", "\n",
 		"UPPERCASE", "MixedCase", "lowercase",
 		"cat's", "dogs'", "children's",
@@ -38,12 +65,37 @@ func FuzzPlural(f *testing.F) {
 
 func FuzzSingular(f *testing.F) {
 	seeds := []string{
-		"cats", "dogs", "children", "mice", "fish",
-		"analyses", "cacti", "data", "phenomena",
-		"", " ", "boxes", "buses", "churches",
-		"CATS", "Cats", "cats",
-		"potatoes", "heroes", "photos",
-		"leaves", "wolves", "knives",
+		// Regular plurals - remove s
+		"cats", "dogs", "books",
+		// Words ending in -es after sibilants
+		"buses", "classes", "bushes", "churches", "boxes", "buzzes",
+		// -ies -> -y
+		"cities", "babies", "flies",
+		// -ys (vowel + y)
+		"boys", "days", "keys",
+		// Words ending in -ves -> -f or -fe
+		"knives", "wives", "lives", "leaves", "wolves", "calves", "halves",
+		// Words ending in -oes -> -o
+		"heroes", "potatoes", "tomatoes", "echoes",
+		// Words ending in -os
+		"radios", "studios", "zoos", "pianos", "photos",
+		// Irregular plurals
+		"children", "feet", "teeth", "mice", "women", "men", "people", "oxen", "geese", "lice", "dice",
+		// Latin/Greek plurals
+		"analyses", "crises", "theses", "cacti", "fungi", "nuclei",
+		"bacteria", "data", "media", "appendices", "indices", "criteria", "phenomena",
+		// Unchanged plurals
+		"sheep", "deer", "fish", "species", "series", "aircraft", "moose",
+		// Words ending in -men -> -man
+		"firemen", "policemen", "spokesmen",
+		// Nationalities
+		"Chinese", "Japanese", "Portuguese",
+		// Case preservation
+		"CATS", "Cats", "Children", "CHILDREN", "BOXES", "Cities", "MICE",
+		// Already singular
+		"cat", "class",
+		// Edge cases
+		"", " ",
 	}
 	for _, s := range seeds {
 		f.Add(s)
@@ -59,11 +111,27 @@ func FuzzSingular(f *testing.F) {
 
 func FuzzAn(f *testing.F) {
 	seeds := []string{
-		"apple", "banana", "hour", "honest", "university",
-		"FBI", "URL", "YAML", "XML",
+		// Basic cases
+		"cat", "ant", "a", "b",
+		// Silent H
+		"honest cat", "dishonest cat", "Honolulu sunset",
+		// Special pronunciation
+		"mpeg", "onetime holiday",
+		// Vowels with consonant sounds (U variations)
+		"Ugandan person", "Ukrainian person", "Unabomber", "unanimous decision",
+		// Abbreviations and acronyms
+		"US farmer", "wild PIKACHU appeared", "YAML code block",
+		"Core ML function", "JSON code block", "FBI", "URL", "XML",
+		// Words that might need forcing
+		"ape", "apple", "eagle", "hour", "hero", "historic",
+		// Pattern-matching cases
+		"euro", "european", "eurozone", "eurocentric",
+		"honor", "honorable", "honorary", "honored",
+		"heir", "heirloom", "heiress",
+		// Edge cases
 		"", " ", "a", "an", "the",
 		"European", "one", "once", "unicorn",
-		"heir", "herb", "hotel",
+		"herb", "hotel",
 		"11", "8", "18", "80",
 	}
 	for _, s := range seeds {
@@ -106,10 +174,28 @@ func FuzzInflect(f *testing.F) {
 
 func FuzzNumberToWords(f *testing.F) {
 	seeds := []int{
-		0, 1, -1, 10, 100, 1000,
-		12, 21, 99, 100, 101, 111,
-		1000000, 1000000000,
-		-999999999, 2147483647, -2147483648,
+		// Zero
+		0,
+		// Basic numbers (1-9)
+		1, 2, 3, 4, 5, 6, 7, 8, 9,
+		// Teens (10-19)
+		10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+		// Tens
+		20, 30, 40, 50, 60, 70, 80, 90,
+		// Compound tens
+		21, 32, 42, 55, 67, 78, 89, 99,
+		// Hundreds
+		100, 101, 110, 111, 120, 121, 200, 555, 999,
+		// Thousands
+		1000, 1001, 1010, 1100, 1234, 12000, 21000, 12345, 123456,
+		// Millions
+		1000000, 1000001, 1234567, 12345678, 123456789,
+		// Billions
+		1000000000, 1000000001, 1234567890,
+		// Negative numbers
+		-1, -5, -11, -21, -42, -100, -1000, -1000000,
+		// Edge cases
+		2147483647, -2147483648, -999999999,
 	}
 	for _, n := range seeds {
 		f.Add(n)
@@ -123,9 +209,20 @@ func FuzzNumberToWords(f *testing.F) {
 
 func FuzzOrdinal(f *testing.F) {
 	seeds := []int{
-		0, 1, 2, 3, 4, 11, 12, 13, 21, 22, 23,
-		100, 101, 102, 103, 111, 112, 113,
-		-1, -2, -3, -11, -12, -13,
+		// Basic cases (1-10)
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+		// Teens (special cases: 11th, 12th, 13th)
+		11, 12, 13, 14, 19,
+		// 21st, 22nd, 23rd pattern
+		21, 22, 23, 24,
+		// Hundreds
+		100, 101, 102, 103, 111, 112, 113, 121, 122, 123,
+		// Thousands
+		1000, 1001, 1011, 1021,
+		// Negative numbers
+		-1, -2, -3, -11, -12, -13, -21,
+		// Large numbers
+		12345, 1000000, 1000000000,
 	}
 	for _, n := range seeds {
 		f.Add(n)
@@ -139,11 +236,34 @@ func FuzzOrdinal(f *testing.F) {
 
 func FuzzPresentParticiple(f *testing.F) {
 	seeds := []string{
-		"run", "walk", "go", "be", "have",
-		"stop", "hop", "sit", "cut",
-		"love", "hate", "make", "take",
-		"try", "cry", "fly", "die",
-		"", " ", "a", "123",
+		// Single letter verbs
+		"a",
+		// Already ending in -ing
+		"running", "sing",
+		// Double consonant (CVC pattern)
+		"run", "sit", "hit", "cut", "stop", "drop", "plan", "skip",
+		"begin", "occur", "prefer", "admit", "commit", "regret",
+		// Drop silent e
+		"make", "take", "come", "give", "have", "write", "live", "move", "hope", "dance",
+		// Just add -ing
+		"play", "stay", "enjoy", "show", "follow", "fix", "mix", "go", "do",
+		"eat", "read", "think", "walk", "talk", "open", "listen", "visit",
+		// ie -> ying
+		"die", "lie", "tie",
+		// ee -> eeing
+		"see", "flee", "agree", "free",
+		// be -> being
+		"be",
+		// Words ending in -c (add k)
+		"panic", "picnic", "traffic", "mimic", "frolic",
+		// Words ending in -ye, -oe
+		"dye", "hoe", "toe",
+		// Words ending in -nge/-inge
+		"singe",
+		// Case preservation
+		"RUN", "Run", "MAKE", "Make", "DIE", "PANIC",
+		// Edge cases
+		"", " ", "123",
 	}
 	for _, s := range seeds {
 		f.Add(s)
@@ -159,9 +279,34 @@ func FuzzPresentParticiple(f *testing.F) {
 
 func FuzzPastTense(f *testing.F) {
 	seeds := []string{
-		"walk", "run", "go", "be", "have",
-		"stop", "try", "play", "stay",
-		"love", "hate", "make", "take",
+		// Regular verbs: add -ed
+		"walk", "talk", "work", "play", "stay", "enjoy", "destroy",
+		"help", "start", "finish", "watch", "wash", "push", "pull",
+		"open", "close", "need", "want", "ask", "answer", "clean", "cook", "look",
+		// Verbs ending in -e: add -d
+		"love", "like", "live", "move", "change", "create", "use", "hope",
+		"smile", "dance", "arrive", "decide", "believe", "receive",
+		// Consonant + y: change y to -ied
+		"try", "cry", "carry", "study", "hurry", "worry", "marry",
+		"copy", "apply", "reply", "supply", "occupy", "deny", "rely",
+		// CVC pattern: double final consonant
+		"stop", "drop", "shop", "plan", "rob", "rub", "hug", "jog",
+		"grab", "trip", "slip", "step", "beg", "nod", "chat",
+		// Don't double w, x, y
+		"show", "fix", "box", "mix",
+		// Irregular verbs
+		"go", "be", "have", "do", "say", "make", "get", "see", "come", "take",
+		"know", "think", "find", "give", "tell", "become", "leave", "put", "keep", "let",
+		"begin", "run", "write", "read", "bring", "buy", "catch", "teach", "fight",
+		"build", "send", "spend", "lose", "feel", "meet", "sit", "stand", "hear", "hold",
+		"speak", "break", "choose", "grow", "throw", "blow", "fly", "draw", "drive", "ride",
+		"rise", "hide", "eat", "fall", "swim", "sing", "ring", "drink", "sink", "win",
+		"hit", "cut", "shut", "set", "hurt", "cost", "sleep", "wake", "wear", "tear",
+		"bear", "swear", "steal", "freeze", "forget", "forgive", "bite", "shake",
+		"mistake", "undertake", "shine", "lie", "lay", "pay", "mean",
+		// Case preservation
+		"WALK", "Walk", "GO", "Go", "TRY", "Try",
+		// Edge cases
 		"", " ", "123",
 	}
 	for _, s := range seeds {
@@ -178,9 +323,31 @@ func FuzzPastTense(f *testing.F) {
 
 func FuzzPastParticiple(f *testing.F) {
 	seeds := []string{
-		"walk", "run", "go", "be", "have",
-		"take", "give", "see", "do",
-		"break", "speak", "write", "drive",
+		// Regular verbs (-ed)
+		"walk", "talk", "play", "stay", "work", "help", "ask", "call", "open", "listen",
+		// Verbs ending in -e
+		"like", "love", "dance", "hope", "use", "close",
+		// Verbs ending in consonant + y
+		"try", "cry", "study", "carry", "worry",
+		// Verbs ending in vowel + y
+		"enjoy", "delay",
+		// CVC pattern - double consonant
+		"stop", "drop", "plan", "skip", "admit", "occur", "prefer", "regret",
+		// Don't double w, x, y
+		"fix", "mix", "show",
+		// Verbs ending in -c
+		"panic", "picnic", "traffic",
+		// Irregular verbs
+		"go", "be", "have", "do", "say", "get", "make", "know", "think", "take",
+		"see", "come", "give", "find", "tell", "write", "run", "eat", "drink", "sing",
+		"swim", "begin", "break", "choose", "speak", "steal", "forget", "drive", "ride",
+		"hide", "bite", "fly", "grow", "throw", "draw", "fall", "buy", "bring", "catch",
+		"teach", "fight", "seek", "feel", "keep", "sleep", "leave", "meet", "read", "lead",
+		"sit", "stand", "lose", "win", "put", "cut", "hit", "let", "set", "shut", "hurt",
+		"cost", "build", "send", "spend", "lend", "bend",
+		// Case preservation
+		"WALK", "Walk", "GO", "Go",
+		// Edge cases
 		"", " ", "123",
 	}
 	for _, s := range seeds {
@@ -197,8 +364,27 @@ func FuzzPastParticiple(f *testing.F) {
 
 func FuzzComparative(f *testing.F) {
 	seeds := []string{
-		"big", "small", "beautiful", "good", "bad",
-		"happy", "hot", "large", "nice",
+		// Irregular forms
+		"good", "bad", "far", "little", "much", "many", "old",
+		// One-syllable adjectives: add -er
+		"tall", "short", "fast", "slow", "young", "long", "strong", "weak",
+		"cheap", "deep", "high", "low", "new", "poor", "rich", "warm", "cold",
+		"dark", "light", "hard", "soft", "clean", "loud",
+		// One-syllable ending in -e: add -r
+		"large", "wide", "close", "late", "nice", "safe", "wise", "rude", "rare", "pale", "fine", "cute", "pure",
+		// CVC pattern: double final consonant
+		"big", "hot", "thin", "fat", "wet", "sad", "red", "dim", "fit",
+		// Consonant + y: change y to -ier
+		"happy", "easy", "busy", "funny", "pretty", "heavy", "dirty", "angry", "crazy", "lazy", "tiny", "ugly", "early", "noisy",
+		// Two-syllable adjectives that take -er
+		"simple", "gentle", "narrow", "shallow", "quiet", "clever",
+		// Long adjectives: use "more"
+		"beautiful", "dangerous", "expensive", "important", "interesting", "comfortable",
+		"difficult", "intelligent", "wonderful", "terrible", "horrible", "incredible",
+		"successful", "popular", "famous", "nervous",
+		// Case preservation
+		"BIG", "Big", "GOOD", "Good", "BEAUTIFUL", "Beautiful",
+		// Edge cases
 		"", " ", "123", "a",
 	}
 	for _, s := range seeds {
@@ -323,9 +509,25 @@ func FuzzCompare(f *testing.F) {
 
 func FuzzWordToOrdinal(f *testing.F) {
 	seeds := []string{
-		"one", "two", "three", "first", "second", "third",
-		"1", "2", "3", "1st", "2nd", "3rd",
-		"twenty-one", "twenty-first",
+		// Basic word numbers
+		"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+		"eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen",
+		// Tens
+		"twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety",
+		// Compound numbers
+		"twenty-one", "thirty-two", "forty-three", "ninety-nine",
+		// Special cases
+		"zero",
+		// Already ordinals (for OrdinalToCardinal)
+		"first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth",
+		"eleventh", "twelfth", "twentieth", "twenty-first", "zeroth",
+		// Case preservation
+		"One", "TWO", "Twenty-One", "First", "SECOND", "Twenty-First",
+		// Numeric strings
+		"1", "2", "3", "11", "21", "100", "1st", "2nd", "3rd", "11th", "21st", "100th",
+		// Not ordinals
+		"cat", "north", "month", "earth",
+		// Edge cases
 		"", " ", "invalid",
 	}
 	for _, s := range seeds {
@@ -401,18 +603,25 @@ func FuzzAdverb(f *testing.F) {
 func FuzzPluralNoun(f *testing.F) {
 	seeds := []string{
 		// Regular nouns
-		"cat", "dog", "child", "mouse", "fish",
-		"box", "bus", "church", "potato", "hero",
-		// Pronouns
+		"cat", "dog", "book",
+		// Sibilants
+		"box", "bus", "church", "class", "bush", "buzz",
+		// Words ending in o
+		"potato", "hero", "radio", "photo",
+		// Pronouns (comprehensive from pronoun handling)
 		"I", "me", "my", "mine", "myself",
 		"you", "your", "yours", "yourself",
 		"he", "she", "it", "they",
 		"him", "her", "them",
 		"his", "hers", "its", "their", "theirs",
 		"we", "us", "our", "ours", "ourselves",
+		"who", "whom", "whose", "whoever", "whomever",
 		// Irregular plurals
-		"analysis", "cactus", "datum", "phenomenon",
-		"leaf", "wolf", "knife",
+		"child", "mouse", "foot", "tooth", "woman", "man", "person", "ox",
+		"analysis", "cactus", "datum", "phenomenon", "criterion",
+		"leaf", "wolf", "knife", "wife",
+		// Unchanged plurals
+		"sheep", "deer", "fish", "species", "series", "aircraft",
 		// Edge cases
 		"", " ", "  ", "\t", "\n",
 		"UPPERCASE", "MixedCase", "lowercase",
@@ -433,17 +642,19 @@ func FuzzPluralNoun(f *testing.F) {
 
 func FuzzPluralVerb(f *testing.F) {
 	seeds := []string{
-		// Auxiliary verbs
+		// Auxiliary verbs (from verb conjugation tests)
 		"is", "was", "has", "does", "am", "are", "were", "have", "do",
 		// Contractions
 		"isn't", "wasn't", "hasn't", "doesn't", "aren't", "weren't", "haven't", "don't",
 		// Modal verbs (unchanged)
 		"can", "could", "may", "might", "must", "shall", "should", "will", "would",
-		// Regular verbs (third person singular)
+		// Regular verbs (third person singular -> base form)
 		"runs", "walks", "goes", "sees", "flies", "tries",
 		"passes", "pushes", "watches", "fixes", "buzzes",
+		// Irregular past tense verbs
+		"went", "came", "took", "gave", "saw", "knew", "thought",
 		// Base form verbs
-		"run", "walk", "go", "see", "fly", "try",
+		"run", "walk", "go", "see", "fly", "try", "be", "have", "do",
 		// Edge cases
 		"", " ", "  ", "\t", "\n",
 		"UPPERCASE", "MixedCase", "lowercase",
@@ -491,17 +702,27 @@ func FuzzPluralAdj(f *testing.F) {
 func FuzzSingularNoun(f *testing.F) {
 	seeds := []string{
 		// Plural nouns to singularize
-		"cats", "dogs", "children", "mice", "fish",
-		"boxes", "buses", "churches", "potatoes", "heroes",
+		"cats", "dogs", "books",
+		"boxes", "buses", "churches", "classes", "bushes", "buzzes",
+		"cities", "babies", "flies",
+		"boys", "days", "keys",
+		"knives", "wives", "lives", "leaves", "wolves", "calves", "halves",
+		"heroes", "potatoes", "tomatoes", "echoes",
+		"radios", "studios", "zoos", "pianos", "photos",
+		// Irregular plurals
+		"children", "feet", "teeth", "mice", "women", "men", "people", "oxen", "geese", "lice", "dice",
+		"analyses", "crises", "theses", "cacti", "fungi", "nuclei",
+		"bacteria", "data", "media", "appendices", "indices", "criteria", "phenomena",
 		// Pronouns (plural)
 		"we", "us", "our", "ours", "ourselves",
 		"they", "them", "their", "theirs", "themselves",
 		// Pronouns (singular)
 		"I", "me", "my", "mine", "myself",
 		"he", "she", "it", "him", "her",
-		// Irregular plurals
-		"analyses", "cacti", "data", "phenomena",
-		"leaves", "wolves", "knives",
+		// Unchanged plurals
+		"sheep", "deer", "fish", "species", "series", "aircraft", "moose",
+		// Words ending in -men
+		"firemen", "policemen", "spokesmen",
 		// Edge cases
 		"", " ", "  ", "\t", "\n",
 		"UPPERCASE", "MixedCase", "lowercase",
