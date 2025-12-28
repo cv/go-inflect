@@ -1,6 +1,7 @@
 package inflect
 
 import (
+	"maps"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -109,9 +110,7 @@ func matchSuffix(word, suffix string) string {
 // copyMap creates a shallow copy of a map.
 func copyMap(src map[string]string) map[string]string {
 	dst := make(map[string]string, len(src))
-	for k, v := range src {
-		dst[k] = v
-	}
+	maps.Copy(dst, src)
 	return dst
 }
 

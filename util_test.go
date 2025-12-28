@@ -179,19 +179,19 @@ func BenchmarkIsSingular(b *testing.B) {
 
 func BenchmarkWordCount(b *testing.B) {
 	input := "The quick brown fox jumps over the lazy dog"
-	for range b.N {
+	for b.Loop() {
 		inflect.WordCount(input)
 	}
 }
 
 func BenchmarkCapitalize(b *testing.B) {
-	for range b.N {
+	for b.Loop() {
 		inflect.Capitalize("hello world")
 	}
 }
 
 func BenchmarkTitleize(b *testing.B) {
-	for range b.N {
+	for b.Loop() {
 		inflect.Titleize("the quick brown fox")
 	}
 }

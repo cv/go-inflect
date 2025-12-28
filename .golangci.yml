@@ -72,6 +72,7 @@ linters:
     - usetesting        # Reports deprecated testing funcs
     - mirror            # Checks bytes/strings usage patterns
     - nilnil            # Checks for nil error + nil value returns
+    - modernize         # Suggests modern Go idioms (slices, maps, max/min)
 
   settings:
     funlen:

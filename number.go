@@ -256,10 +256,7 @@ func NumberToWordsGrouped(n, groupSize int) string {
 	// Split into groups from right to left
 	var groups []string
 	for s != "" {
-		start := len(s) - groupSize
-		if start < 0 {
-			start = 0
-		}
+		start := max(len(s)-groupSize, 0)
 		groups = append([]string{s[start:]}, groups...)
 		s = s[:start]
 	}

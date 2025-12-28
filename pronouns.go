@@ -1,5 +1,7 @@
 package inflect
 
+import "maps"
+
 // pronounNominativePlural maps singular nominative pronouns to plural forms.
 var pronounNominativePlural = map[string]string{
 	"i":   "we",
@@ -40,18 +42,10 @@ var allPronounsToPlural = buildAllPronounsToPlural()
 
 func buildAllPronounsToPlural() map[string]string {
 	m := make(map[string]string)
-	for k, v := range pronounNominativePlural {
-		m[k] = v
-	}
-	for k, v := range pronounAccusativePlural {
-		m[k] = v
-	}
-	for k, v := range pronounPossessivePlural {
-		m[k] = v
-	}
-	for k, v := range pronounReflexivePlural {
-		m[k] = v
-	}
+	maps.Copy(m, pronounNominativePlural)
+	maps.Copy(m, pronounAccusativePlural)
+	maps.Copy(m, pronounPossessivePlural)
+	maps.Copy(m, pronounReflexivePlural)
 	return m
 }
 

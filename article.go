@@ -2,6 +2,7 @@ package inflect
 
 import (
 	"regexp"
+	"slices"
 	"strings"
 	"unicode"
 )
@@ -180,10 +181,8 @@ func isConsonantYSound(lower string) bool {
 
 	if len(lower) >= 3 {
 		prefix := lower[:3]
-		for _, pat := range youPatterns {
-			if prefix == pat {
-				return true
-			}
+		if slices.Contains(youPatterns, prefix) {
+			return true
 		}
 	}
 

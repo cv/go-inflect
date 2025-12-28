@@ -308,14 +308,14 @@ func TestJoinNoOxfordWithConj(t *testing.T) {
 
 func BenchmarkJoinWithFinalSep(b *testing.B) {
 	input := []string{"a", "b", "c", "d", "e"}
-	for range b.N {
+	for b.Loop() {
 		inflect.JoinWithFinalSep(input, "and", ", ", "; ")
 	}
 }
 
 func BenchmarkJoinNoOxford(b *testing.B) {
 	input := []string{"a", "b", "c", "d", "e"}
-	for range b.N {
+	for b.Loop() {
 		inflect.JoinNoOxford(input)
 	}
 }
