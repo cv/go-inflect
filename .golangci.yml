@@ -57,6 +57,22 @@ linters:
     - gocyclo
     - gocognit
 
+    # Additional quality checks (zero issues currently)
+    - unparam           # Reports unused function parameters
+    - forcetypeassert   # Finds forced type assertions
+    - nakedret          # Checks naked returns in long functions
+    - recvcheck         # Checks receiver type consistency
+    - wastedassign      # Finds wasted assignments
+    - thelper           # Checks t.Helper() in test helpers
+    - perfsprint        # Suggests faster fmt alternatives
+    - testableexamples  # Checks examples have expected output
+    - nolintlint        # Reports ill-formed nolint directives
+    - dogsled           # Checks for too many blank identifiers
+    - gocheckcompilerdirectives  # Validates //go: directives
+    - usetesting        # Reports deprecated testing funcs
+    - mirror            # Checks bytes/strings usage patterns
+    - nilnil            # Checks for nil error + nil value returns
+
   settings:
     funlen:
       lines: 80
