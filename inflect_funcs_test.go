@@ -755,6 +755,42 @@ func BenchmarkInflect(b *testing.B) {
 		{"ordinal", "This is the ordinal(1) item"},
 		{"complex", "plural_noun('I') saw plural_adj('this') plural('cat', 5) ordinal(3) time"},
 		{"nested_quotes", "an('apple') and an('orange')"},
+		// Adverb function
+		{"adverb", "He ran adverb('quick')"},
+		// Case conversion functions
+		{"snake_case", "Variable: snake_case('HelloWorld')"},
+		{"camel_case", "Property: camel_case('hello_world')"},
+		{"pascal_case", "Class: pascal_case('my_class')"},
+		{"kebab_case", "URL: kebab_case('MyPage')"},
+		{"humanize", "Label: humanize('employee_salary')"},
+		{"case_conversion_multiple", "snake_case('Test') camel_case('Test') pascal_case('test')"},
+		// Rails-style functions
+		{"tableize", "Table: tableize('Person')"},
+		{"foreign_key", "FK: foreign_key('User')"},
+		{"typeify", "Type: typeify('users')"},
+		{"parameterize", "Slug: parameterize('Hello World!')"},
+		{"asciify", "ASCII: asciify('café')"},
+		{"rails_multiple", "tableize('User') with foreign_key('Post')"},
+		// Number formatting functions
+		{"format_number", "Total: format_number(1000000)"},
+		{"number_to_words_with_and", "Amount: number_to_words_with_and(123)"},
+		{"number_to_words_threshold", "Count: number_to_words_threshold(5, 10)"},
+		{"currency_to_words", "Price: currency_to_words(1.50, 'USD')"},
+		{"fraction", "Portion: fraction(3, 4)"},
+		// Comparison functions
+		{"compare", "Result: compare('cat', 'cats')"},
+		{"compare_nouns", "Result: compare_nouns('child', 'children')"},
+		{"compare_verbs", "Result: compare_verbs('is', 'are')"},
+		{"compare_adjs", "Result: compare_adjs('this', 'these')"},
+		// Word count function
+		{"word_count", "Words: word_count('hello world')"},
+		{"word_count_long", "Words: word_count('the quick brown fox jumps over the lazy dog')"},
+		// Capitalize and titleize
+		{"capitalize", "Title: capitalize('hello')"},
+		{"titleize", "Book: titleize('the great gatsby')"},
+		// Word ordinals
+		{"word_to_ordinal", "The word_to_ordinal('one') place"},
+		{"ordinal_to_cardinal", "Number ordinal_to_cardinal('first')"},
 	}
 
 	for _, bm := range benchmarks {
