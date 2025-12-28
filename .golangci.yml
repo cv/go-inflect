@@ -75,6 +75,7 @@ linters:
     - modernize         # Suggests modern Go idioms (slices, maps, max/min)
     - goconst           # Finds repeated strings to make constants
     - prealloc          # Suggests pre-allocating slices
+    - exhaustive        # Checks switch statement exhaustiveness
 
   settings:
     funlen:

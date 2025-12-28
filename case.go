@@ -156,6 +156,8 @@ func handleUpperRune(r rune, i int, runes []rune, prevType charType, separator r
 	if result.Len() > 0 {
 		needsSep := false
 		switch prevType {
+		case charNone:
+			// Initial state, no separator needed
 		case charLower:
 			needsSep = true
 		case charUpper:

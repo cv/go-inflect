@@ -284,9 +284,10 @@ func applyCase(s string, pattern casePattern) string {
 		return strings.ToUpper(s)
 	case caseTitle:
 		return toTitleCase(s)
-	default:
+	case caseLower, caseMixed:
 		return s
 	}
+	return s
 }
 
 // toTitleCase converts a string to title case (first letter of each word uppercase).
