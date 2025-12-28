@@ -166,6 +166,19 @@ inflect.CountingWord(5)           // "five times"
 | `Underscore(s)` | Alias for SnakeCase |
 | `Dasherize(s)` | Alias for KebabCase |
 
+### Rails-Style Helpers
+
+| Function | Description |
+|----------|-------------|
+| `Humanize(word)` | `"employee_salary"` → `"Employee salary"` |
+| `ForeignKey(word)` | `"Person"` → `"person_id"` |
+| `ForeignKeyCondensed(word)` | `"Person"` → `"personid"` |
+| `Tableize(word)` | `"RawScaledScorer"` → `"raw_scaled_scorers"` |
+| `Parameterize(word)` | `"Hello World!"` → `"hello-world"` |
+| `ParameterizeJoin(word, sep)` | URL-safe slug with custom separator |
+| `Typeify(word)` | `"users"` → `"User"` |
+| `Asciify(word)` | `"café"` → `"cafe"` |
+
 ## Advanced Features
 
 ### Classical Mode
@@ -235,6 +248,16 @@ inflect.Capitalize("hello")   // "Hello"
 inflect.Titleize("hello world") // "Hello World"
 inflect.Underscore("HelloWorld") // "hello_world"
 inflect.Dasherize("HelloWorld")  // "hello-world"
+
+// Rails-style helpers
+inflect.Humanize("employee_salary")     // "Employee salary"
+inflect.ForeignKey("Person")            // "person_id"
+inflect.ForeignKeyCondensed("Person")   // "personid"
+inflect.Tableize("RawScaledScorer")     // "raw_scaled_scorers"
+inflect.Parameterize("Hello World!")    // "hello-world"
+inflect.ParameterizeJoin("Hello!", "_") // "hello"
+inflect.Typeify("users")                // "User"
+inflect.Asciify("café")                 // "cafe"
 ```
 
 ### Gender for Pronouns

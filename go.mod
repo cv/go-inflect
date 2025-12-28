@@ -5,6 +5,7 @@ go 1.25.5
 require (
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/perf v0.0.0-20251208221838-04cf7a2dca90
+	golang.org/x/text v0.32.0
 )
 
 require (
