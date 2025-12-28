@@ -111,8 +111,15 @@ inflect.CountingWord(5)           // "five times"
 |----------|-------------|
 | `NumberToWords(n)` | 42 → "forty-two" |
 | `NumberToWordsWithAnd(n)` | 101 → "one hundred and one" |
+| `NumberToWordsFloat(f)` | 3.14 → "three point one four" |
+| `NumberToWordsGrouped(n, size)` | Group digits: 1234 with size 2 → "twelve thirty-four" |
+| `NumberToWordsThreshold(n, t)` | Words if n < t, else digits |
+| `FormatNumber(n)` | 1000 → "1,000" (thousand separators) |
 | `Ordinal(n)` | 1 → "1st", 2 → "2nd" |
 | `OrdinalWord(n)` | 1 → "first", 2 → "second" |
+| `OrdinalSuffix(n)` | 1 → "st", 2 → "nd", 3 → "rd" |
+| `WordToOrdinal(s)` | "one" → "first", "1" → "1st" |
+| `OrdinalToCardinal(s)` | "1st" → "1", "first" → "one" |
 | `CountingWord(n)` | 1 → "once", 2 → "twice", 5 → "five times" |
 | `FractionToWords(num, den)` | (3, 4) → "three quarters" |
 | `CurrencyToWords(amount, code)` | (1.50, "USD") → "one dollar and fifty cents" |
