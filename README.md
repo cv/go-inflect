@@ -186,6 +186,42 @@ inflect.CountingWord(5)           // "five times"
 | `Typeify(word)` | `"users"` → `"User"` |
 | `Asciify(word)` | `"café"` → `"cafe"` |
 
+## Thread Safety
+
+All package-level functions are safe for concurrent use from multiple goroutines.
+The library uses a read-write mutex internally to protect mutable state.
+
+```go
+// Safe to call concurrently from multiple goroutines
+go func() { inflect.Plural("cat") }()
+go func() { inflect.Plural("dog") }()
+go func() { inflect.Singular("boxes") }()
+```
+
+### Using Engine for Isolated Configurations
+
+Package-level functions use a shared default engine. If you need isolated
+configurations (e.g., different classical mode settings per request), create
+separate Engine instances:
+
+```go
+// Create an engine with classical pluralization
+classical := inflect.NewEngine()
+classical.Classical(true)
+classical.Plural("formula")  // "formulae"
+
+// Create another engine with default settings
+modern := inflect.NewEngine()
+modern.Plural("formula")     // "formulas"
+
+// Package-level functions use the default engine (unaffected)
+inflect.Plural("formula")    // "formulas" (unless you changed default)
+```
+
+Each Engine instance has its own mutex, so operations on different engines
+don't block each other. Use `Clone()` to create a copy of an existing engine's
+configuration.
+
 ## Advanced Features
 
 ### Classical Mode

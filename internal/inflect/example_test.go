@@ -1385,3 +1385,50 @@ func ExampleAsciify() {
 	// naive
 	// Creme brulee
 }
+
+// --- Engine examples ---
+
+// ExampleNewEngine demonstrates creating isolated engine instances.
+// Each engine has independent configuration, so changes to one
+// don't affect others or the package-level default.
+func ExampleNewEngine() {
+	// Create an engine with classical pluralization
+	classical := inflect.NewEngine()
+	classical.Classical(true)
+
+	// Create an engine with default (modern) settings
+	modern := inflect.NewEngine()
+
+	// Each engine operates independently
+	fmt.Println("classical:", classical.Plural("formula"))
+	fmt.Println("modern:", modern.Plural("formula"))
+
+	// Output:
+	// classical: formulae
+	// modern: formulas
+}
+
+// ExampleEngine_Clone demonstrates creating a copy of an engine's configuration.
+func ExampleEngine_Clone() {
+	// Create and configure an engine
+	original := inflect.NewEngine()
+	original.DefNoun("gizmo", "gizmoz")
+
+	// Clone it
+	cloned := original.Clone()
+
+	// Both have the custom noun
+	fmt.Println("original:", original.Plural("gizmo"))
+	fmt.Println("cloned:", cloned.Plural("gizmo"))
+
+	// Modify the clone - original is unaffected
+	cloned.DefNoun("widget", "widgetz")
+	fmt.Println("cloned widget:", cloned.Plural("widget"))
+	fmt.Println("original widget:", original.Plural("widget"))
+
+	// Output:
+	// original: gizmoz
+	// cloned: gizmoz
+	// cloned widget: widgetz
+	// original widget: widgets
+}
