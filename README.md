@@ -333,4 +333,8 @@ MIT License - see [LICENSE](LICENSE)
 
 ## Acknowledgments
 
-Go port of the [Python inflect library](https://github.com/jaraco/inflect) by Jason R. Coombs.
+- Go port of the [Python inflect library](https://github.com/jaraco/inflect) by Jason R. Coombs
+- Compatibility APIs inspired by [jinzhu/inflection](https://github.com/jinzhu/inflection) and [go-openapi/inflect](https://github.com/go-openapi/inflect)
+- Rails-style helpers inspired by [ActiveSupport::Inflector](https://api.rubyonrails.org/classes/ActiveSupport/Inflector.html)
+
+This project was written with [Claude](https://claude.ai) and [Nemotron](https://developer.nvidia.com/nemotron).
