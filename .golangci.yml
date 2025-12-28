@@ -76,6 +76,7 @@ linters:
     - goconst           # Finds repeated strings to make constants
     - prealloc          # Suggests pre-allocating slices
     - exhaustive        # Checks switch statement exhaustiveness
+    - nestif            # Reports deeply nested if statements
 
   settings:
     funlen:

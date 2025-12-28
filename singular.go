@@ -82,39 +82,8 @@ func applySingularSuffixRules(word, lower string) string {
 
 	// Words ending in -es after sibilants (s, ss, sh, ch, x, z)
 	if strings.HasSuffix(lower, "es") && n > 2 {
-		base := lower[:n-2]
-		// -sses -> -ss (classes -> class)
-		if strings.HasSuffix(base, "ss") {
-			return word[:len(word)-2]
-		}
-		// -shes -> -sh (bushes -> bush)
-		if strings.HasSuffix(base, "sh") {
-			return word[:len(word)-2]
-		}
-		// -ches -> -ch (churches -> church)
-		if strings.HasSuffix(base, "ch") {
-			return word[:len(word)-2]
-		}
-		// -xes -> -x (boxes -> box)
-		if strings.HasSuffix(base, "x") {
-			return word[:len(word)-2]
-		}
-		// -zes -> -z (buzzes -> buzz)
-		if strings.HasSuffix(base, "zz") {
-			return word[:len(word)-2]
-		}
-		// -oes -> -o (heroes -> hero, potatoes -> potato)
-		// But not words like "shoes" -> "shoe"
-		if strings.HasSuffix(base, "o") && !oExceptionTakesS(base) {
-			// Check if this looks like a word that would have taken -oes
-			beforeO := base[len(base)-2]
-			if !isVowel(rune(beforeO)) {
-				return word[:len(word)-2]
-			}
-		}
-		// Single -s ending with -es: buses -> bus
-		if strings.HasSuffix(base, "s") && !strings.HasSuffix(base, "ss") {
-			return word[:len(word)-2]
+		if result, ok := singularizeEsSuffix(word, lower[:n-2]); ok {
+			return result
 		}
 	}
 
@@ -134,4 +103,43 @@ func applySingularSuffixRules(word, lower string) string {
 // singularEndsInFe checks if a base word's singular form ends in -fe.
 func singularEndsInFe(base string) bool {
 	return feWordBases[base]
+}
+
+// singularizeEsSuffix handles -es suffix singularization.
+// Returns the singular form and true if a rule matched, empty and false otherwise.
+func singularizeEsSuffix(word, base string) (string, bool) {
+	// -sses -> -ss (classes -> class)
+	if strings.HasSuffix(base, "ss") {
+		return word[:len(word)-2], true
+	}
+	// -shes -> -sh (bushes -> bush)
+	if strings.HasSuffix(base, "sh") {
+		return word[:len(word)-2], true
+	}
+	// -ches -> -ch (churches -> church)
+	if strings.HasSuffix(base, "ch") {
+		return word[:len(word)-2], true
+	}
+	// -xes -> -x (boxes -> box)
+	if strings.HasSuffix(base, "x") {
+		return word[:len(word)-2], true
+	}
+	// -zes -> -z (buzzes -> buzz)
+	if strings.HasSuffix(base, "zz") {
+		return word[:len(word)-2], true
+	}
+	// -oes -> -o (heroes -> hero, potatoes -> potato)
+	// But not words like "shoes" -> "shoe"
+	if strings.HasSuffix(base, "o") && !oExceptionTakesS(base) {
+		// Check if this looks like a word that would have taken -oes
+		beforeO := base[len(base)-2]
+		if !isVowel(rune(beforeO)) {
+			return word[:len(word)-2], true
+		}
+	}
+	// Single -s ending with -es: buses -> bus
+	if strings.HasSuffix(base, "s") && !strings.HasSuffix(base, "ss") {
+		return word[:len(word)-2], true
+	}
+	return "", false
 }

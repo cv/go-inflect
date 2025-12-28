@@ -140,55 +140,65 @@ func isTruePlural(word, lower string) bool {
 
 	// For words ending in s, check if they follow common plural patterns
 	if strings.HasSuffix(lower, "s") {
-		// Try to get the singular form
-		singular := Singular(word)
-		singularLower := strings.ToLower(singular)
-
-		// If singular is the same, it's not a plural we can detect
-		if singularLower == lower {
-			return false
-		}
-
-		// Check if the singular form is a real word (not just stripping 's')
-		// A "real" plural typically has a singular that differs by more than just the final 's'
-		// or the singular-to-plural transformation follows known rules
-
-		// If removing 's' gives a very short word (1-2 chars), likely not a valid singular
-		if len(singularLower) <= 2 {
-			return false
-		}
-
-		// Check for -es plurals (boxes, churches, etc.)
-		if strings.HasSuffix(lower, "es") {
-			baseWithoutEs := lower[:len(lower)-2]
-			// If base ends in s, x, z, ch, sh, it's a valid -es plural
-			if strings.HasSuffix(baseWithoutEs, "s") ||
-				strings.HasSuffix(baseWithoutEs, "x") ||
-				strings.HasSuffix(baseWithoutEs, "z") ||
-				strings.HasSuffix(baseWithoutEs, "ch") ||
-				strings.HasSuffix(baseWithoutEs, "sh") {
-				return true
-			}
-		}
-
-		// Check for -ies plurals (cities, babies, etc.)
-		if strings.HasSuffix(lower, "ies") && len(lower) > 3 {
-			return true
-		}
-
-		// Default: if singular differs and pluralizing it gives us back the word, it's plural
-		pluralOfSingular := strings.ToLower(Plural(singular))
-		if pluralOfSingular == lower && singularLower != lower {
-			// Additional check: singular should look "complete" (not truncated)
-			// Words like "bu" from "bus" don't look complete
-			if !looksLikeCompleteWord(singularLower) {
-				return false
-			}
-			return true
-		}
+		return checkPluralPatterns(word, lower)
 	}
 
 	return false
+}
+
+// checkPluralPatterns checks if a word ending in 's' follows plural patterns.
+func checkPluralPatterns(word, lower string) bool {
+	// Try to get the singular form
+	singular := Singular(word)
+	singularLower := strings.ToLower(singular)
+
+	// If singular is the same, it's not a plural we can detect
+	if singularLower == lower {
+		return false
+	}
+
+	// If removing 's' gives a very short word (1-2 chars), likely not a valid singular
+	if len(singularLower) <= 2 {
+		return false
+	}
+
+	// Check for -es plurals (boxes, churches, etc.)
+	if isEsPlural(lower) {
+		return true
+	}
+
+	// Check for -ies plurals (cities, babies, etc.)
+	if strings.HasSuffix(lower, "ies") && len(lower) > 3 {
+		return true
+	}
+
+	// Default: if singular differs and pluralizing it gives us back the word, it's plural
+	return isValidPluralOfSingular(lower, singular, singularLower)
+}
+
+// isEsPlural checks if a word is a valid -es plural (boxes, churches, etc.).
+func isEsPlural(lower string) bool {
+	if !strings.HasSuffix(lower, "es") {
+		return false
+	}
+	baseWithoutEs := lower[:len(lower)-2]
+	// If base ends in s, x, z, ch, sh, it's a valid -es plural
+	return strings.HasSuffix(baseWithoutEs, "s") ||
+		strings.HasSuffix(baseWithoutEs, "x") ||
+		strings.HasSuffix(baseWithoutEs, "z") ||
+		strings.HasSuffix(baseWithoutEs, "ch") ||
+		strings.HasSuffix(baseWithoutEs, "sh")
+}
+
+// isValidPluralOfSingular checks if lower is a valid plural of singular.
+func isValidPluralOfSingular(lower, singular, singularLower string) bool {
+	pluralOfSingular := strings.ToLower(Plural(singular))
+	if pluralOfSingular != lower || singularLower == lower {
+		return false
+	}
+	// Additional check: singular should look "complete" (not truncated)
+	// Words like "bu" from "bus" don't look complete
+	return looksLikeCompleteWord(singularLower)
 }
 
 // isLikelyCommonNoun checks if a word is likely a common noun (not a proper name).

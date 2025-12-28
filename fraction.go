@@ -83,19 +83,7 @@ func fractionToWordsInternal(numerator, denominator int, useQuarters bool) strin
 			denominatorWord = "half"
 		}
 	case 4:
-		if useQuarters {
-			if plural {
-				denominatorWord = "quarters"
-			} else {
-				denominatorWord = "quarter"
-			}
-		} else {
-			if plural {
-				denominatorWord = "fourths"
-			} else {
-				denominatorWord = "fourth"
-			}
-		}
+		denominatorWord = denominatorFour(useQuarters, plural)
 	default:
 		// Use ordinal form for other denominators
 		ordinal := ordinalDenominator(denominator)
@@ -117,6 +105,20 @@ func fractionToWordsInternal(numerator, denominator int, useQuarters bool) strin
 // Handles compound ordinals like "twenty-first" → "twenty-firsts".
 func pluralizeOrdinal(ordinal string) string {
 	return ordinal + "s"
+}
+
+// denominatorFour returns the denominator word for 4 (quarter or fourth).
+func denominatorFour(useQuarters, plural bool) string {
+	if useQuarters {
+		if plural {
+			return "quarters"
+		}
+		return "quarter"
+	}
+	if plural {
+		return "fourths"
+	}
+	return "fourth"
 }
 
 // ordinalDenominator returns the ordinal form of a number suitable for use as
