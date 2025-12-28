@@ -168,3 +168,49 @@ func TestFractionToWordsExamples(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkFractionToWords(b *testing.B) {
+	benchmarks := []struct {
+		name string
+		num  int
+		den  int
+	}{
+		{"half", 1, 2},
+		{"quarter", 1, 4},
+		{"three_quarters", 3, 4},
+		{"third", 1, 3},
+		{"two_thirds", 2, 3},
+		{"fifth", 1, 5},
+		{"complex", 7, 16},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.FractionToWords(bm.num, bm.den)
+			}
+		})
+	}
+}
+
+func BenchmarkFractionToWordsWithFourths(b *testing.B) {
+	benchmarks := []struct {
+		name string
+		num  int
+		den  int
+	}{
+		{"half", 1, 2},
+		{"fourth", 1, 4},
+		{"three_fourths", 3, 4},
+		{"third", 1, 3},
+		{"fifth", 1, 5},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.FractionToWordsWithFourths(bm.num, bm.den)
+			}
+		})
+	}
+}

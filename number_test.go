@@ -1125,3 +1125,25 @@ func BenchmarkFormatNumber(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkNo(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		word  string
+		count int
+	}{
+		{"zero", "error", 0},
+		{"one", "error", 1},
+		{"multiple", "error", 5},
+		{"irregular_zero", "child", 0},
+		{"irregular_multiple", "child", 3},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.No(bm.word, bm.count)
+			}
+		})
+	}
+}
