@@ -394,3 +394,125 @@ func FuzzAdverb(f *testing.F) {
 		_ = Adverb(input)
 	})
 }
+
+func FuzzPluralNoun(f *testing.F) {
+	seeds := []string{
+		// Regular nouns
+		"cat", "dog", "child", "mouse", "fish",
+		"box", "bus", "church", "potato", "hero",
+		// Pronouns
+		"I", "me", "my", "mine", "myself",
+		"you", "your", "yours", "yourself",
+		"he", "she", "it", "they",
+		"him", "her", "them",
+		"his", "hers", "its", "their", "theirs",
+		"we", "us", "our", "ours", "ourselves",
+		// Irregular plurals
+		"analysis", "cactus", "datum", "phenomenon",
+		"leaf", "wolf", "knife",
+		// Edge cases
+		"", " ", "  ", "\t", "\n",
+		"UPPERCASE", "MixedCase", "lowercase",
+		"123", "test123",
+		"café", "naïve",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = PluralNoun(input)
+	})
+}
+
+func FuzzPluralVerb(f *testing.F) {
+	seeds := []string{
+		// Auxiliary verbs
+		"is", "was", "has", "does", "am", "are", "were", "have", "do",
+		// Contractions
+		"isn't", "wasn't", "hasn't", "doesn't", "aren't", "weren't", "haven't", "don't",
+		// Modal verbs (unchanged)
+		"can", "could", "may", "might", "must", "shall", "should", "will", "would",
+		// Regular verbs (third person singular)
+		"runs", "walks", "goes", "sees", "flies", "tries",
+		"passes", "pushes", "watches", "fixes", "buzzes",
+		// Base form verbs
+		"run", "walk", "go", "see", "fly", "try",
+		// Edge cases
+		"", " ", "  ", "\t", "\n",
+		"UPPERCASE", "MixedCase", "lowercase",
+		"123", "test123",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = PluralVerb(input)
+	})
+}
+
+func FuzzPluralAdj(f *testing.F) {
+	seeds := []string{
+		// Demonstrative adjectives
+		"this", "that", "these", "those",
+		// Indefinite articles
+		"a", "an", "some",
+		// Possessive adjectives
+		"my", "your", "his", "her", "its", "our", "their",
+		// Regular adjectives (unchanged)
+		"big", "small", "beautiful", "happy", "red", "blue",
+		// Edge cases
+		"", " ", "  ", "\t", "\n",
+		"UPPERCASE", "MixedCase", "lowercase",
+		"123", "test123",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = PluralAdj(input)
+	})
+}
+
+func FuzzSingularNoun(f *testing.F) {
+	seeds := []string{
+		// Plural nouns to singularize
+		"cats", "dogs", "children", "mice", "fish",
+		"boxes", "buses", "churches", "potatoes", "heroes",
+		// Pronouns (plural)
+		"we", "us", "our", "ours", "ourselves",
+		"they", "them", "their", "theirs", "themselves",
+		// Pronouns (singular)
+		"I", "me", "my", "mine", "myself",
+		"he", "she", "it", "him", "her",
+		// Irregular plurals
+		"analyses", "cacti", "data", "phenomena",
+		"leaves", "wolves", "knives",
+		// Edge cases
+		"", " ", "  ", "\t", "\n",
+		"UPPERCASE", "MixedCase", "lowercase",
+		"123", "test123",
+		"café", "naïve",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = SingularNoun(input)
+	})
+}
