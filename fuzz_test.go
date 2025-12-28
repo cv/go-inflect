@@ -233,6 +233,8 @@ func FuzzCaseConversion(f *testing.F) {
 		_ = PascalCase(input)
 		_ = SnakeCase(input)
 		_ = KebabCase(input)
+		_ = Dasherize(input)
+		_ = Underscore(input)
 	})
 }
 
@@ -636,5 +638,115 @@ func FuzzCountingWordThreshold(f *testing.F) {
 
 	f.Fuzz(func(_ *testing.T, n, threshold int) {
 		_ = CountingWordThreshold(n, threshold)
+	})
+}
+
+func FuzzCapitalize(f *testing.F) {
+	seeds := []string{
+		// Empty and whitespace
+		"", " ", "  ", "\t", "\n", "\r\n",
+		// Single characters
+		"a", "A", "1", "!", "é", "日",
+		// Mixed case
+		"hello", "HELLO", "Hello", "hELLO", "HeLLo",
+		// With numbers
+		"123", "abc123", "123abc", "a1b2c3",
+		// Unicode
+		"café", "naïve", "日本語", "Привет", "مرحبا",
+		"über", "ÜBER", "Äpfel", "ñoño",
+		// Special characters
+		"hello world", "hello-world", "hello_world",
+		"'quoted'", "\"double\"", "(parens)",
+		// Leading whitespace
+		" hello", "  world", "\thello",
+		// Only whitespace
+		"   ", "\t\t", "\n\n",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = Capitalize(input)
+	})
+}
+
+func FuzzTitleize(f *testing.F) {
+	seeds := []string{
+		// Empty and whitespace
+		"", " ", "  ", "\t", "\n", "\r\n",
+		// Single words
+		"hello", "HELLO", "Hello", "hELLO",
+		// Multiple words
+		"hello world", "HELLO WORLD", "Hello World",
+		"the quick brown fox",
+		// With hyphens
+		"hello-world", "one-two-three", "HELLO-WORLD",
+		// Mixed separators
+		"hello world-test", "one two-three four",
+		// With numbers
+		"123", "abc123", "123abc", "test 123 value",
+		// Unicode
+		"café au lait", "naïve approach", "日本語 テスト",
+		"über alles", "ÜBER ALLES", "Äpfel und Birnen",
+		// Edge cases
+		"a", "A", " a ", "-a-", "a-",
+		// Multiple spaces/hyphens
+		"hello  world", "hello--world", "  hello  ",
+		// Only whitespace
+		"   ", "\t\t", "\n\n",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = Titleize(input)
+	})
+}
+
+func FuzzTitleCase(f *testing.F) {
+	seeds := []string{
+		// Empty and whitespace
+		"", " ", "  ", "\t", "\n", "\r\n",
+		// snake_case
+		"hello_world", "one_two_three", "HELLO_WORLD",
+		// kebab-case
+		"hello-world", "one-two-three", "HELLO-WORLD",
+		// Space separated
+		"hello world", "one two three",
+		// Mixed case inputs
+		"camelCase", "PascalCase", "snake_case", "kebab-case",
+		// With numbers
+		"123", "abc123", "123abc", "test_123_value",
+		// Acronyms
+		"XMLHttpRequest", "getHTTPResponse", "IOError",
+		"HTTP_SERVER", "xml_http_request",
+		// Unicode
+		"café_au_lait", "naïve-approach", "日本語_テスト",
+		// Edge cases
+		"a", "A", "_a_", "-a-", "a_", "_a",
+		// Multiple separators
+		"hello__world", "hello--world", "hello_ _world",
+		// Only separators
+		"___", "---", "_ _", "- -",
+		// Only whitespace
+		"   ", "\t\t", "\n\n",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = TitleCase(input)
 	})
 }
