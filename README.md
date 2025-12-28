@@ -201,6 +201,42 @@ inflect.An("herb")       // "an herb"
 inflect.DefAPattern("euro.*")  // "a euro", "a european"
 ```
 
+### Migrating from jinzhu/inflection
+
+For easier migration from `github.com/jinzhu/inflection`, the following
+compatibility aliases are provided:
+
+```go
+// These work exactly like their jinzhu/inflection counterparts
+inflect.AddIrregular("person", "people")  // alias for DefNoun
+inflect.AddUncountable("fish", "sheep")   // marks words as uncountable
+
+// Core functions have the same signatures
+inflect.Plural("cat")     // "cats"
+inflect.Singular("cats")  // "cat"
+```
+
+### Migrating from go-openapi/inflect
+
+For easier migration from `github.com/go-openapi/inflect`, the following
+compatibility aliases are provided:
+
+```go
+// These work exactly like their go-openapi/inflect counterparts
+inflect.Pluralize("cat")              // alias for Plural
+inflect.Singularize("cats")           // alias for Singular
+inflect.Camelize("hello_world")       // alias for PascalCase -> "HelloWorld"
+inflect.CamelizeDownFirst("hello_world") // alias for CamelCase -> "helloWorld"
+inflect.AddIrregular("person", "people")
+inflect.AddUncountable("fish")
+
+// These functions have the same names and signatures
+inflect.Capitalize("hello")   // "Hello"
+inflect.Titleize("hello world") // "Hello World"
+inflect.Underscore("HelloWorld") // "hello_world"
+inflect.Dasherize("HelloWorld")  // "hello-world"
+```
+
 ### Gender for Pronouns
 
 Control third-person singular pronoun resolution:

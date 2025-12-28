@@ -186,3 +186,69 @@ func DefAdjReset() {
 	customAdjs = make(map[string]string)
 	customAdjsReverse = make(map[string]string)
 }
+
+// AddIrregular is an alias for DefNoun, provided for compatibility with
+// github.com/jinzhu/inflection.
+//
+// Example:
+//
+//	AddIrregular("person", "people")
+//	Plural("person") // returns "people"
+func AddIrregular(singular, plural string) {
+	DefNoun(singular, plural)
+}
+
+// AddUncountable marks words as uncountable (same singular and plural form),
+// provided for compatibility with github.com/jinzhu/inflection and
+// github.com/go-openapi/inflect.
+//
+// Example:
+//
+//	AddUncountable("fish", "sheep")
+//	Plural("fish")  // returns "fish"
+//	Plural("sheep") // returns "sheep"
+func AddUncountable(words ...string) {
+	for _, w := range words {
+		DefNoun(w, w)
+	}
+}
+
+// Pluralize is an alias for Plural, provided for compatibility with
+// github.com/go-openapi/inflect.
+//
+// Example:
+//
+//	Pluralize("cat") // returns "cats"
+func Pluralize(word string) string {
+	return Plural(word)
+}
+
+// Singularize is an alias for Singular, provided for compatibility with
+// github.com/go-openapi/inflect.
+//
+// Example:
+//
+//	Singularize("cats") // returns "cat"
+func Singularize(word string) string {
+	return Singular(word)
+}
+
+// Camelize is an alias for PascalCase, provided for compatibility with
+// github.com/go-openapi/inflect.
+//
+// Example:
+//
+//	Camelize("hello_world") // returns "HelloWorld"
+func Camelize(word string) string {
+	return PascalCase(word)
+}
+
+// CamelizeDownFirst is an alias for CamelCase, provided for compatibility with
+// github.com/go-openapi/inflect.
+//
+// Example:
+//
+//	CamelizeDownFirst("hello_world") // returns "helloWorld"
+func CamelizeDownFirst(word string) string {
+	return CamelCase(word)
+}

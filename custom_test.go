@@ -566,3 +566,67 @@ func TestDefAdjIntegration(t *testing.T) {
 		assert.False(t, inflect.UndefAdj("happy"), "After reset: UndefAdj(happy) should return false")
 	})
 }
+
+// Tests for jinzhu/inflection compatibility aliases
+
+func TestAddIrregular(t *testing.T) {
+	defer inflect.DefNounReset()
+
+	// AddIrregular should behave exactly like DefNoun
+	inflect.AddIrregular("person", "people")
+	assert.Equal(t, "people", inflect.Plural("person"))
+	assert.Equal(t, "person", inflect.Singular("people"))
+
+	// Case preservation
+	assert.Equal(t, "People", inflect.Plural("Person"))
+	assert.Equal(t, "PEOPLE", inflect.Plural("PERSON"))
+}
+
+func TestAddUncountable(t *testing.T) {
+	defer inflect.DefNounReset()
+
+	// Single word
+	inflect.AddUncountable("rice")
+	assert.Equal(t, "rice", inflect.Plural("rice"))
+	assert.Equal(t, "rice", inflect.Singular("rice"))
+
+	// Multiple words
+	inflect.AddUncountable("fish", "sheep", "deer")
+	assert.Equal(t, "fish", inflect.Plural("fish"))
+	assert.Equal(t, "sheep", inflect.Plural("sheep"))
+	assert.Equal(t, "deer", inflect.Plural("deer"))
+
+	// Case preservation
+	assert.Equal(t, "Fish", inflect.Plural("Fish"))
+	assert.Equal(t, "SHEEP", inflect.Plural("SHEEP"))
+}
+
+// Tests for go-openapi/inflect compatibility aliases
+
+func TestPluralize(t *testing.T) {
+	// Pluralize should behave exactly like Plural
+	assert.Equal(t, inflect.Plural("cat"), inflect.Pluralize("cat"))
+	assert.Equal(t, inflect.Plural("child"), inflect.Pluralize("child"))
+	assert.Equal(t, inflect.Plural("Person"), inflect.Pluralize("Person"))
+}
+
+func TestSingularize(t *testing.T) {
+	// Singularize should behave exactly like Singular
+	assert.Equal(t, inflect.Singular("cats"), inflect.Singularize("cats"))
+	assert.Equal(t, inflect.Singular("children"), inflect.Singularize("children"))
+	assert.Equal(t, inflect.Singular("People"), inflect.Singularize("People"))
+}
+
+func TestCamelize(t *testing.T) {
+	// Camelize should behave exactly like PascalCase
+	assert.Equal(t, inflect.PascalCase("hello_world"), inflect.Camelize("hello_world"))
+	assert.Equal(t, inflect.PascalCase("foo-bar"), inflect.Camelize("foo-bar"))
+	assert.Equal(t, inflect.PascalCase("some_thing"), inflect.Camelize("some_thing"))
+}
+
+func TestCamelizeDownFirst(t *testing.T) {
+	// CamelizeDownFirst should behave exactly like CamelCase
+	assert.Equal(t, inflect.CamelCase("hello_world"), inflect.CamelizeDownFirst("hello_world"))
+	assert.Equal(t, inflect.CamelCase("foo-bar"), inflect.CamelizeDownFirst("foo-bar"))
+	assert.Equal(t, inflect.CamelCase("some_thing"), inflect.CamelizeDownFirst("some_thing"))
+}
