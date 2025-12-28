@@ -1037,3 +1037,91 @@ func BenchmarkWordToOrdinal(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkNumberToWordsFloat(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		input float64
+	}{
+		{"simple", 3.14},
+		{"integer", 42.0},
+		{"long_decimal", 123.456789},
+		{"small", 0.001},
+		{"negative", -5.5},
+		{"large", 1234567.89},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.NumberToWordsFloat(bm.input)
+			}
+		})
+	}
+}
+
+func BenchmarkNumberToWordsGrouped(b *testing.B) {
+	benchmarks := []struct {
+		name      string
+		n         int
+		groupSize int
+	}{
+		{"pairs_4digit", 1234, 2},
+		{"pairs_6digit", 123456, 2},
+		{"triples_6digit", 123456, 3},
+		{"singles", 1234, 1},
+		{"phone_like", 5551234567, 3},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.NumberToWordsGrouped(bm.n, bm.groupSize)
+			}
+		})
+	}
+}
+
+func BenchmarkNumberToWordsThreshold(b *testing.B) {
+	benchmarks := []struct {
+		name      string
+		n         int
+		threshold int
+	}{
+		{"below_threshold", 5, 10},
+		{"at_threshold", 10, 10},
+		{"above_threshold", 15, 10},
+		{"small_threshold", 100, 5},
+		{"large_threshold", 50, 1000},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.NumberToWordsThreshold(bm.n, bm.threshold)
+			}
+		})
+	}
+}
+
+func BenchmarkFormatNumber(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		input int
+	}{
+		{"small", 42},
+		{"thousands", 1234},
+		{"millions", 1234567},
+		{"billions", 1234567890},
+		{"negative", -1234567},
+		{"zero", 0},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.FormatNumber(bm.input)
+			}
+		})
+	}
+}

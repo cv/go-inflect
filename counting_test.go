@@ -192,3 +192,46 @@ func TestCountingWordEdgeCases(t *testing.T) {
 		assert.Equal(t, want, got, "CountingWord(%d) should equal CountingWordWithOptions(%d, true)", n, n)
 	}
 }
+
+func BenchmarkCountingWord(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		input int
+	}{
+		{"once", 1},
+		{"twice", 2},
+		{"thrice", 3},
+		{"five_times", 5},
+		{"ten_times", 10},
+		{"hundred_times", 100},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				CountingWord(bm.input)
+			}
+		})
+	}
+}
+
+func BenchmarkCountingWordThreshold(b *testing.B) {
+	benchmarks := []struct {
+		name      string
+		n         int
+		threshold int
+	}{
+		{"once_below", 1, 10},
+		{"twice_below", 2, 10},
+		{"above_threshold", 15, 10},
+		{"at_threshold", 10, 10},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				CountingWordThreshold(bm.n, bm.threshold)
+			}
+		})
+	}
+}
