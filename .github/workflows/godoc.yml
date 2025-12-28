@@ -26,47 +26,25 @@ jobs:
         with:
           go-version: stable
 
-      - name: Install godoc
-        run: go install golang.org/x/tools/cmd/godoc@latest
-
-      - name: Generate static documentation
+      - name: Generate redirect page
         run: |
           MODULE=$(go list -m)
-          PKG_PATH="pkg/${MODULE}/"
+          mkdir -p _site
           
-          mkdir -p _site/${PKG_PATH}
-          mkdir -p _site/lib/godoc
-          
-          # Start godoc server
-          godoc -http=:6060 &
-          sleep 5
-          
-          # Download package documentation
-          curl -s "http://localhost:6060/${PKG_PATH}" > "_site/${PKG_PATH}index.html"
-          
-          # Download required assets
-          curl -s "http://localhost:6060/lib/godoc/style.css" > "_site/lib/godoc/style.css"
-          curl -s "http://localhost:6060/lib/godoc/godocs.js" > "_site/lib/godoc/godocs.js"
-          curl -s "http://localhost:6060/lib/godoc/jquery.js" > "_site/lib/godoc/jquery.js"
-          
-          # Create root redirect
           cat > _site/index.html << EOF
           <!DOCTYPE html>
           <html>
           <head>
             <meta charset="utf-8">
-            <meta http-equiv="refresh" content="0; url='${PKG_PATH}'">
-            <title>go-inflect documentation</title>
+            <meta http-equiv="refresh" content="0; url='https://pkg.go.dev/${MODULE}'">
+            <link rel="canonical" href="https://pkg.go.dev/${MODULE}">
+            <title>go-inflect - Go Package Documentation</title>
           </head>
           <body>
-            <p>Redirecting to <a href="${PKG_PATH}">package documentation</a>...</p>
+            <p>Redirecting to <a href="https://pkg.go.dev/${MODULE}">pkg.go.dev documentation</a>...</p>
           </body>
           </html>
           EOF
-          
-          # Fix asset paths in HTML (remove leading slash for relative paths)
-          sed -i 's|href="/lib/godoc/|href="/go-inflect/lib/godoc/|g' "_site/${PKG_PATH}index.html"
-          sed -i 's|src="/lib/godoc/|src="/go-inflect/lib/godoc/|g' "_site/${PKG_PATH}index.html"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
