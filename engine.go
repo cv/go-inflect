@@ -9,6 +9,62 @@ import (
 // Engine holds all mutable state for inflection operations.
 // Use NewEngine() to create an instance with default settings.
 // The Engine is safe for concurrent use; all methods are protected by a mutex.
+//
+// # Thread Safety Architecture
+//
+// All mutable state is encapsulated within the Engine struct and protected
+// by a sync.RWMutex. Package-level functions delegate to a defaultEngine
+// instance, providing backward-compatible API while ensuring thread safety.
+//
+// # Mutable State (in Engine)
+//
+// The following state is mutable and protected by Engine.mu:
+//   - Classical mode flags: classicalMode, classicalAll, classicalZero,
+//     classicalHerd, classicalNames, classicalAncient, classicalPersons
+//   - Custom noun mappings: irregularPlurals, singularIrregulars
+//   - Custom verb mappings: customVerbs, customVerbsReverse
+//   - Custom adjective mappings: customAdjs, customAdjsReverse
+//   - Custom article patterns: customAWords, customAnWords, customAPatterns, customAnPatterns
+//   - Gender setting: gender (for third-person pronoun singularization)
+//   - Possessive style: possessiveStyle (modern vs traditional)
+//   - Default number: defaultNum (for Num/GetNum)
+//
+// # Immutable State (package-level variables)
+//
+// The following package-level variables are IMMUTABLE after initialization
+// and are safe for concurrent read access without locking:
+//
+// Lookup tables (never modified after init):
+//   - adjective.go: irregularComparatives, irregularSuperlatives, twoSyllableWithSuffix
+//   - adverb.go: irregularAdverbs, unchangedAdverbs
+//   - article.go: silentHWords, lowercaseAbbrevs
+//   - currency.go: currencies
+//   - number.go: onesCardinal, onesOrdinal, tensCardinal, tensOrdinal
+//   - ordinal.go: cardinalToOrdinal, ordinalToCardinalMap, ordinalWords
+//   - participle.go: doubleConsonantWords, irregularPastParticiples, knownParticiples
+//   - past_tense.go: irregularPastTense
+//   - plural.go: changeToVesWords, oExceptionWords, unchangedPlurals, herdAnimals,
+//     classicalLatinPlurals, defaultIrregularPlurals
+//   - possessive.go: irregularPluralNoS, singularEndsInS, commonNouns, truncatedNames, validShortA
+//   - pronouns.go: pronounNominativePlural, pronounAccusativePlural, pronounPossessivePlural,
+//     pronounReflexivePlural, allPronounsToPlural, pronoun*SingularByGender maps
+//   - singular.go: feWordBases
+//   - verbs.go: verbSingularToPlural, verbPluralToSingular, verbUnchanged,
+//     adjSingularToPlural, adjPluralToSingular, adjPluralToSingularByGender
+//
+// Compiled regular expressions (immutable after compilation):
+//   - inflect_funcs.go: inflectFuncPattern
+//   - rails.go: notURLSafe, multiSep
+//
+// Function lookup tables (immutable after init):
+//   - inflect_funcs.go: inflectFuncs
+//
+// # Default Engine
+//
+// The package-level defaultEngine (in classical.go) is created at package
+// initialization and used by all package-level functions. It is safe for
+// concurrent use but modifications affect all callers globally.
+// For isolated configurations, use NewEngine() to create separate instances.
 type Engine struct {
 	mu sync.RWMutex
 

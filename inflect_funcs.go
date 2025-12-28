@@ -15,6 +15,11 @@ var inflectFuncPattern = regexp.MustCompile(`(\w+)\(([^)]*)\)`)
 // Inflect parses text containing inline function calls and replaces them
 // with their inflected results.
 //
+// Note: This function uses the default Engine (defaultEngine) for all
+// inflection operations. For isolated Engine configurations, use the
+// individual Engine methods directly instead of this templating function.
+// TODO: Add Engine.Inflect method for full Engine isolation support.
+//
 // Supported function calls:
 //
 // Basic inflection:
