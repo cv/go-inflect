@@ -516,3 +516,125 @@ func FuzzSingularNoun(f *testing.F) {
 		_ = SingularNoun(input)
 	})
 }
+
+func FuzzNo(f *testing.F) {
+	// Seeds: word (string), count (int)
+	seeds := []struct {
+		word  string
+		count int
+	}{
+		// Regular nouns
+		{"cat", 0}, {"cat", 1}, {"cat", 2}, {"cat", -1},
+		{"error", 0}, {"error", 1}, {"error", 5},
+		{"child", 0}, {"child", 1}, {"child", 3},
+		// Edge cases
+		{"", 0}, {"", 1}, {"", -1},
+		{" ", 0}, {"  ", 1},
+		// Irregular plurals
+		{"mouse", 0}, {"mouse", 1}, {"mouse", 5},
+		{"datum", 0}, {"datum", 1}, {"datum", 10},
+		// Large numbers
+		{"item", 1000000}, {"item", -1000000},
+		// Special characters
+		{"café", 0}, {"naïve", 2},
+	}
+	for _, s := range seeds {
+		f.Add(s.word, s.count)
+	}
+
+	f.Fuzz(func(_ *testing.T, word string, count int) {
+		if !utf8.ValidString(word) {
+			return
+		}
+		_ = No(word, count)
+	})
+}
+
+func FuzzCountingWord(f *testing.F) {
+	seeds := []int{
+		// Special words
+		0, 1, 2, 3,
+		// Regular small numbers
+		4, 5, 6, 7, 8, 9, 10,
+		// Teens
+		11, 12, 13, 14, 15,
+		// Larger numbers
+		20, 21, 50, 99, 100, 101,
+		1000, 1000000, 1000000000,
+		// Negative numbers
+		-1, -2, -3, -10, -100,
+		// Edge cases
+		2147483647, -2147483648,
+	}
+	for _, n := range seeds {
+		f.Add(n)
+	}
+
+	f.Fuzz(func(_ *testing.T, n int) {
+		_ = CountingWord(n)
+	})
+}
+
+func FuzzCountingWordWithOptions(f *testing.F) {
+	// Seeds: n (int), useThrice (bool)
+	seeds := []struct {
+		n         int
+		useThrice bool
+	}{
+		// Special words with useThrice variations
+		{1, true}, {1, false},
+		{2, true}, {2, false},
+		{3, true}, {3, false},
+		// Zero
+		{0, true}, {0, false},
+		// Regular numbers
+		{4, true}, {4, false},
+		{10, true}, {10, false},
+		{100, true}, {100, false},
+		// Negative numbers
+		{-1, true}, {-1, false},
+		{-2, true}, {-2, false},
+		{-3, true}, {-3, false},
+		{-10, true}, {-10, false},
+		// Edge cases
+		{2147483647, true}, {-2147483648, false},
+	}
+	for _, s := range seeds {
+		f.Add(s.n, s.useThrice)
+	}
+
+	f.Fuzz(func(_ *testing.T, n int, useThrice bool) {
+		_ = CountingWordWithOptions(n, useThrice)
+	})
+}
+
+func FuzzCountingWordThreshold(f *testing.F) {
+	// Seeds: n (int), threshold (int)
+	seeds := []struct {
+		n         int
+		threshold int
+	}{
+		// Below threshold
+		{1, 10}, {2, 10}, {3, 10}, {5, 10}, {9, 10},
+		// At threshold
+		{10, 10}, {100, 100},
+		// Above threshold
+		{15, 10}, {100, 10}, {1000, 10},
+		// Zero
+		{0, 10}, {0, 0},
+		// Negative numbers
+		{-1, 10}, {-5, 10}, {-15, 10},
+		// Negative threshold (edge case)
+		{5, -10}, {-5, -10},
+		// Edge cases
+		{2147483647, 10}, {-2147483648, 10},
+		{10, 2147483647}, {10, -2147483648},
+	}
+	for _, s := range seeds {
+		f.Add(s.n, s.threshold)
+	}
+
+	f.Fuzz(func(_ *testing.T, n, threshold int) {
+		_ = CountingWordThreshold(n, threshold)
+	})
+}
