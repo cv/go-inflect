@@ -765,3 +765,293 @@ func BenchmarkInflect(b *testing.B) {
 		})
 	}
 }
+
+func TestInflectPastTense(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "regular verb walk", input: "past_tense('walk')", expected: "walked"},
+		{name: "regular verb play", input: "past_tense('play')", expected: "played"},
+		{name: "regular verb try", input: "past_tense('try')", expected: "tried"},
+		{name: "regular verb stop", input: "past_tense('stop')", expected: "stopped"},
+		{name: "irregular verb go", input: "past_tense('go')", expected: "went"},
+		{name: "irregular verb see", input: "past_tense('see')", expected: "saw"},
+		{name: "irregular verb take", input: "past_tense('take')", expected: "took"},
+		{name: "irregular verb be", input: "past_tense('be')", expected: "was"},
+		{name: "in sentence", input: "She past_tense('walk') home", expected: "She walked home"},
+		{name: "double quotes", input: `He past_tense("run") fast`, expected: "He ran fast"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectPastParticiple(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "regular verb walk", input: "past_participle('walk')", expected: "walked"},
+		{name: "regular verb play", input: "past_participle('play')", expected: "played"},
+		{name: "irregular verb take", input: "past_participle('take')", expected: "taken"},
+		{name: "irregular verb go", input: "past_participle('go')", expected: "gone"},
+		{name: "irregular verb see", input: "past_participle('see')", expected: "seen"},
+		{name: "irregular verb write", input: "past_participle('write')", expected: "written"},
+		{name: "in sentence", input: "I have past_participle('take') it", expected: "I have taken it"},
+		{name: "double quotes", input: `She has past_participle("write") a book`, expected: "She has written a book"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectPresentParticiple(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "regular verb walk", input: "present_participle('walk')", expected: "walking"},
+		{name: "regular verb play", input: "present_participle('play')", expected: "playing"},
+		{name: "verb ending in e", input: "present_participle('make')", expected: "making"},
+		{name: "verb doubling consonant", input: "present_participle('run')", expected: "running"},
+		{name: "verb doubling consonant stop", input: "present_participle('stop')", expected: "stopping"},
+		{name: "verb ending in ie", input: "present_participle('lie')", expected: "lying"},
+		{name: "in sentence", input: "He is present_participle('run')", expected: "He is running"},
+		{name: "double quotes", input: `She is present_participle("swim")`, expected: "She is swimming"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectPossessive(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "singular noun", input: "possessive('cat')", expected: "cat's"},
+		{name: "singular noun dog", input: "possessive('dog')", expected: "dog's"},
+		{name: "name", input: "possessive('John')", expected: "John's"},
+		{name: "name ending in s", input: "possessive('James')", expected: "James's"},
+		{name: "plural noun", input: "possessive('cats')", expected: "cats'"},
+		{name: "in sentence", input: "The possessive('cat') toy", expected: "The cat's toy"},
+		{name: "double quotes", input: `The possessive("dog") bone`, expected: "The dog's bone"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectComparative(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "short adjective big", input: "comparative('big')", expected: "bigger"},
+		{name: "short adjective small", input: "comparative('small')", expected: "smaller"},
+		{name: "short adjective tall", input: "comparative('tall')", expected: "taller"},
+		{name: "adjective ending in y", input: "comparative('happy')", expected: "happier"},
+		{name: "adjective ending in e", input: "comparative('large')", expected: "larger"},
+		{name: "long adjective", input: "comparative('beautiful')", expected: "more beautiful"},
+		{name: "irregular good", input: "comparative('good')", expected: "better"},
+		{name: "irregular bad", input: "comparative('bad')", expected: "worse"},
+		{name: "in sentence", input: "This is comparative('big')", expected: "This is bigger"},
+		{name: "double quotes", input: `She is comparative("smart")`, expected: "She is smarter"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectSuperlative(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "short adjective big", input: "superlative('big')", expected: "biggest"},
+		{name: "short adjective small", input: "superlative('small')", expected: "smallest"},
+		{name: "short adjective tall", input: "superlative('tall')", expected: "tallest"},
+		{name: "adjective ending in y", input: "superlative('happy')", expected: "happiest"},
+		{name: "adjective ending in e", input: "superlative('large')", expected: "largest"},
+		{name: "long adjective", input: "superlative('beautiful')", expected: "most beautiful"},
+		{name: "irregular good", input: "superlative('good')", expected: "best"},
+		{name: "irregular bad", input: "superlative('bad')", expected: "worst"},
+		{name: "in sentence", input: "This is the superlative('big')", expected: "This is the biggest"},
+		{name: "double quotes", input: `She is the superlative("smart")`, expected: "She is the smartest"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectOrdinalWord(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "first", input: "ordinal_word(1)", expected: "first"},
+		{name: "second", input: "ordinal_word(2)", expected: "second"},
+		{name: "third", input: "ordinal_word(3)", expected: "third"},
+		{name: "fourth", input: "ordinal_word(4)", expected: "fourth"},
+		{name: "fifth", input: "ordinal_word(5)", expected: "fifth"},
+		{name: "eleventh", input: "ordinal_word(11)", expected: "eleventh"},
+		{name: "twelfth", input: "ordinal_word(12)", expected: "twelfth"},
+		{name: "twentieth", input: "ordinal_word(20)", expected: "twentieth"},
+		{name: "twenty-first", input: "ordinal_word(21)", expected: "twenty-first"},
+		{name: "hundredth", input: "ordinal_word(100)", expected: "one hundredth"},
+		{name: "in sentence", input: "The ordinal_word(1) place", expected: "The first place"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectNumberToWords(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "zero", input: "number_to_words(0)", expected: "zero"},
+		{name: "one", input: "number_to_words(1)", expected: "one"},
+		{name: "ten", input: "number_to_words(10)", expected: "ten"},
+		{name: "twelve", input: "number_to_words(12)", expected: "twelve"},
+		{name: "twenty", input: "number_to_words(20)", expected: "twenty"},
+		{name: "forty-two", input: "number_to_words(42)", expected: "forty-two"},
+		{name: "one hundred", input: "number_to_words(100)", expected: "one hundred"},
+		{name: "one hundred twenty-three", input: "number_to_words(123)", expected: "one hundred twenty-three"},
+		{name: "one thousand", input: "number_to_words(1000)", expected: "one thousand"},
+		{name: "negative", input: "number_to_words(-5)", expected: "negative five"},
+		{name: "in sentence", input: "I have number_to_words(42) apples", expected: "I have forty-two apples"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectCountingWord(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "once", input: "counting_word(1)", expected: "once"},
+		{name: "twice", input: "counting_word(2)", expected: "twice"},
+		{name: "thrice", input: "counting_word(3)", expected: "thrice"},
+		{name: "four times", input: "counting_word(4)", expected: "four times"},
+		{name: "ten times", input: "counting_word(10)", expected: "ten times"},
+		{name: "zero times", input: "counting_word(0)", expected: "zero times"},
+		{name: "in sentence", input: "I saw it counting_word(2)", expected: "I saw it twice"},
+		{name: "in sentence once", input: "I did it counting_word(1)", expected: "I did it once"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectNo(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "no errors", input: "no('error', 0)", expected: "no errors"},
+		{name: "one error", input: "no('error', 1)", expected: "1 error"},
+		{name: "two errors", input: "no('error', 2)", expected: "2 errors"},
+		{name: "three errors", input: "no('error', 3)", expected: "3 errors"},
+		{name: "no items", input: "no('item', 0)", expected: "no items"},
+		{name: "one item", input: "no('item', 1)", expected: "1 item"},
+		{name: "five items", input: "no('item', 5)", expected: "5 items"},
+		{name: "in sentence zero", input: "There are no('error', 0)", expected: "There are no errors"},
+		{name: "in sentence nonzero", input: "There are no('error', 3)", expected: "There are 3 errors"},
+		{name: "double quotes", input: `Found no("match", 0)`, expected: "Found no matches"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestInflectNewFunctionsEdgeCases(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		// Empty args - should return original
+		{name: "past_tense no args", input: "past_tense()", expected: "past_tense()"},
+		{name: "past_participle no args", input: "past_participle()", expected: "past_participle()"},
+		{name: "present_participle no args", input: "present_participle()", expected: "present_participle()"},
+		{name: "possessive no args", input: "possessive()", expected: "possessive()"},
+		{name: "comparative no args", input: "comparative()", expected: "comparative()"},
+		{name: "superlative no args", input: "superlative()", expected: "superlative()"},
+		{name: "ordinal_word no args", input: "ordinal_word()", expected: "ordinal_word()"},
+		{name: "number_to_words no args", input: "number_to_words()", expected: "number_to_words()"},
+		{name: "counting_word no args", input: "counting_word()", expected: "counting_word()"},
+		{name: "no single arg", input: "no('error')", expected: "no('error')"},
+
+		// Invalid numeric args
+		{name: "ordinal_word non-numeric", input: "ordinal_word('abc')", expected: "ordinal_word('abc')"},
+		{name: "number_to_words non-numeric", input: "number_to_words('abc')", expected: "number_to_words('abc')"},
+		{name: "counting_word non-numeric", input: "counting_word('abc')", expected: "counting_word('abc')"},
+		{name: "no non-numeric count", input: "no('error', 'abc')", expected: "no('error', 'abc')"},
+
+		// Multiple new functions in one string
+		{name: "multiple new functions", input: "The ordinal_word(1) time I past_tense('see') it", expected: "The first time I saw it"},
+		{name: "comparative and superlative", input: "This is comparative('good') but that is superlative('good')", expected: "This is better but that is best"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}

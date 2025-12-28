@@ -36,7 +36,21 @@ var inflectFuncPattern = regexp.MustCompile(`(\w+)\(([^)]*)\)`)
 //
 // Numbers:
 //   - ordinal(n) - returns ordinal form like "1st", "2nd", "3rd"
+//   - ordinal_word(n) - returns ordinal word like "first", "second", "third"
 //   - num(n) - returns the number as a string
+//   - number_to_words(n) - converts number to words like "forty-two"
+//   - counting_word(n) - returns counting words: 1 → "once", 2 → "twice", 3+ → "3 times"
+//   - no(word, count) - returns "no word" for 0, or "count words" otherwise
+//
+// Verb tenses:
+//   - past_tense(verb) - returns past tense like "walk" → "walked"
+//   - past_participle(verb) - returns past participle like "take" → "taken"
+//   - present_participle(verb) - returns present participle like "run" → "running"
+//
+// Other inflections:
+//   - possessive(noun) - returns possessive form like "cat" → "cat's"
+//   - comparative(adj) - returns comparative form like "big" → "bigger"
+//   - superlative(adj) - returns superlative form like "big" → "biggest"
 //
 // Examples:
 //   - Inflect("The plural of cat is plural('cat')") -> "The plural of cat is cats"
@@ -45,6 +59,16 @@ var inflectFuncPattern = regexp.MustCompile(`(\w+)\(([^)]*)\)`)
 //   - Inflect("This is the ordinal(1) item") -> "This is the 1st item"
 //   - Inflect("plural_noun('I') saw it") -> "We saw it"
 //   - Inflect("The cat plural_verb('is') happy") -> "The cat are happy"
+//   - Inflect("She past_tense('walk') home") -> "She walked home"
+//   - Inflect("I have past_participle('take') it") -> "I have taken it"
+//   - Inflect("He is present_participle('run')") -> "He is running"
+//   - Inflect("The possessive('cat') toy") -> "The cat's toy"
+//   - Inflect("This is comparative('big')") -> "This is bigger"
+//   - Inflect("This is the superlative('big')") -> "This is the biggest"
+//   - Inflect("The ordinal_word(1) place") -> "The first place"
+//   - Inflect("I have number_to_words(42) apples") -> "I have forty-two apples"
+//   - Inflect("I saw it counting_word(2)") -> "I saw it twice"
+//   - Inflect("There are no('error', 0)") -> "There are no errors"
 func Inflect(text string) string {
 	return inflectFuncPattern.ReplaceAllStringFunc(text, processInflectCall)
 }
@@ -79,8 +103,28 @@ func processInflectCall(match string) string {
 		return processArticle(args, match)
 	case "ordinal":
 		return processOrdinal(args, match)
+	case "ordinal_word":
+		return processOrdinalWord(args, match)
 	case "num":
 		return processNum(args, match)
+	case "number_to_words":
+		return processNumberToWords(args, match)
+	case "counting_word":
+		return processCountingWord(args, match)
+	case "no":
+		return processNo(args, match)
+	case "past_tense":
+		return processPastTense(args, match)
+	case "past_participle":
+		return processPastParticiple(args, match)
+	case "present_participle":
+		return processPresentParticiple(args, match)
+	case "possessive":
+		return processPossessive(args, match)
+	case "comparative":
+		return processComparative(args, match)
+	case "superlative":
+		return processSuperlative(args, match)
 	default:
 		return match
 	}
@@ -276,6 +320,103 @@ func processNum(args []string, original string) string {
 	}
 	// Just return the number as-is (it's already a string)
 	return args[0]
+}
+
+// processOrdinalWord handles ordinal_word(n).
+func processOrdinalWord(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	n, err := strconv.Atoi(args[0])
+	if err != nil {
+		return original
+	}
+	return OrdinalWord(n)
+}
+
+// processNumberToWords handles number_to_words(n).
+func processNumberToWords(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	n, err := strconv.Atoi(args[0])
+	if err != nil {
+		return original
+	}
+	return NumberToWords(n)
+}
+
+// processCountingWord handles counting_word(n).
+func processCountingWord(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	n, err := strconv.Atoi(args[0])
+	if err != nil {
+		return original
+	}
+	return CountingWord(n)
+}
+
+// processNo handles no('word', count).
+func processNo(args []string, original string) string {
+	if len(args) < 2 {
+		return original
+	}
+	word := args[0]
+	count, err := strconv.Atoi(args[1])
+	if err != nil {
+		return original
+	}
+	return No(word, count)
+}
+
+// processPastTense handles past_tense('verb').
+func processPastTense(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return PastTense(args[0])
+}
+
+// processPastParticiple handles past_participle('verb').
+func processPastParticiple(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return PastParticiple(args[0])
+}
+
+// processPresentParticiple handles present_participle('verb').
+func processPresentParticiple(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return PresentParticiple(args[0])
+}
+
+// processPossessive handles possessive('noun').
+func processPossessive(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return Possessive(args[0])
+}
+
+// processComparative handles comparative('adj').
+func processComparative(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return Comparative(args[0])
+}
+
+// processSuperlative handles superlative('adj').
+func processSuperlative(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return Superlative(args[0])
 }
 
 // PluralNoun returns the plural form of an English noun or pronoun.
