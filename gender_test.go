@@ -28,7 +28,7 @@ func TestGender(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			inflect.Gender(tt.setTo)
 			got := inflect.GetGender()
-			assert.Equal(t, tt.expected, got, "Gender(%q): GetGender()", tt.setTo)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -71,7 +71,7 @@ func TestGenderInvalidValues(t *testing.T) {
 		t.Run("invalid:"+invalid, func(t *testing.T) {
 			inflect.Gender(invalid)
 			got := inflect.GetGender()
-			assert.Equal(t, "m", got, "Gender(%q): should remain unchanged", invalid)
+			assert.Equal(t, "m", got)
 		})
 	}
 }
@@ -96,9 +96,9 @@ func TestGenderSequence(t *testing.T) {
 		{"f", "f"},
 	}
 
-	for i, step := range sequence {
+	for _, step := range sequence {
 		inflect.Gender(step.setTo)
 		got := inflect.GetGender()
-		assert.Equal(t, step.expected, got, "Step %d: Gender(%q)", i, step.setTo)
+		assert.Equal(t, step.expected, got)
 	}
 }

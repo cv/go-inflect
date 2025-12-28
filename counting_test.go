@@ -50,7 +50,7 @@ func TestCountingWord(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
 			got := CountingWord(tt.n)
-			assert.Equal(t, tt.want, got, "CountingWord(%d)", tt.n)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -91,7 +91,7 @@ func TestCountingWordWithOptions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
 			got := CountingWordWithOptions(tt.n, tt.useThrice)
-			assert.Equal(t, tt.want, got, "CountingWordWithOptions(%d, %v)", tt.n, tt.useThrice)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -158,7 +158,7 @@ func TestCountingWordThreshold(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
 			got := CountingWordThreshold(tt.n, tt.threshold)
-			assert.Equal(t, tt.want, got, "CountingWordThreshold(%d, %d)", tt.n, tt.threshold)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -179,7 +179,7 @@ func TestCountingWordLargeNumbers(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
 			got := CountingWord(tt.n)
-			assert.Equal(t, tt.want, got, "CountingWord(%d)", tt.n)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

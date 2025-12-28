@@ -24,7 +24,7 @@ func TestClassical(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			inflect.Classical(tt.enabled)
 			got := inflect.IsClassical()
-			assert.Equal(t, tt.enabled, got, "after Classical(%v): IsClassical()", tt.enabled)
+			assert.Equal(t, tt.enabled, got)
 		})
 	}
 }
@@ -79,7 +79,7 @@ func TestIsClassical(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup()
 			got := inflect.IsClassical()
-			assert.Equal(t, tt.want, got, "IsClassical()")
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -164,7 +164,7 @@ func TestClassicalAncient(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			inflect.ClassicalAncient(tt.enabled)
 			got := inflect.Plural(tt.input)
-			assert.Equal(t, tt.want, got, "ClassicalAncient(%v): Plural(%q)", tt.enabled, tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -199,7 +199,7 @@ func TestIsClassicalAncient(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup()
 			got := inflect.IsClassicalAncient()
-			assert.Equal(t, tt.want, got, "IsClassicalAncient()")
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -299,7 +299,7 @@ func TestClassicalAll(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			inflect.ClassicalAll(tt.enabled)
 			got := inflect.Plural(tt.word)
-			assert.Equal(t, tt.want, got, "ClassicalAll(%v): Plural(%q)", tt.enabled, tt.word)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -325,7 +325,7 @@ func TestClassicalAliasForClassicalAll(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			inflect.Classical(tt.enabled) // Use Classical(), not ClassicalAll()
 			got := inflect.Plural(tt.word)
-			assert.Equal(t, tt.want, got, "Classical(%v): Plural(%q)", tt.enabled, tt.word)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -368,7 +368,7 @@ func TestIsClassicalAll(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup()
 			got := inflect.IsClassicalAll()
-			assert.Equal(t, tt.want, got, "IsClassicalAll()")
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -439,7 +439,7 @@ func TestClassicalPersons(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			inflect.ClassicalPersons(tt.enabled)
 			got := inflect.Plural(tt.input)
-			assert.Equal(t, tt.want, got, "ClassicalPersons(%v): Plural(%q)", tt.enabled, tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -492,7 +492,7 @@ func TestIsClassicalPersons(t *testing.T) {
 			inflect.ClassicalAll(false)
 			tt.setup()
 			got := inflect.IsClassicalPersons()
-			assert.Equal(t, tt.want, got, "IsClassicalPersons()")
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -580,11 +580,11 @@ func TestClassicalNames(t *testing.T) {
 			inflect.ClassicalNames(tt.enabled)
 
 			// Test the getter function
-			assert.Equal(t, tt.wantGetter, inflect.IsClassicalNames(), "IsClassicalNames()")
+			assert.Equal(t, tt.wantGetter, inflect.IsClassicalNames())
 
 			// Test pluralization
 			got := inflect.Plural(tt.input)
-			assert.Equal(t, tt.want, got, "Plural(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

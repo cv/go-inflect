@@ -160,7 +160,7 @@ func TestAdverb(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Adverb(tt.input)
-			assert.Equal(t, tt.want, got, "Adverb(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

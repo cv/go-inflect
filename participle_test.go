@@ -112,7 +112,7 @@ func TestPresentParticiple(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.PresentParticiple(tt.input)
-			assert.Equal(t, tt.want, got, "PresentParticiple(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -281,7 +281,7 @@ func TestPastParticiple(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.PastParticiple(tt.input)
-			assert.Equal(t, tt.want, got, "PastParticiple(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -376,7 +376,7 @@ func TestIsParticiple(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.IsParticiple(tt.input)
-			assert.Equal(t, tt.want, got, "IsParticiple(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

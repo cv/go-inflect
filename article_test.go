@@ -49,7 +49,7 @@ func TestAn(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.An(tt.input)
-			assert.Equal(t, tt.want, got, "An(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -66,7 +66,7 @@ func TestA(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
 			got := inflect.A(tt.input)
-			assert.Equal(t, tt.want, got, "A(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -103,7 +103,7 @@ func TestDefA(t *testing.T) {
 			inflect.DefA(tt.word)
 
 			got := inflect.An(tt.input)
-			assert.Equal(t, tt.want, got, "After DefA(%q): An(%q)", tt.word, tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -140,7 +140,7 @@ func TestDefAn(t *testing.T) {
 			inflect.DefAn(tt.word)
 
 			got := inflect.An(tt.input)
-			assert.Equal(t, tt.want, got, "After DefAn(%q): An(%q)", tt.word, tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -192,10 +192,10 @@ func TestUndefA(t *testing.T) {
 			}
 
 			removed := inflect.UndefA(tt.undefWord)
-			assert.Equal(t, tt.wantRemoved, removed, "UndefA(%q)", tt.undefWord)
+			assert.Equal(t, tt.wantRemoved, removed)
 
 			got := inflect.An(tt.checkInput)
-			assert.Equal(t, tt.wantAfter, got, "After UndefA: An(%q)", tt.checkInput)
+			assert.Equal(t, tt.wantAfter, got)
 		})
 	}
 }
@@ -247,10 +247,10 @@ func TestUndefAn(t *testing.T) {
 			}
 
 			removed := inflect.UndefAn(tt.undefWord)
-			assert.Equal(t, tt.wantRemoved, removed, "UndefAn(%q)", tt.undefWord)
+			assert.Equal(t, tt.wantRemoved, removed)
 
 			got := inflect.An(tt.checkInput)
-			assert.Equal(t, tt.wantAfter, got, "After UndefAn: An(%q)", tt.checkInput)
+			assert.Equal(t, tt.wantAfter, got)
 		})
 	}
 }
@@ -319,7 +319,7 @@ func TestDefAReset(t *testing.T) {
 			// Check results
 			for input, want := range tt.checkInputs {
 				got := inflect.An(input)
-				assert.Equal(t, want, got, "After reset: An(%q)", input)
+				assert.Equal(t, want, got)
 			}
 		})
 	}
@@ -435,7 +435,7 @@ func TestDefAPattern(t *testing.T) {
 			for _, input := range tt.inputs {
 				got := inflect.An(input)
 				want := tt.want + " " + input
-				assert.Equal(t, want, got, "An(%q)", input)
+				assert.Equal(t, want, got)
 			}
 		})
 	}
@@ -480,7 +480,7 @@ func TestDefAnPattern(t *testing.T) {
 			for _, input := range tt.inputs {
 				got := inflect.An(input)
 				want := tt.want + " " + input
-				assert.Equal(t, want, got, "An(%q)", input)
+				assert.Equal(t, want, got)
 			}
 		})
 	}
@@ -629,7 +629,7 @@ func TestPatternCaseInsensitive(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		assert.Equal(t, tt.want, inflect.An(tt.input), "An(%q)", tt.input)
+		assert.Equal(t, tt.want, inflect.An(tt.input))
 	}
 }
 

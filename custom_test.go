@@ -34,12 +34,12 @@ func TestDefNoun(t *testing.T) {
 
 			// Test Plural()
 			got := inflect.Plural(tt.singular)
-			assert.Equal(t, tt.plural, got, "After DefNoun(%q, %q): Plural(%q)", tt.singular, tt.plural, tt.singular)
+			assert.Equal(t, tt.plural, got)
 
 			// Test Singular() for reverse lookup
 			if tt.plural != "" {
 				gotSingular := inflect.Singular(tt.plural)
-				assert.Equal(t, tt.singular, gotSingular, "After DefNoun(%q, %q): Singular(%q)", tt.singular, tt.plural, tt.plural)
+				assert.Equal(t, tt.singular, gotSingular)
 			}
 		})
 	}
@@ -102,10 +102,10 @@ func TestDefNounCasePreservation(t *testing.T) {
 			inflect.DefNoun(tt.singular, tt.plural)
 
 			got := inflect.Plural(tt.inputWord)
-			assert.Equal(t, tt.wantPlural, got, "Plural(%q)", tt.inputWord)
+			assert.Equal(t, tt.wantPlural, got)
 
 			gotSingular := inflect.Singular(tt.inputPlural)
-			assert.Equal(t, tt.wantSingular, gotSingular, "Singular(%q)", tt.inputPlural)
+			assert.Equal(t, tt.wantSingular, gotSingular)
 		})
 	}
 }
@@ -172,11 +172,11 @@ func TestUndefNoun(t *testing.T) {
 
 			// Attempt to remove
 			removed := inflect.UndefNoun(tt.undefSingular)
-			assert.Equal(t, tt.wantRemoved, removed, "UndefNoun(%q)", tt.undefSingular)
+			assert.Equal(t, tt.wantRemoved, removed)
 
 			// Check pluralization after removal
 			got := inflect.Plural(tt.checkWord)
-			assert.Equal(t, tt.wantPluralAfter, got, "After UndefNoun: Plural(%q)", tt.checkWord)
+			assert.Equal(t, tt.wantPluralAfter, got)
 		})
 	}
 }
@@ -251,7 +251,7 @@ func TestDefNounReset(t *testing.T) {
 			// Check results
 			for word, wantPlural := range tt.checkWords {
 				got := inflect.Plural(word)
-				assert.Equal(t, wantPlural, got, "After reset: Plural(%q)", word)
+				assert.Equal(t, wantPlural, got)
 			}
 		})
 	}
@@ -372,7 +372,7 @@ func TestUndefVerb(t *testing.T) {
 			}
 
 			removed := inflect.UndefVerb(tt.undefSingular)
-			assert.Equal(t, tt.wantRemoved, removed, "UndefVerb(%q)", tt.undefSingular)
+			assert.Equal(t, tt.wantRemoved, removed)
 		})
 	}
 }
@@ -510,7 +510,7 @@ func TestUndefAdj(t *testing.T) {
 			}
 
 			removed := inflect.UndefAdj(tt.undefSingular)
-			assert.Equal(t, tt.wantRemoved, removed, "UndefAdj(%q)", tt.undefSingular)
+			assert.Equal(t, tt.wantRemoved, removed)
 		})
 	}
 }

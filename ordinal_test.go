@@ -94,7 +94,7 @@ func TestOrdinalWord(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.OrdinalWord(tt.input)
-			assert.Equal(t, tt.want, got, "OrdinalWord(%d)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -152,7 +152,7 @@ func TestOrdinal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Ordinal(tt.input)
-			assert.Equal(t, tt.want, got, "Ordinal(%d)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -255,7 +255,7 @@ func TestOrdinalSuffix(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.OrdinalSuffix(tt.input)
-			assert.Equal(t, tt.want, got, "OrdinalSuffix(%d)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -311,7 +311,7 @@ func TestIsOrdinal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.IsOrdinal(tt.input)
-			assert.Equal(t, tt.want, got, "IsOrdinal(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -364,7 +364,7 @@ func TestOrdinalToCardinal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.OrdinalToCardinal(tt.input)
-			assert.Equal(t, tt.want, got, "OrdinalToCardinal(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

@@ -74,7 +74,7 @@ func TestCompare(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Compare(tt.word1, tt.word2)
-			assert.Equal(t, tt.want, got, "Compare(%q, %q)", tt.word1, tt.word2)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -97,10 +97,10 @@ func TestCompareNouns(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.CompareNouns(tt.noun1, tt.noun2)
-			assert.Equal(t, tt.want, got, "CompareNouns(%q, %q)", tt.noun1, tt.noun2)
+			assert.Equal(t, tt.want, got)
 			// Verify it matches Compare() behavior
 			compareGot := inflect.Compare(tt.noun1, tt.noun2)
-			assert.Equal(t, compareGot, got, "CompareNouns(%q, %q) should match Compare()", tt.noun1, tt.noun2)
+			assert.Equal(t, compareGot, got)
 		})
 	}
 }
@@ -156,7 +156,7 @@ func TestCompareVerbs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.CompareVerbs(tt.verb1, tt.verb2)
-			assert.Equal(t, tt.want, got, "CompareVerbs(%q, %q)", tt.verb1, tt.verb2)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -204,7 +204,7 @@ func TestCompareAdjs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.CompareAdjs(tt.adj1, tt.adj2)
-			assert.Equal(t, tt.want, got, "CompareAdjs(%q, %q)", tt.adj1, tt.adj2)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

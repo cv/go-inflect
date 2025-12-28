@@ -179,7 +179,7 @@ func TestInflect(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -204,7 +204,7 @@ func TestInflectPlural(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -225,7 +225,7 @@ func TestInflectSingular(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -248,7 +248,7 @@ func TestInflectArticle(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -276,7 +276,7 @@ func TestInflectOrdinal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -296,7 +296,7 @@ func TestInflectNum(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -370,7 +370,7 @@ func TestPluralNoun(t *testing.T) {
 			} else {
 				got = inflect.PluralNoun(tt.word)
 			}
-			assert.Equal(t, tt.expected, got, "PluralNoun(%q, %v)", tt.word, tt.count)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -452,7 +452,7 @@ func TestPluralVerb(t *testing.T) {
 			} else {
 				got = inflect.PluralVerb(tt.word)
 			}
-			assert.Equal(t, tt.expected, got, "PluralVerb(%q, %v)", tt.word, tt.count)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -515,7 +515,7 @@ func TestPluralAdj(t *testing.T) {
 			} else {
 				got = inflect.PluralAdj(tt.word)
 			}
-			assert.Equal(t, tt.expected, got, "PluralAdj(%q, %v)", tt.word, tt.count)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -581,7 +581,7 @@ func TestSingularNoun(t *testing.T) {
 			} else {
 				got = inflect.SingularNoun(tt.word)
 			}
-			assert.Equal(t, tt.expected, got, "SingularNoun(%q, %v)", tt.word, tt.count)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -635,7 +635,7 @@ func TestSingularNounWithGender(t *testing.T) {
 			defer inflect.Gender(originalGender)
 
 			got := inflect.SingularNoun(tt.word)
-			assert.Equal(t, tt.expected, got, "with Gender(%q), SingularNoun(%q)", tt.gender, tt.word)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -675,7 +675,7 @@ func TestInflectPluralNoun(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -696,7 +696,7 @@ func TestInflectPluralVerb(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -717,7 +717,7 @@ func TestInflectPluralAdj(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
@@ -738,7 +738,7 @@ func TestInflectSingularNoun(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Inflect(tt.input)
-			assert.Equal(t, tt.expected, got, "Inflect(%q)", tt.input)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }

@@ -48,7 +48,7 @@ func TestIsPlural(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.IsPlural(tt.input)
-			assert.Equal(t, tt.want, got, "IsPlural(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -87,7 +87,7 @@ func TestIsSingular(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.IsSingular(tt.input)
-			assert.Equal(t, tt.want, got, "IsSingular(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -111,7 +111,7 @@ func TestWordCount(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.WordCount(tt.input)
-			assert.Equal(t, tt.want, got, "WordCount(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -134,7 +134,7 @@ func TestCapitalize(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Capitalize(tt.input)
-			assert.Equal(t, tt.want, got, "Capitalize(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -158,7 +158,7 @@ func TestTitleize(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Titleize(tt.input)
-			assert.Equal(t, tt.want, got, "Titleize(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

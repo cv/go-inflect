@@ -54,7 +54,7 @@ func TestDasherize(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Dasherize(tt.input)
-			assert.Equal(t, tt.want, got, "Dasherize(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -74,9 +74,9 @@ func TestKebabCase(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.KebabCase(tt.input)
-			assert.Equal(t, tt.want, got, "KebabCase(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 			// Verify it matches Dasherize
-			assert.Equal(t, inflect.Dasherize(tt.input), got, "KebabCase should match Dasherize")
+			assert.Equal(t, inflect.Dasherize(tt.input), got)
 		})
 	}
 }
@@ -127,7 +127,7 @@ func TestUnderscore(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Underscore(tt.input)
-			assert.Equal(t, tt.want, got, "Underscore(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -147,9 +147,9 @@ func TestSnakeCase(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.SnakeCase(tt.input)
-			assert.Equal(t, tt.want, got, "SnakeCase(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 			// Verify it matches Underscore
-			assert.Equal(t, inflect.Underscore(tt.input), got, "SnakeCase should match Underscore")
+			assert.Equal(t, inflect.Underscore(tt.input), got)
 		})
 	}
 }
@@ -194,7 +194,7 @@ func TestPascalCase(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.PascalCase(tt.input)
-			assert.Equal(t, tt.want, got, "PascalCase(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -214,9 +214,9 @@ func TestTitleCase(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.TitleCase(tt.input)
-			assert.Equal(t, tt.want, got, "TitleCase(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 			// Verify it matches PascalCase
-			assert.Equal(t, inflect.PascalCase(tt.input), got, "TitleCase should match PascalCase")
+			assert.Equal(t, inflect.PascalCase(tt.input), got)
 		})
 	}
 }
@@ -261,7 +261,7 @@ func TestCamelCase(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.CamelCase(tt.input)
-			assert.Equal(t, tt.want, got, "CamelCase(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -282,12 +282,12 @@ func TestCaseRoundTrip(t *testing.T) {
 			// snake_case -> PascalCase -> snake_case
 			pascal := inflect.PascalCase(tt.input)
 			backToSnake := inflect.SnakeCase(pascal)
-			assert.Equal(t, tt.input, backToSnake, "round trip snake->pascal->snake")
+			assert.Equal(t, tt.input, backToSnake)
 
 			// snake_case -> kebab-case -> snake_case
 			kebab := inflect.Dasherize(tt.input)
 			backToSnake2 := inflect.Underscore(kebab)
-			assert.Equal(t, tt.input, backToSnake2, "round trip snake->kebab->snake")
+			assert.Equal(t, tt.input, backToSnake2)
 		})
 	}
 }

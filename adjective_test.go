@@ -131,7 +131,7 @@ func TestComparative(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Comparative(tt.input)
-			assert.Equal(t, tt.want, got, "Comparative(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -259,7 +259,7 @@ func TestSuperlative(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Superlative(tt.input)
-			assert.Equal(t, tt.want, got, "Superlative(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

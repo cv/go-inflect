@@ -117,7 +117,7 @@ func TestFractionToWords(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.FractionToWords(tt.numerator, tt.denominator)
-			assert.Equal(t, tt.want, got, "FractionToWords(%d, %d)", tt.numerator, tt.denominator)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -139,7 +139,7 @@ func TestFractionToWordsWithFourths(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.FractionToWordsWithFourths(tt.numerator, tt.denominator)
-			assert.Equal(t, tt.want, got, "FractionToWordsWithFourths(%d, %d)", tt.numerator, tt.denominator)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -164,7 +164,7 @@ func TestFractionToWordsExamples(t *testing.T) {
 	for _, ex := range examples {
 		t.Run("", func(t *testing.T) {
 			got := inflect.FractionToWords(ex.numerator, ex.denominator)
-			assert.Equal(t, ex.want, got, "FractionToWords(%d, %d)", ex.numerator, ex.denominator)
+			assert.Equal(t, ex.want, got)
 		})
 	}
 }

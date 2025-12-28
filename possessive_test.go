@@ -103,7 +103,7 @@ func TestPossessive(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Possessive(tt.input)
-			assert.Equal(t, tt.want, got, "Possessive(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -136,7 +136,7 @@ func TestPossessiveWithStyle(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Possessive(tt.input)
-			assert.Equal(t, tt.want, got, "Possessive(%q) with traditional style", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

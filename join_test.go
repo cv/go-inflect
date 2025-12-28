@@ -43,7 +43,7 @@ func TestJoin(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.Join(tt.input)
-			assert.Equal(t, tt.want, got, "Join(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -89,7 +89,7 @@ func TestJoinWithConj(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.JoinWithConj(tt.input, tt.conj)
-			assert.Equal(t, tt.want, got, "JoinWithConj(%q, %q)", tt.input, tt.conj)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -136,7 +136,7 @@ func TestJoinWithSep(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.JoinWithSep(tt.input, tt.conj, tt.sep)
-			assert.Equal(t, tt.want, got, "JoinWithSep(%q, %q, %q)", tt.input, tt.conj, tt.sep)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -185,7 +185,7 @@ func TestJoinWithAutoSep(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.JoinWithAutoSep(tt.input, tt.conj)
-			assert.Equal(t, tt.want, got, "JoinWithAutoSep(%q, %q)", tt.input, tt.conj)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -246,7 +246,7 @@ func TestJoinWithFinalSep(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.JoinWithFinalSep(tt.input, tt.conj, tt.sep, tt.finalSep)
-			assert.Equal(t, tt.want, got, "JoinWithFinalSep(%q, %q, %q, %q)", tt.input, tt.conj, tt.sep, tt.finalSep)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -273,7 +273,7 @@ func TestJoinNoOxford(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.JoinNoOxford(tt.input)
-			assert.Equal(t, tt.want, got, "JoinNoOxford(%q)", tt.input)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -301,7 +301,7 @@ func TestJoinNoOxfordWithConj(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := inflect.JoinNoOxfordWithConj(tt.input, tt.conj)
-			assert.Equal(t, tt.want, got, "JoinNoOxfordWithConj(%q, %q)", tt.input, tt.conj)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
