@@ -54,7 +54,11 @@ func An(word string) string {
 	}
 
 	// Get the first word for pattern matching
-	firstWord := strings.Fields(word)[0]
+	fields := strings.Fields(word)
+	if len(fields) == 0 {
+		return word
+	}
+	firstWord := fields[0]
 	lowerFirst := strings.ToLower(firstWord)
 
 	// Check custom "a" exact words first (highest priority)

@@ -1,4 +1,4 @@
-.PHONY: help deps build test lint bench bench-save bench-compare
+.PHONY: help deps build test lint fuzz bench bench-save bench-compare
 
 .DEFAULT_GOAL := help
 
@@ -16,6 +16,12 @@ test: ## Run tests with race detection and coverage
 
 lint: ## Run linter
 	golangci-lint run
+
+fuzz: ## Run all fuzz tests (10s each)
+	@for f in $$(go test -list='Fuzz.*' ./... 2>/dev/null | grep '^Fuzz'); do \
+		echo "Running $$f..."; \
+		go test -run="^$$" -fuzz=$$f -fuzztime=10s ./... || exit 1; \
+	done
 
 bench: ## Run benchmarks
 	go test -bench=. -benchmem -count=6 ./...

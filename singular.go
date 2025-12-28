@@ -130,7 +130,7 @@ func singularizeEsSuffix(word, base string) (string, bool) {
 	}
 	// -oes -> -o (heroes -> hero, potatoes -> potato)
 	// But not words like "shoes" -> "shoe"
-	if strings.HasSuffix(base, "o") && !oExceptionTakesS(base) {
+	if strings.HasSuffix(base, "o") && !oExceptionTakesS(base) && len(base) >= 2 {
 		// Check if this looks like a word that would have taken -oes
 		beforeO := base[len(base)-2]
 		if !isVowel(rune(beforeO)) {
