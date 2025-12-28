@@ -213,6 +213,69 @@ func BenchmarkJoin(b *testing.B) {
 	}
 }
 
+func BenchmarkJoinWithConj(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		words []string
+		conj  string
+	}{
+		{"two_or", []string{"apple", "banana"}, "or"},
+		{"three_or", []string{"apple", "banana", "cherry"}, "or"},
+		{"three_and_or", []string{"a", "b", "c"}, "and/or"},
+		{"five_or", []string{"a", "b", "c", "d", "e"}, "or"},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.JoinWithConj(bm.words, bm.conj)
+			}
+		})
+	}
+}
+
+func BenchmarkJoinWithSep(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		words []string
+		conj  string
+		sep   string
+	}{
+		{"semicolon", []string{"a", "b", "c"}, "and", ";"},
+		{"pipe", []string{"a", "b", "c"}, "or", "|"},
+		{"custom", []string{"one", "two", "three", "four"}, "and", " - "},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.JoinWithSep(bm.words, bm.conj, bm.sep)
+			}
+		})
+	}
+}
+
+func BenchmarkJoinWithAutoSep(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		words []string
+		conj  string
+	}{
+		{"no_commas", []string{"apple", "banana", "cherry"}, "and"},
+		{"with_commas", []string{"red, ripe", "yellow", "green, unripe"}, "and"},
+		{"single_comma", []string{"a, b", "c", "d"}, "or"},
+		{"long_list", []string{"one", "two", "three", "four", "five"}, "and"},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.JoinWithAutoSep(bm.words, bm.conj)
+			}
+		})
+	}
+}
+
 func TestJoinWithFinalSep(t *testing.T) {
 	tests := []struct {
 		name     string
