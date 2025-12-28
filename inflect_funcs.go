@@ -602,7 +602,10 @@ func PluralVerb(word string, count ...int) string {
 	}
 
 	// Check custom verb definitions
-	if plural, ok := customVerbs[lower]; ok {
+	defaultEngine.mu.RLock()
+	plural, ok := defaultEngine.customVerbs[lower]
+	defaultEngine.mu.RUnlock()
+	if ok {
 		return prefix + matchCase(trimmed, plural) + suffix
 	}
 
@@ -699,7 +702,10 @@ func PluralAdj(word string, count ...int) string {
 	}
 
 	// Check custom adjective definitions
-	if plural, ok := customAdjs[lower]; ok {
+	defaultEngine.mu.RLock()
+	plural, ok := defaultEngine.customAdjs[lower]
+	defaultEngine.mu.RUnlock()
+	if ok {
 		return prefix + matchCase(trimmed, plural) + suffix
 	}
 

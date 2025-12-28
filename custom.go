@@ -133,13 +133,6 @@ func (e *Engine) DefNounReset() {
 	}
 }
 
-// customVerbs stores custom verb conjugation rules (singular -> plural).
-// This is a placeholder map for future verb conjugation support.
-var customVerbs = make(map[string]string)
-
-// customVerbsReverse stores reverse verb conjugation rules (plural -> singular).
-var customVerbsReverse = make(map[string]string)
-
 // DefVerb defines a custom verb conjugation rule.
 //
 // NOTE: This is a placeholder stub for future implementation.
@@ -153,10 +146,29 @@ var customVerbsReverse = make(map[string]string)
 //	DefVerb("run", "runs")
 //	DefVerb("be", "are")
 func DefVerb(singular, plural string) {
+	defaultEngine.DefVerb(singular, plural)
+}
+
+// DefVerb defines a custom verb conjugation rule.
+//
+// NOTE: This is a placeholder stub for future implementation.
+// Full verb conjugation is not yet implemented; this function only stores
+// the singular/plural pair in internal maps for future use.
+//
+// The singular and plural forms are stored in lowercase.
+//
+// Examples:
+//
+//	e := NewEngine()
+//	e.DefVerb("run", "runs")
+//	e.DefVerb("be", "are")
+func (e *Engine) DefVerb(singular, plural string) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
 	lower := strings.ToLower(singular)
 	lowerPlural := strings.ToLower(plural)
-	customVerbs[lower] = lowerPlural
-	customVerbsReverse[lowerPlural] = lower
+	e.customVerbs[lower] = lowerPlural
+	e.customVerbsReverse[lowerPlural] = lower
 }
 
 // UndefVerb removes a custom verb conjugation rule.
@@ -171,13 +183,31 @@ func DefVerb(singular, plural string) {
 //	UndefVerb("run") // returns true
 //	UndefVerb("walk") // returns false (not defined)
 func UndefVerb(singular string) bool {
+	return defaultEngine.UndefVerb(singular)
+}
+
+// UndefVerb removes a custom verb conjugation rule.
+//
+// NOTE: This is a placeholder stub for future implementation.
+//
+// Returns true if the rule was removed, false if it didn't exist.
+//
+// Examples:
+//
+//	e := NewEngine()
+//	e.DefVerb("run", "runs")
+//	e.UndefVerb("run") // returns true
+//	e.UndefVerb("walk") // returns false (not defined)
+func (e *Engine) UndefVerb(singular string) bool {
+	e.mu.Lock()
+	defer e.mu.Unlock()
 	lower := strings.ToLower(singular)
-	plural, exists := customVerbs[lower]
+	plural, exists := e.customVerbs[lower]
 	if !exists {
 		return false
 	}
-	delete(customVerbs, lower)
-	delete(customVerbsReverse, plural)
+	delete(e.customVerbs, lower)
+	delete(e.customVerbsReverse, plural)
 	return true
 }
 
@@ -187,16 +217,27 @@ func UndefVerb(singular string) bool {
 //
 // This removes all custom rules added via DefVerb().
 func DefVerbReset() {
-	customVerbs = make(map[string]string)
-	customVerbsReverse = make(map[string]string)
+	defaultEngine.DefVerbReset()
 }
 
-// customAdjs stores custom adjective pluralization rules (singular -> plural).
-// This is a placeholder map for future adjective pluralization support.
-var customAdjs = make(map[string]string)
-
-// customAdjsReverse stores reverse adjective rules (plural -> singular).
-var customAdjsReverse = make(map[string]string)
+// DefVerbReset resets all custom verb conjugation rules.
+//
+// NOTE: This is a placeholder stub for future implementation.
+//
+// This removes all custom rules added via DefVerb().
+//
+// Example:
+//
+//	e := NewEngine()
+//	e.DefVerb("run", "runs")
+//	e.DefVerbReset()
+//	e.UndefVerb("run") // returns false (rule was reset)
+func (e *Engine) DefVerbReset() {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.customVerbs = make(map[string]string)
+	e.customVerbsReverse = make(map[string]string)
+}
 
 // DefAdj defines a custom adjective pluralization rule.
 //
@@ -211,10 +252,29 @@ var customAdjsReverse = make(map[string]string)
 //	DefAdj("big", "bigs")
 //	DefAdj("happy", "happies")
 func DefAdj(singular, plural string) {
+	defaultEngine.DefAdj(singular, plural)
+}
+
+// DefAdj defines a custom adjective pluralization rule.
+//
+// NOTE: This is a placeholder stub for future implementation.
+// Full adjective pluralization is not yet implemented; this function only stores
+// the singular/plural pair in internal maps for future use.
+//
+// The singular and plural forms are stored in lowercase.
+//
+// Examples:
+//
+//	e := NewEngine()
+//	e.DefAdj("big", "bigs")
+//	e.DefAdj("happy", "happies")
+func (e *Engine) DefAdj(singular, plural string) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
 	lower := strings.ToLower(singular)
 	lowerPlural := strings.ToLower(plural)
-	customAdjs[lower] = lowerPlural
-	customAdjsReverse[lowerPlural] = lower
+	e.customAdjs[lower] = lowerPlural
+	e.customAdjsReverse[lowerPlural] = lower
 }
 
 // UndefAdj removes a custom adjective pluralization rule.
@@ -229,13 +289,31 @@ func DefAdj(singular, plural string) {
 //	UndefAdj("big") // returns true
 //	UndefAdj("small") // returns false (not defined)
 func UndefAdj(singular string) bool {
+	return defaultEngine.UndefAdj(singular)
+}
+
+// UndefAdj removes a custom adjective pluralization rule.
+//
+// NOTE: This is a placeholder stub for future implementation.
+//
+// Returns true if the rule was removed, false if it didn't exist.
+//
+// Examples:
+//
+//	e := NewEngine()
+//	e.DefAdj("big", "bigs")
+//	e.UndefAdj("big") // returns true
+//	e.UndefAdj("small") // returns false (not defined)
+func (e *Engine) UndefAdj(singular string) bool {
+	e.mu.Lock()
+	defer e.mu.Unlock()
 	lower := strings.ToLower(singular)
-	plural, exists := customAdjs[lower]
+	plural, exists := e.customAdjs[lower]
 	if !exists {
 		return false
 	}
-	delete(customAdjs, lower)
-	delete(customAdjsReverse, plural)
+	delete(e.customAdjs, lower)
+	delete(e.customAdjsReverse, plural)
 	return true
 }
 
@@ -245,8 +323,26 @@ func UndefAdj(singular string) bool {
 //
 // This removes all custom rules added via DefAdj().
 func DefAdjReset() {
-	customAdjs = make(map[string]string)
-	customAdjsReverse = make(map[string]string)
+	defaultEngine.DefAdjReset()
+}
+
+// DefAdjReset resets all custom adjective pluralization rules.
+//
+// NOTE: This is a placeholder stub for future implementation.
+//
+// This removes all custom rules added via DefAdj().
+//
+// Example:
+//
+//	e := NewEngine()
+//	e.DefAdj("big", "bigs")
+//	e.DefAdjReset()
+//	e.UndefAdj("big") // returns false (rule was reset)
+func (e *Engine) DefAdjReset() {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.customAdjs = make(map[string]string)
+	e.customAdjsReverse = make(map[string]string)
 }
 
 // AddIrregular is an alias for DefNoun, provided for compatibility with
