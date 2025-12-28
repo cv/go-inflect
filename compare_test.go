@@ -233,3 +233,69 @@ func BenchmarkCompare(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkCompareNouns(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		word1 string
+		word2 string
+	}{
+		{"equal", "cat", "cat"},
+		{"singular_plural", "cat", "cats"},
+		{"plural_singular", "cats", "cat"},
+		{"irregular", "child", "children"},
+		{"unrelated", "cat", "dog"},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.CompareNouns(bm.word1, bm.word2)
+			}
+		})
+	}
+}
+
+func BenchmarkCompareVerbs(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		word1 string
+		word2 string
+	}{
+		{"equal", "run", "run"},
+		{"singular_plural", "runs", "run"},
+		{"is_are", "is", "are"},
+		{"has_have", "has", "have"},
+		{"unrelated", "run", "walk"},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.CompareVerbs(bm.word1, bm.word2)
+			}
+		})
+	}
+}
+
+func BenchmarkCompareAdjs(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		word1 string
+		word2 string
+	}{
+		{"equal", "big", "big"},
+		{"this_these", "this", "these"},
+		{"that_those", "that", "those"},
+		{"a_some", "a", "some"},
+		{"unrelated", "big", "small"},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.CompareAdjs(bm.word1, bm.word2)
+			}
+		})
+	}
+}
