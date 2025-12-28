@@ -20,7 +20,7 @@ lint: ## Run linter
 fuzz: ## Run all fuzz tests (10s each)
 	@for f in $$(go test -list='Fuzz.*' ./... 2>/dev/null | grep '^Fuzz'); do \
 		echo "Running $$f..."; \
-		go test -run="^$$" -fuzz=$$f -fuzztime=10s ./... || exit 1; \
+		go test -run="^$$" -fuzz="^$${f}$$" -fuzztime=10s ./... || exit 1; \
 	done
 
 bench: ## Run benchmarks
