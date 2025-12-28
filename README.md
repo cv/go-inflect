@@ -142,7 +142,18 @@ inflect.CountingWord(5)           // "five times"
 | `IsPlural(word)` / `IsSingular(word)` | Check word form |
 | `IsOrdinal(s)` / `IsParticiple(word)` | Check word type |
 | `WordCount(text)` | Count words in text |
-| `Capitalize(s)` / `Titleize(s)` | Case conversion |
+| `Capitalize(s)` / `Titleize(s)` | Capitalize first letter / title case |
+
+### Case Conversion
+
+| Function | Description |
+|----------|-------------|
+| `CamelCase(s)` | Convert to camelCase |
+| `PascalCase(s)` | Convert to PascalCase |
+| `SnakeCase(s)` | Convert to snake_case |
+| `KebabCase(s)` | Convert to kebab-case |
+| `Underscore(s)` | Alias for SnakeCase |
+| `Dasherize(s)` | Alias for KebabCase |
 
 ## Advanced Features
 
