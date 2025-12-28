@@ -320,3 +320,47 @@ func BenchmarkCamelCase(b *testing.B) {
 		inflect.CamelCase(inputs[i%len(inputs)])
 	}
 }
+
+func BenchmarkSnakeCase(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		input string
+	}{
+		{"camel", "camelCase"},
+		{"pascal", "PascalCase"},
+		{"kebab", "kebab-case"},
+		{"spaces", "hello world"},
+		{"mixed", "XMLHttpRequest"},
+		{"already_snake", "already_snake_case"},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.SnakeCase(bm.input)
+			}
+		})
+	}
+}
+
+func BenchmarkKebabCase(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		input string
+	}{
+		{"camel", "camelCase"},
+		{"pascal", "PascalCase"},
+		{"snake", "snake_case"},
+		{"spaces", "hello world"},
+		{"mixed", "XMLHttpRequest"},
+		{"already_kebab", "already-kebab-case"},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.KebabCase(bm.input)
+			}
+		})
+	}
+}
