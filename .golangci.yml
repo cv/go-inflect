@@ -74,6 +74,7 @@ linters:
     - nilnil            # Checks for nil error + nil value returns
     - modernize         # Suggests modern Go idioms (slices, maps, max/min)
     - goconst           # Finds repeated strings to make constants
+    - prealloc          # Suggests pre-allocating slices
 
   settings:
     funlen:

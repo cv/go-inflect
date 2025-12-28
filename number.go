@@ -187,8 +187,8 @@ func NumberToWordsFloatWithDecimal(f float64, decimal string) string {
 	// Get decimal digits
 	decimalDigits := str[dotIdx+1:]
 
-	// Build the result
-	var parts []string
+	// Build the result: integer word + "point" + each decimal digit word
+	parts := make([]string, 0, 2+len(decimalDigits))
 	parts = append(parts, prefix+cardinalWord(intPart), decimal)
 
 	// Convert each decimal digit individually
@@ -265,7 +265,7 @@ func NumberToWordsGrouped(n, groupSize int) string {
 	}
 
 	// Convert each group to words
-	var words []string
+	words := make([]string, 0, len(groups))
 	for _, g := range groups {
 		num, _ := strconv.Atoi(g)
 		words = append(words, cardinalWord(num))
