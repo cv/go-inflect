@@ -155,3 +155,26 @@ func BenchmarkSingular(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkSingularNoun(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		word  string
+		count []int
+	}{
+		{"regular_no_count", "cats", nil},
+		{"regular_count_1", "cats", []int{1}},
+		{"regular_count_2", "cats", []int{2}},
+		{"pronoun_we", "we", nil},
+		{"pronoun_they", "they", nil},
+		{"irregular", "children", nil},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.SingularNoun(bm.word, bm.count...)
+			}
+		})
+	}
+}

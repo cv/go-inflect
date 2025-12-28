@@ -144,3 +144,49 @@ func BenchmarkPlural(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkPluralNoun(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		word  string
+		count []int
+	}{
+		{"regular_no_count", "cat", nil},
+		{"regular_count_2", "cat", []int{2}},
+		{"regular_count_1", "cat", []int{1}},
+		{"pronoun_I", "I", nil},
+		{"pronoun_they", "they", nil},
+		{"irregular", "child", nil},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.PluralNoun(bm.word, bm.count...)
+			}
+		})
+	}
+}
+
+func BenchmarkPluralVerb(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		word  string
+		count []int
+	}{
+		{"is_to_are", "is", nil},
+		{"has_to_have", "has", nil},
+		{"runs_to_run", "runs", nil},
+		{"walks_to_walk", "walks", nil},
+		{"with_count_1", "is", []int{1}},
+		{"with_count_2", "is", []int{2}},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.PluralVerb(bm.word, bm.count...)
+			}
+		})
+	}
+}

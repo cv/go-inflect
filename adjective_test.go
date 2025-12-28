@@ -307,3 +307,27 @@ func BenchmarkSuperlative(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkPluralAdj(b *testing.B) {
+	benchmarks := []struct {
+		name  string
+		word  string
+		count []int
+	}{
+		{"this_to_these", "this", nil},
+		{"that_to_those", "that", nil},
+		{"a_to_some", "a", nil},
+		{"an_to_some", "an", nil},
+		{"my_unchanged", "my", nil},
+		{"with_count_1", "this", []int{1}},
+		{"with_count_2", "this", []int{2}},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for range b.N {
+				inflect.PluralAdj(bm.word, bm.count...)
+			}
+		})
+	}
+}
