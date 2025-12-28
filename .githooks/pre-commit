@@ -12,7 +12,7 @@ NC='\033[0m' # No Color
 
 # Build
 echo -n "📦 Building... "
-if go build ./... 2>&1; then
+if make build 2>&1 > /dev/null; then
     echo -e "${GREEN}✓${NC}"
 else
     echo -e "${RED}✗${NC}"
@@ -20,25 +20,25 @@ else
     exit 1
 fi
 
-# Test (without -v for speed, no race detector for speed)
+# Test (without race detector for speed)
 echo -n "🧪 Testing... "
-if go test ./... 2>&1 > /dev/null; then
+if make test 2>&1 > /dev/null; then
     echo -e "${GREEN}✓${NC}"
 else
     echo -e "${RED}✗${NC}"
     echo "Tests failed. Fix errors before committing."
-    go test ./...
+    make test
     exit 1
 fi
 
 # Lint
 echo -n "🔬 Linting... "
-if golangci-lint run 2>&1 > /dev/null; then
+if make lint 2>&1 > /dev/null; then
     echo -e "${GREEN}✓${NC}"
 else
     echo -e "${RED}✗${NC}"
     echo "Linting failed. Fix errors before committing."
-    golangci-lint run
+    make lint
     exit 1
 fi
 

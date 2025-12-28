@@ -249,29 +249,17 @@ Supported functions: `plural`, `singular`, `an`/`a`, `ordinal`, `num`,
 
 ## Development
 
-### Benchmark Comparison
+Run `make` to see available targets:
 
-Use benchstat to compare benchmark results across commits:
-
-```bash
-# Run benchmarks
-make bench
-
-# Save baseline (e.g., on main branch before changes)
-make bench-save
-
-# After making changes, compare against baseline
-make bench-compare
 ```
-
-Example output:
-```
-goos: darwin
-goarch: arm64
-pkg: github.com/cv/go-inflect
-                    │ baseline.txt │             new.txt              │
-                    │    sec/op    │   sec/op     vs base             │
-Plural/regular-12      70.1ns ± 1%   65.2ns ± 2%  -7.00% (p=0.002 n=6)
+bench                          Run benchmarks
+bench-compare                  Compare against baseline
+bench-save                     Save benchmark baseline
+build                          Build the project
+deps                           Download dependencies
+help                           Print help message
+lint                           Run linter
+test                           Run tests with race detection and coverage
 ```
 
 ## Contributing

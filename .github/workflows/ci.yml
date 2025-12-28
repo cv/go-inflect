@@ -20,13 +20,13 @@ jobs:
           go-version: stable
 
       - name: Download dependencies
-        run: go mod download
+        run: make deps
 
       - name: Build
-        run: go build ./...
+        run: make build
 
       - name: Test
-        run: go test -v -race -coverprofile=coverage.out ./...
+        run: make test
 
   lint:
     runs-on: ubuntu-latest
