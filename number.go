@@ -33,6 +33,9 @@ var tensOrdinal = []string{
 	"seventieth", "eightieth", "ninetieth",
 }
 
+// wordZero is the word representation of zero.
+const wordZero = "zero"
+
 // NumberToWords converts an integer to its English word representation.
 //
 // Examples:
@@ -72,7 +75,7 @@ func NumberToWordsWithAnd(n int) string {
 // using British English style with "and".
 func cardinalWordWithAnd(n int) string {
 	if n == 0 {
-		return "zero"
+		return wordZero
 	}
 
 	if n <= 19 {
@@ -247,7 +250,7 @@ func NumberToWordsGrouped(n, groupSize int) string {
 
 	// Handle zero
 	if n == 0 {
-		return "zero"
+		return wordZero
 	}
 
 	// Convert number to string
@@ -274,7 +277,7 @@ func NumberToWordsGrouped(n, groupSize int) string {
 // cardinalWord converts a positive integer to its cardinal word form.
 func cardinalWord(n int) string {
 	if n == 0 {
-		return "zero"
+		return wordZero
 	}
 
 	if n <= 19 {

@@ -2,6 +2,14 @@ package inflect
 
 import "strings"
 
+// Compare result constants.
+const (
+	compareEq           = "eq"
+	compareSingToPlural = "s:p"
+	comparePluralToSing = "p:s"
+	comparePluralPlural = "p:p"
+)
+
 // Compare compares two words for singular/plural equality.
 //
 // It returns:
@@ -21,7 +29,7 @@ func Compare(word1, word2 string) string {
 	// Handle empty strings
 	if word1 == "" || word2 == "" {
 		if word1 == "" && word2 == "" {
-			return "eq"
+			return compareEq
 		}
 		return ""
 	}
@@ -32,18 +40,18 @@ func Compare(word1, word2 string) string {
 
 	// Same word
 	if lower1 == lower2 {
-		return "eq"
+		return compareEq
 	}
 
 	// Check if word1 is singular and word2 is its plural
 	// Use Plural() for verification since Singular() has edge cases
 	if strings.ToLower(Plural(word1)) == lower2 {
-		return "s:p"
+		return compareSingToPlural
 	}
 
 	// Check if word2 is singular and word1 is its plural
 	if strings.ToLower(Plural(word2)) == lower1 {
-		return "p:s"
+		return comparePluralToSing
 	}
 
 	// Check if both are different plural forms of the same singular word
@@ -59,7 +67,7 @@ func Compare(word1, word2 string) string {
 		if lower1 != singular1 && lower2 != singular2 {
 			// Additional verification: ensure the singular is valid
 			if pluralOfSingular == lower1 || pluralOfSingular == lower2 {
-				return "p:p"
+				return comparePluralPlural
 			}
 		}
 	}
@@ -105,7 +113,7 @@ func CompareVerbs(verb1, verb2 string) string {
 	// Handle empty strings
 	if verb1 == "" || verb2 == "" {
 		if verb1 == "" && verb2 == "" {
-			return "eq"
+			return compareEq
 		}
 		return ""
 	}
@@ -116,18 +124,18 @@ func CompareVerbs(verb1, verb2 string) string {
 
 	// Same verb
 	if lower1 == lower2 {
-		return "eq"
+		return compareEq
 	}
 
 	// Check if verb1 is singular (3rd person) and verb2 is its plural (base form)
 	// PluralVerb converts 3rd person singular to base form
 	if strings.ToLower(PluralVerb(verb1)) == lower2 {
-		return "s:p"
+		return compareSingToPlural
 	}
 
 	// Check if verb2 is singular and verb1 is its plural
 	if strings.ToLower(PluralVerb(verb2)) == lower1 {
-		return "p:s"
+		return comparePluralToSing
 	}
 
 	return ""
@@ -152,7 +160,7 @@ func CompareAdjs(adj1, adj2 string) string {
 	// Handle empty strings
 	if adj1 == "" || adj2 == "" {
 		if adj1 == "" && adj2 == "" {
-			return "eq"
+			return compareEq
 		}
 		return ""
 	}
@@ -163,17 +171,17 @@ func CompareAdjs(adj1, adj2 string) string {
 
 	// Same adjective
 	if lower1 == lower2 {
-		return "eq"
+		return compareEq
 	}
 
 	// Check if adj1 is singular and adj2 is its plural form
 	if strings.ToLower(PluralAdj(adj1)) == lower2 {
-		return "s:p"
+		return compareSingToPlural
 	}
 
 	// Check if adj2 is singular and adj1 is its plural form
 	if strings.ToLower(PluralAdj(adj2)) == lower1 {
-		return "p:s"
+		return comparePluralToSing
 	}
 
 	return ""

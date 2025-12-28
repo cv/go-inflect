@@ -73,6 +73,7 @@ linters:
     - mirror            # Checks bytes/strings usage patterns
     - nilnil            # Checks for nil error + nil value returns
     - modernize         # Suggests modern Go idioms (slices, maps, max/min)
+    - goconst           # Finds repeated strings to make constants
 
   settings:
     funlen:
