@@ -83,6 +83,8 @@ var manExceptions = map[string]bool{
 	"human": true, "shaman": true, "talisman": true, "dolman": true,
 	"dragoman": true, "caiman": true, "cayman": true, "ataman": true,
 	"hetman": true, "leman": true, "saman": true,
+	// Sanskrit/Hindi loanwords
+	"atman": true,
 	// Brand names and proper nouns
 	"walkman": true,
 }
@@ -129,13 +131,8 @@ var classicalLatinPlurals = map[string]string{
 	// Note: already in irregularPlurals
 
 	// Other classical forms
-	"octopus":     "octopodes", // Greek: -pous -> -podes
-	"platypus":    "platypodes",
-	"hippopotami": "hippopotami", // Already in irregular (but classical is hippopotami)
-	"opus":        "opera",
-	"corpus":      "corpora",
-	"genus":       "genera",
-	"viscus":      "viscera",
+	"octopus":  "octopodes", // Greek: -pous -> -podes
+	"platypus": "platypodes",
 }
 
 // defaultIrregularPlurals contains the built-in irregular plural mappings.
@@ -337,6 +334,21 @@ var defaultIrregularPlurals = map[string]string{
 	"testis":  "testes",
 	"penis":   "penes",
 	"agendum": "agenda",
+	// Latin third declension (-us -> -era/-ora)
+	"genus":  "genera",
+	"corpus": "corpora",
+	"opus":   "opera",
+	"viscus": "viscera",
+	// Latin second declension (-en -> -ina)
+	"numen":  "numina",
+	"carmen": "carmina",
+	// Greek (-os -> -oi)
+	"mythos": "mythoi",
+	// Other irregulars
+	"money":  "monies",
+	"trilby": "trilbys", // Exception to -y rule (proper name origin)
+	"atman":  "atmas",   // Sanskrit loanword
+	"rom":    "roma",    // Romani people
 }
 
 // Plural returns the plural form of an English noun.
