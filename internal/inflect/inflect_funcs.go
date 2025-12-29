@@ -403,7 +403,14 @@ func processNum(args []string, original string) string {
 	if len(args) == 0 {
 		return original
 	}
-	// Just return the number as-is (it's already a string)
+	n, err := strconv.Atoi(args[0])
+	if err != nil {
+		return original
+	}
+	// Treat negative numbers like zero per documentation
+	if n <= 0 {
+		return "0"
+	}
 	return args[0]
 }
 

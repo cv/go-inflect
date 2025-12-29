@@ -448,7 +448,7 @@ func Num(n ...int) int {
 func (e *Engine) Num(n ...int) int {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	if len(n) == 0 || n[0] == 0 {
+	if len(n) == 0 || n[0] <= 0 {
 		e.defaultNum = 0
 		return 0
 	}

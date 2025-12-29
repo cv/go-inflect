@@ -735,9 +735,9 @@ func TestNum(t *testing.T) {
 		// Clear with no args
 		{name: "clear with no args", args: []int{}, wantReturn: 0, wantGetNum: 0},
 
-		// Negative values
-		{name: "store negative", args: []int{-5}, wantReturn: -5, wantGetNum: -5},
-		{name: "store -1", args: []int{-1}, wantReturn: -1, wantGetNum: -1},
+		// Negative values (treated like zero per documentation)
+		{name: "store negative", args: []int{-5}, wantReturn: 0, wantGetNum: 0},
+		{name: "store -1", args: []int{-1}, wantReturn: 0, wantGetNum: 0},
 	}
 
 	for _, tt := range tests {

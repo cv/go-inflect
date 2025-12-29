@@ -290,7 +290,7 @@ func TestInflectNum(t *testing.T) {
 		{"zero", "num(0)", "0"},
 		{"positive", "num(42)", "42"},
 		{"large", "num(12345)", "12345"},
-		{"negative", "num(-5)", "-5"},
+		{"negative", "num(-5)", "0"},
 	}
 
 	for _, tt := range tests {
