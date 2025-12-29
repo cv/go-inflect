@@ -15,7 +15,7 @@ var doubleConsonantWords = map[string]bool{
 
 // irregularPastParticiples maps base verbs to their irregular past participle forms.
 var irregularPastParticiples = map[string]string{
-	"be": "been", "beat": "beaten", "become": "become", "begin": "begun",
+	"be": "been", "bear": "borne", "beat": "beaten", "become": "become", "begin": "begun",
 	"bend": "bent", "bet": "bet", "bind": "bound", "bite": "bitten",
 	"bleed": "bled", "blow": "blown", "break": "broken", "breed": "bred",
 	"bring": "brought", "build": "built", "burn": "burnt", "burst": "burst",
@@ -52,6 +52,21 @@ var irregularPastParticiples = map[string]string{
 	"understand": "understood", "wake": "woken", "wear": "worn", "weave": "woven",
 	"weep": "wept", "win": "won", "wind": "wound", "withdraw": "withdrawn",
 	"wring": "wrung", "write": "written",
+	// Additional irregular past participles
+	"beseech": "besought", "beget": "begotten", "dwell": "dwelt",
+	"forsake": "forsaken", "inlay": "inlaid", "slay": "slain",
+	"awake": "awoken", "arise": "arisen",
+	// Compound verbs with irregular bases
+	"foresee": "foreseen", "outdo": "outdone", "outgrow": "outgrown",
+	"overdo": "overdone", "overhear": "overheard", "override": "overridden",
+	"oversee": "overseen", "oversleep": "overslept", "overthrow": "overthrown",
+	"partake": "partaken", "rebuild": "rebuilt", "redo": "redone",
+	"remake": "remade", "repay": "repaid", "retell": "retold",
+	"rewind": "rewound", "rewrite": "rewritten", "unbind": "unbound",
+	"undo": "undone", "unwind": "unwound", "uphold": "upheld",
+	"withstand": "withstood", "withhold": "withheld", "overcome": "overcome",
+	"undergo": "undergone", "undertake": "undertaken", "mistake": "mistaken",
+	"overtake": "overtaken",
 }
 
 // knownParticiples is a set of known irregular past participles for IsParticiple.

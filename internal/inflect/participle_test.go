@@ -271,6 +271,31 @@ func TestPastParticiple(t *testing.T) {
 		{name: "lend", input: "lend", want: "lent"},
 		{name: "bend", input: "bend", want: "bent"},
 
+		// New irregular past participles
+		{name: "bear", input: "bear", want: "borne"},
+		{name: "beseech", input: "beseech", want: "besought"},
+		{name: "beget", input: "beget", want: "begotten"},
+		{name: "dwell", input: "dwell", want: "dwelt"},
+		{name: "forsake", input: "forsake", want: "forsaken"},
+		{name: "inlay", input: "inlay", want: "inlaid"},
+		{name: "slay", input: "slay", want: "slain"},
+		{name: "awake", input: "awake", want: "awoken"},
+		{name: "arise", input: "arise", want: "arisen"},
+
+		// Compound verbs
+		{name: "foresee", input: "foresee", want: "foreseen"},
+		{name: "outdo", input: "outdo", want: "outdone"},
+		{name: "overdo", input: "overdo", want: "overdone"},
+		{name: "redo", input: "redo", want: "redone"},
+		{name: "undo", input: "undo", want: "undone"},
+		{name: "rebuild", input: "rebuild", want: "rebuilt"},
+		{name: "uphold", input: "uphold", want: "upheld"},
+		{name: "overcome", input: "overcome", want: "overcome"},
+		{name: "undergo", input: "undergo", want: "undergone"},
+		{name: "undertake", input: "undertake", want: "undertaken"},
+		{name: "mistake", input: "mistake", want: "mistaken"},
+		{name: "overtake", input: "overtake", want: "overtaken"},
+
 		// Case preservation
 		{name: "WALK uppercase", input: "WALK", want: "WALKED"},
 		{name: "Walk titlecase", input: "Walk", want: "Walked"},
