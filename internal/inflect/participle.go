@@ -13,73 +13,19 @@ var doubleConsonantWords = map[string]bool{
 	"submit": true, "transfer": true, "transmit": true, "upset": true,
 }
 
-// irregularPastParticiples maps base verbs to their irregular past participle forms.
-var irregularPastParticiples = map[string]string{
-	"be": "been", "bear": "borne", "beat": "beaten", "become": "become", "begin": "begun",
-	"bend": "bent", "bet": "bet", "bind": "bound", "bite": "bitten",
-	"bleed": "bled", "blow": "blown", "break": "broken", "breed": "bred",
-	"bring": "brought", "build": "built", "burn": "burnt", "burst": "burst",
-	"buy": "bought", "catch": "caught", "choose": "chosen", "cling": "clung",
-	"come": "come", "cost": "cost", "creep": "crept", "cut": "cut",
-	"deal": "dealt", "dig": "dug", "do": "done", "draw": "drawn",
-	"dream": "dreamt", "drink": "drunk", "drive": "driven", "eat": "eaten",
-	"fall": "fallen", "feed": "fed", "feel": "felt", "fight": "fought",
-	"find": "found", "flee": "fled", "fling": "flung", "fly": "flown",
-	"forbid": "forbidden", "forget": "forgotten", "forgive": "forgiven",
-	"freeze": "frozen", "get": "got", "give": "given", "go": "gone",
-	"grind": "ground", "grow": "grown", "hang": "hung", "have": "had",
-	"hear": "heard", "hide": "hidden", "hit": "hit", "hold": "held",
-	"hurt": "hurt", "keep": "kept", "kneel": "knelt", "know": "known",
-	"lay": "laid", "lead": "led", "lean": "leant", "leap": "leapt",
-	"learn": "learnt", "leave": "left", "lend": "lent", "let": "let",
-	"lie": "lain", "light": "lit", "lose": "lost", "make": "made",
-	"mean": "meant", "meet": "met", "pay": "paid", "prove": "proven",
-	"put": "put", "quit": "quit", "read": "read", "ride": "ridden",
-	"ring": "rung", "rise": "risen", "run": "run", "say": "said",
-	"see": "seen", "seek": "sought", "sell": "sold", "send": "sent",
-	"set": "set", "shake": "shaken", "shed": "shed", "shine": "shone",
-	"shoot": "shot", "show": "shown", "shrink": "shrunk", "shut": "shut",
-	"sing": "sung", "sink": "sunk", "sit": "sat", "sleep": "slept",
-	"slide": "slid", "sling": "slung", "slit": "slit", "smell": "smelt",
-	"speak": "spoken", "speed": "sped", "spell": "spelt", "spend": "spent",
-	"spill": "spilt", "spin": "spun", "spit": "spat", "split": "split",
-	"spoil": "spoilt", "spread": "spread", "spring": "sprung", "stand": "stood",
-	"steal": "stolen", "stick": "stuck", "sting": "stung", "stink": "stunk",
-	"stride": "stridden", "strike": "struck", "string": "strung", "strive": "striven",
-	"swear": "sworn", "sweep": "swept", "swim": "swum", "swing": "swung",
-	"take": "taken", "teach": "taught", "tear": "torn", "tell": "told",
-	"think": "thought", "throw": "thrown", "thrust": "thrust", "tread": "trodden",
-	"understand": "understood", "wake": "woken", "wear": "worn", "weave": "woven",
-	"weep": "wept", "win": "won", "wind": "wound", "withdraw": "withdrawn",
-	"wring": "wrung", "write": "written",
-	// Additional irregular past participles
-	"beseech": "besought", "beget": "begotten", "dwell": "dwelt",
-	"forsake": "forsaken", "inlay": "inlaid", "slay": "slain",
-	"awake": "awoken", "arise": "arisen",
-	// Compound verbs with irregular bases
-	"foresee": "foreseen", "outdo": "outdone", "outgrow": "outgrown",
-	"overdo": "overdone", "overhear": "overheard", "override": "overridden",
-	"oversee": "overseen", "oversleep": "overslept", "overthrow": "overthrown",
-	"partake": "partaken", "rebuild": "rebuilt", "redo": "redone",
-	"remake": "remade", "repay": "repaid", "retell": "retold",
-	"rewind": "rewound", "rewrite": "rewritten", "unbind": "unbound",
-	"undo": "undone", "unwind": "unwound", "uphold": "upheld",
-	"withstand": "withstood", "withhold": "withheld", "overcome": "overcome",
-	"undergo": "undergone", "undertake": "undertaken", "mistake": "mistaken",
-	"overtake": "overtaken",
-}
-
 // knownParticiples is a set of known irregular past participles for IsParticiple.
 var knownParticiples = map[string]bool{
 	// Irregular past participles ending in -en
 	"been": true, "beaten": true, "bitten": true, "blown": true, "broken": true,
-	"chosen": true, "driven": true, "eaten": true, "fallen": true, "forbidden": true,
-	"forgotten": true, "forgiven": true, "frozen": true, "given": true, "gone": true,
-	"grown": true, "hidden": true, "known": true, "lain": true, "proven": true,
-	"ridden": true, "risen": true, "seen": true, "shaken": true, "shown": true,
-	"spoken": true, "stolen": true, "stridden": true, "striven": true, "sworn": true,
-	"taken": true, "torn": true, "trodden": true, "woken": true, "worn": true,
-	"woven": true, "written": true,
+	"chosen": true, "cloven": true, "driven": true, "eaten": true, "fallen": true,
+	"forbidden": true, "foregone": true, "forgotten": true, "forgiven": true,
+	"frozen": true, "given": true, "gone": true, "grown": true, "hewn": true,
+	"hidden": true, "known": true, "laden": true, "lain": true, "mown": true,
+	"proven": true, "ridden": true, "risen": true, "sawn": true, "seen": true,
+	"sewn": true, "shaken": true, "shorn": true, "shown": true, "smitten": true, "sown": true,
+	"spoken": true, "stolen": true, "strewn": true, "stridden": true, "striven": true,
+	"sworn": true, "taken": true, "torn": true, "trodden": true, "woken": true,
+	"worn": true, "woven": true, "written": true,
 	// Irregular past participles ending in -t
 	"bent": true, "built": true, "burnt": true, "crept": true, "dealt": true,
 	"dreamt": true, "dwelt": true, "felt": true, "kept": true, "knelt": true,
@@ -104,9 +50,10 @@ var knownParticiples = map[string]bool{
 	"sung": true, "sunk": true, "swum": true, "swung": true, "told": true,
 	"understood": true, "withdrawn": true, "won": true, "wound": true, "wrung": true,
 	// Unchanged forms (also participles)
-	"bet": true, "burst": true, "come": true, "cost": true, "cut": true,
-	"hit": true, "hurt": true, "let": true, "put": true, "quit": true,
-	"read": true, "run": true, "set": true, "shut": true, "split": true,
+	"abode": true, "beset": true, "bet": true, "bid": true, "burst": true,
+	"come": true, "cost": true, "cut": true, "hit": true, "hurt": true,
+	"let": true, "put": true, "quit": true, "read": true, "run": true,
+	"set": true, "shut": true, "split": true, "wet": true,
 	"spread": true, "thrust": true,
 }
 
@@ -297,8 +244,13 @@ func PastParticiple(verb string) string {
 
 	lower := strings.ToLower(verb)
 
-	// Check for irregular verbs first
-	if participle, ok := irregularPastParticiples[lower]; ok {
+	// Check verbs with same past/participle first (most common)
+	if participle, ok := irregularVerbsSame[lower]; ok {
+		return matchCase(verb, participle)
+	}
+
+	// Check verbs with different participle
+	if participle, ok := irregularPastParticipleOnly[lower]; ok {
 		return matchCase(verb, participle)
 	}
 
