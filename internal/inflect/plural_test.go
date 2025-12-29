@@ -133,6 +133,47 @@ func TestPlural(t *testing.T) {
 		{name: "scarf", input: "scarf", want: "scarves"},
 		{name: "wharf", input: "wharf", want: "wharves"},
 
+		// Additional -is -> -es words
+		{name: "axis", input: "axis", want: "axes"},
+		{name: "ellipsis", input: "ellipsis", want: "ellipses"},
+		{name: "nemesis", input: "nemesis", want: "nemeses"},
+		{name: "synthesis", input: "synthesis", want: "syntheses"},
+
+		// Additional -us -> -i words
+		{name: "calculus", input: "calculus", want: "calculi"},
+		{name: "locus", input: "locus", want: "loci"},
+		{name: "bacillus", input: "bacillus", want: "bacilli"},
+
+		// Additional -ex/-ix -> -ices words
+		{name: "cortex", input: "cortex", want: "cortices"},
+		{name: "vortex", input: "vortex", want: "vortices"},
+		{name: "helix", input: "helix", want: "helices"},
+
+		// French -eau -> -eaux
+		{name: "bureau", input: "bureau", want: "bureaux"},
+		{name: "plateau", input: "plateau", want: "plateaux"},
+		{name: "chateau", input: "chateau", want: "chateaux"},
+
+		// Unchanged plurals (French loanwords, etc.)
+		{name: "corps", input: "corps", want: "corps"},
+		{name: "chassis", input: "chassis", want: "chassis"},
+		{name: "means", input: "means", want: "means"},
+		{name: "gallows", input: "gallows", want: "gallows"},
+		{name: "barracks", input: "barracks", want: "barracks"},
+		{name: "headquarters", input: "headquarters", want: "headquarters"},
+
+		// Compound -foot -> -feet
+		{name: "bigfoot", input: "bigfoot", want: "bigfeet"},
+		{name: "clubfoot", input: "clubfoot", want: "clubfeet"},
+
+		// Compound -tooth -> -teeth
+		{name: "eyetooth", input: "eyetooth", want: "eyeteeth"},
+		{name: "sabertooth", input: "sabertooth", want: "saberteeth"},
+
+		// Brand names and other -man exceptions
+		{name: "Walkman", input: "Walkman", want: "Walkmans"},
+		{name: "leman", input: "leman", want: "lemans"},
+
 		// Nationalities ending in -ese (unchanged)
 		{name: "Chinese", input: "Chinese", want: "Chinese"},
 		{name: "Japanese", input: "Japanese", want: "Japanese"},
