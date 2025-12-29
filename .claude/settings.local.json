@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bd doctor:*)",
+      "Bash(bd mol stale:*)",
+      "Bash(bd show:*)"
+    ]
+  }
+}

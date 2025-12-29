@@ -99,6 +99,40 @@ func TestPlural(t *testing.T) {
 		{name: "policeman", input: "policeman", want: "policemen"},
 		{name: "spokesman", input: "spokesman", want: "spokesmen"},
 
+		// Words ending in -man that should NOT become -men
+		{name: "German", input: "German", want: "Germans"},
+		{name: "Roman", input: "Roman", want: "Romans"},
+		{name: "Ottoman", input: "Ottoman", want: "Ottomans"},
+		{name: "Norman", input: "Norman", want: "Normans"},
+		{name: "shaman", input: "shaman", want: "shamans"},
+		{name: "talisman", input: "talisman", want: "talismans"},
+		{name: "human", input: "human", want: "humans"},
+
+		// Additional Latin neuter (-um -> -a)
+		{name: "addendum", input: "addendum", want: "addenda"},
+		{name: "erratum", input: "erratum", want: "errata"},
+		{name: "symposium", input: "symposium", want: "symposia"},
+		{name: "atrium", input: "atrium", want: "atria"},
+
+		// Greek neuter (-on -> -a)
+		{name: "automaton", input: "automaton", want: "automata"},
+		{name: "polyhedron", input: "polyhedron", want: "polyhedra"},
+
+		// Hebrew plurals
+		{name: "seraph", input: "seraph", want: "seraphim"},
+		{name: "cherub", input: "cherub", want: "cherubim"},
+		{name: "kibbutz", input: "kibbutz", want: "kibbutzim"},
+
+		// Italian plurals
+		{name: "graffito", input: "graffito", want: "graffiti"},
+		{name: "virtuoso", input: "virtuoso", want: "virtuosi"},
+		{name: "libretto", input: "libretto", want: "libretti"},
+
+		// Words ending in -f that now use -ves
+		{name: "hoof", input: "hoof", want: "hooves"},
+		{name: "scarf", input: "scarf", want: "scarves"},
+		{name: "wharf", input: "wharf", want: "wharves"},
+
 		// Nationalities ending in -ese (unchanged)
 		{name: "Chinese", input: "Chinese", want: "Chinese"},
 		{name: "Japanese", input: "Japanese", want: "Japanese"},

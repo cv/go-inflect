@@ -4,9 +4,10 @@ import "strings"
 
 // changeToVesWords contains words ending in -f/-fe that change to -ves.
 var changeToVesWords = map[string]bool{
-	"calf": true, "elf": true, "half": true, "knife": true, "leaf": true,
-	"life": true, "loaf": true, "self": true, "sheaf": true, "shelf": true,
-	"thief": true, "wife": true, "wolf": true,
+	"calf": true, "elf": true, "half": true, "hoof": true, "knife": true,
+	"leaf": true, "life": true, "loaf": true, "scarf": true, "self": true,
+	"sheaf": true, "shelf": true, "thief": true, "wharf": true, "wife": true,
+	"wolf": true,
 }
 
 // oExceptionWords contains words ending in -o that just take -s (not -es).
@@ -52,6 +53,19 @@ var herdAnimals = map[string]bool{
 	"grouse":     true,
 	"antelope":   true,
 	"wildebeest": true,
+}
+
+// manExceptions contains words ending in -man that should NOT become -men.
+// These are words where "man" is not the word "man" but part of a different root.
+// Examples: German -> Germans (not Germen), talisman -> talismans (not talismen)
+var manExceptions = map[string]bool{
+	// Nationalities and peoples
+	"german": true, "roman": true, "ottoman": true, "norman": true,
+	"turkoman": true, "mussulman": true,
+	// Words where -man is not "man"
+	"human": true, "shaman": true, "talisman": true, "dolman": true,
+	"dragoman": true, "caiman": true, "cayman": true, "ataman": true,
+	"hetman": true,
 }
 
 // classicalLatinPlurals contains words with classical Latin/Greek plural forms.
@@ -150,6 +164,45 @@ var defaultIrregularPlurals = map[string]string{
 	"matrix":      "matrices",
 	"vertex":      "vertices",
 	"apex":        "apices",
+	// Additional Latin neuter (-um -> -a)
+	"addendum":   "addenda",
+	"erratum":    "errata",
+	"symposium":  "symposia",
+	"consortium": "consortia",
+	"compendium": "compendia",
+	"atrium":     "atria",
+	"forum":      "fora",
+	"auditorium": "auditoria",
+	"gymnasium":  "gymnasia",
+	"emporium":   "emporia",
+	"cranium":    "crania",
+	"aquarium":   "aquaria",
+	"ovum":       "ova",
+	"spectrum":   "spectra",
+	"vacuum":     "vacua",
+	// Greek neuter (-on -> -a)
+	"automaton":  "automata",
+	"polyhedron": "polyhedra",
+	// Additional Latin masculine (-us -> -i)
+	"terminus":  "termini",
+	"colossus":  "colossi",
+	"emeritus":  "emeriti",
+	"narcissus": "narcissi",
+	"rhombus":   "rhombi",
+	"gladius":   "gladii",
+	// Hebrew plurals
+	"seraph":  "seraphim",
+	"cherub":  "cherubim",
+	"kibbutz": "kibbutzim",
+	// Italian plurals
+	"graffito": "graffiti",
+	"virtuoso": "virtuosi",
+	"libretto": "libretti",
+	"tempo":    "tempi",
+	"concerto": "concerti",
+	// Other irregular forms
+	"testis": "testes",
+	"penis":  "penes",
 }
 
 // Plural returns the plural form of an English noun.
@@ -229,8 +282,8 @@ func (e *Engine) Plural(word string) string {
 
 // applySuffixRules applies standard English pluralization suffix rules.
 func applySuffixRules(word, lower string) string {
-	// Words ending in -man -> -men
-	if strings.HasSuffix(lower, "man") && !strings.HasSuffix(lower, "human") {
+	// Words ending in -man -> -men (except for words in manExceptions)
+	if strings.HasSuffix(lower, "man") && !manExceptions[lower] {
 		return word[:len(word)-3] + matchCase(word[len(word)-3:], "men")
 	}
 
