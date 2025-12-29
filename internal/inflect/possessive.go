@@ -127,9 +127,22 @@ func Possessive(word string) string {
 	return defaultEngine.Possessive(word)
 }
 
+// possessivePronouns maps pronouns to their possessive forms.
+var possessivePronouns = map[string]string{
+	"i": "my", "me": "my",
+	"you": "your",
+	"he":  "his", "him": "his",
+	"she": "her", "her": "her",
+	"it": "its",
+	"we": "our", "us": "our",
+	"they": "their", "them": "their",
+	"who": "whose", "whom": "whose",
+}
+
 // Possessive returns the possessive form of an English noun.
 //
 // Rules applied:
+//   - Pronouns: use special forms (it → its, who → whose)
 //   - Singular nouns: add 's (cat → cat's)
 //   - Plural nouns ending in s: add only ' (cats → cats')
 //   - Plural nouns not ending in s: add 's (children → children's)
@@ -140,11 +153,19 @@ func Possessive(word string) string {
 //   - e.Possessive("cat") returns "cat's"
 //   - e.Possessive("cats") returns "cats'"
 //   - e.Possessive("children") returns "children's"
+//   - e.Possessive("it") returns "its"
+//   - e.Possessive("who") returns "whose"
 //   - e.Possessive("James") returns "James's" (with PossessiveModern)
 //   - e.Possessive("James") returns "James'" (with PossessiveTraditional)
 func (e *Engine) Possessive(word string) string {
 	if word == "" {
 		return ""
+	}
+
+	// Check for pronoun possessives first
+	lower := strings.ToLower(word)
+	if poss, ok := possessivePronouns[lower]; ok {
+		return matchCase(word, poss)
 	}
 
 	// Check if already possessive (no allocation needed)
@@ -163,7 +184,6 @@ func (e *Engine) Possessive(word string) string {
 	// Fast path for simple singular words not ending in s
 	if !endsInS {
 		// Check for irregular plurals that don't end in s
-		lower := strings.ToLower(word)
 		if irregularPluralNoS[lower] {
 			// Plural noun not ending in s: add 's
 			return word + matchSuffix(word, "'s")
@@ -173,7 +193,6 @@ func (e *Engine) Possessive(word string) string {
 	}
 
 	// Word ends in s - need to determine if plural or singular
-	lower := strings.ToLower(word)
 
 	// Words ending in double-s are typically singular (boss, class, glass, dress, etc.)
 	if strings.HasSuffix(lower, "ss") {
