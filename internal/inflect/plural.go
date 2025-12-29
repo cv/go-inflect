@@ -49,6 +49,11 @@ var unchangedPlurals = map[string]bool{
 	"economics": true, "mathematics": true, "physics": true, "ethics": true,
 	"scissors": true, "pants": true, "trousers": true, "clothes": true,
 	"swiss": true,
+	// Japanese loanwords (typically unchanged or uncountable)
+	"samurai": true, "sushi": true, "karate": true, "sake": true,
+	"tofu": true, "miso": true, "wasabi": true, "tempura": true,
+	"origami": true, "judo": true, "sumo": true, "anime": true,
+	"manga": true, "karaoke": true,
 }
 
 // herdAnimals contains animals that have both unchanged (classical) and
@@ -69,7 +74,7 @@ var herdAnimals = map[string]bool{
 
 // manExceptions contains words ending in -man that should NOT become -men.
 // These are words where "man" is not the word "man" but part of a different root.
-// Examples: German -> Germans (not Germen), talisman -> talismans (not talismen)
+// Examples: German -> Germans (not Germen), talisman -> talismans (not talismen).
 var manExceptions = map[string]bool{
 	// Nationalities and peoples
 	"german": true, "roman": true, "ottoman": true, "norman": true,
@@ -288,16 +293,16 @@ var defaultIrregularPlurals = map[string]string{
 	"tempo":    "tempi",
 	"concerto": "concerti",
 	// Compound -foot -> -feet
-	"bigfoot":      "bigfeet",
-	"underfoot":    "underfeet",
-	"forefoot":     "forefeet",
-	"hindfoot":     "hindfeet",
-	"hotfoot":      "hotfeet",
-	"clubfoot":     "clubfeet",
-	"flatfoot":     "flatfeet",
-	"tenderfoot":   "tenderfeet",
-	"blackfoot":    "blackfeet",
-	"barefoot":     "barefeet",
+	"bigfoot":    "bigfeet",
+	"underfoot":  "underfeet",
+	"forefoot":   "forefeet",
+	"hindfoot":   "hindfeet",
+	"hotfoot":    "hotfeet",
+	"clubfoot":   "clubfeet",
+	"flatfoot":   "flatfeet",
+	"tenderfoot": "tenderfeet",
+	"blackfoot":  "blackfeet",
+	"barefoot":   "barefeet",
 	// Compound -tooth -> -teeth
 	"eyetooth":     "eyeteeth",
 	"bucktooth":    "buckteeth",
@@ -306,9 +311,32 @@ var defaultIrregularPlurals = map[string]string{
 	"snaggletooth": "snaggleteeth",
 	"houndstooth":  "houndsteeth",
 	"sawtooth":     "sawteeth",
+	// Compound -mouse -> -mice
+	"dormouse":     "dormice",
+	"titmouse":     "titmice",
+	"flittermouse": "flittermice",
+	// Compound -louse -> -lice
+	"woodlouse": "woodlice",
+	"booklouse": "booklice",
+	// Greek -ma -> -mata (classical forms)
+	"stigma":    "stigmata",
+	"stoma":     "stomata",
+	"soma":      "somata",
+	"carcinoma": "carcinomata",
+	"sarcoma":   "sarcomata",
+	"lymphoma":  "lymphomata",
+	"melanoma":  "melanomata",
+	"glaucoma":  "glaucomata",
+	"edema":     "edemata",
+	"anathema":  "anathemata",
+	// Anatomical Latin
+	"femur":   "femora",
+	"humerus": "humeri",
+	"sternum": "sterna",
 	// Other irregular forms
-	"testis": "testes",
-	"penis":  "penes",
+	"testis":  "testes",
+	"penis":   "penes",
+	"agendum": "agenda",
 }
 
 // Plural returns the plural form of an English noun.
