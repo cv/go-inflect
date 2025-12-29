@@ -19,7 +19,9 @@ func TestComparative(t *testing.T) {
 
 		// Irregular forms
 		{name: "good", input: "good", want: "better"},
+		{name: "well", input: "well", want: "better"},
 		{name: "bad", input: "bad", want: "worse"},
+		{name: "ill", input: "ill", want: "worse"},
 		{name: "far", input: "far", want: "farther"},
 		{name: "little", input: "little", want: "less"},
 		{name: "much", input: "much", want: "more"},
@@ -147,7 +149,9 @@ func TestSuperlative(t *testing.T) {
 
 		// Irregular forms
 		{name: "good", input: "good", want: "best"},
+		{name: "well", input: "well", want: "best"},
 		{name: "bad", input: "bad", want: "worst"},
+		{name: "ill", input: "ill", want: "worst"},
 		{name: "far", input: "far", want: "farthest"},
 		{name: "little", input: "little", want: "least"},
 		{name: "much", input: "much", want: "most"},

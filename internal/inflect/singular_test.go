@@ -90,6 +90,16 @@ func TestSingular(t *testing.T) {
 		{name: "criteria", input: "criteria", want: "criterion"},
 		{name: "phenomena", input: "phenomena", want: "phenomenon"},
 
+		// Latin feminine -ae -> -a (classical forms)
+		{name: "larvae", input: "larvae", want: "larva"},
+		{name: "pupae", input: "pupae", want: "pupa"},
+		{name: "antennae", input: "antennae", want: "antenna"},
+		{name: "alumnae", input: "alumnae", want: "alumna"},
+		{name: "formulae", input: "formulae", want: "formula"},
+		{name: "nebulae", input: "nebulae", want: "nebula"},
+		{name: "vertebrae", input: "vertebrae", want: "vertebra"},
+		{name: "algae", input: "algae", want: "alga"},
+
 		// Unchanged plurals
 		{name: "sheep", input: "sheep", want: "sheep"},
 		{name: "deer", input: "deer", want: "deer"},

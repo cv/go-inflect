@@ -54,9 +54,23 @@ func (e *Engine) Singular(word string) string {
 	return applySingularSuffixRules(word, lower)
 }
 
+// classicalPluralSingulars maps classical Latin/Greek plural endings to singular.
+var classicalPluralSingulars = map[string]string{
+	// Latin feminine -ae -> -a
+	"larvae": "larva", "pupae": "pupa", "antennae": "antenna",
+	"alumnae": "alumna", "formulae": "formula", "nebulae": "nebula",
+	"vertebrae": "vertebra", "algae": "alga", "amoebae": "amoeba",
+	"aureolae": "aureola", "coronae": "corona",
+}
+
 // applySingularSuffixRules applies standard English singularization suffix rules.
 func applySingularSuffixRules(word, lower string) string {
 	n := len(lower)
+
+	// Check for classical Latin/Greek plurals
+	if singular, ok := classicalPluralSingulars[lower]; ok {
+		return matchCase(word, singular)
+	}
 
 	// Words ending in -men -> -man (but not "women" which is irregular)
 	if strings.HasSuffix(lower, "men") && n > 3 {

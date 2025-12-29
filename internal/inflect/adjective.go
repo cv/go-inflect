@@ -5,7 +5,9 @@ import "strings"
 // irregularComparatives maps adjectives to their irregular comparative forms.
 var irregularComparatives = map[string]string{
 	"good":   "better",
+	"well":   "better", // as adjective (feeling well)
 	"bad":    "worse",
+	"ill":    "worse",
 	"far":    "farther",
 	"little": "less",
 	"much":   "more",
@@ -15,7 +17,9 @@ var irregularComparatives = map[string]string{
 // irregularSuperlatives maps adjectives to their irregular superlative forms.
 var irregularSuperlatives = map[string]string{
 	"good":   "best",
+	"well":   "best", // as adjective (feeling well)
 	"bad":    "worst",
+	"ill":    "worst",
 	"far":    "farthest",
 	"little": "least",
 	"much":   "most",

@@ -192,6 +192,37 @@ func TestPastTense(t *testing.T) {
 		{name: "smell", input: "smell", want: "smelled"}, // regular (American)
 		{name: "spill", input: "spill", want: "spilled"}, // regular (American)
 
+		// New irregular forms (unchanged)
+		{name: "bet", input: "bet", want: "bet"},
+		{name: "burst", input: "burst", want: "burst"},
+		{name: "cast", input: "cast", want: "cast"},
+		{name: "forecast", input: "forecast", want: "forecast"},
+		{name: "fit", input: "fit", want: "fit"},
+		{name: "upset", input: "upset", want: "upset"},
+		{name: "thrust", input: "thrust", want: "thrust"},
+
+		// New irregular forms
+		{name: "deal", input: "deal", want: "dealt"},
+		{name: "dwell", input: "dwell", want: "dwelt"},
+		{name: "kneel", input: "kneel", want: "knelt"},
+		{name: "light", input: "light", want: "lit"},
+		{name: "slay", input: "slay", want: "slew"},
+		{name: "stride", input: "stride", want: "strode"},
+		{name: "strive", input: "strive", want: "strove"},
+		{name: "tread", input: "tread", want: "trod"},
+		{name: "weave", input: "weave", want: "wove"},
+		{name: "fling", input: "fling", want: "flung"},
+		{name: "wring", input: "wring", want: "wrung"},
+
+		// Compound verbs
+		{name: "foresee", input: "foresee", want: "foresaw"},
+		{name: "outdo", input: "outdo", want: "outdid"},
+		{name: "overdo", input: "overdo", want: "overdid"},
+		{name: "redo", input: "redo", want: "redid"},
+		{name: "undo", input: "undo", want: "undid"},
+		{name: "rebuild", input: "rebuild", want: "rebuilt"},
+		{name: "uphold", input: "uphold", want: "upheld"},
+
 		// Case preservation
 		{name: "WALK uppercase", input: "WALK", want: "WALKED"},
 		{name: "Walk titlecase", input: "Walk", want: "Walked"},
