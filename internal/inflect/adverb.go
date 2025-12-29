@@ -4,16 +4,32 @@ import "strings"
 
 // irregularAdverbs maps adjectives to their irregular adverb forms.
 var irregularAdverbs = map[string]string{
-	"good": "well",
+	"good":  "well",
+	"whole": "wholly",
+	"day":   "daily",
+	"gay":   "gaily",
 }
 
 // unchangedAdverbs contains adjectives that remain unchanged as adverbs.
+// These are "flat adverbs" that can function as both adjective and adverb.
 var unchangedAdverbs = map[string]bool{
+	// Common flat adverbs
 	"fast":     true,
 	"hard":     true,
 	"late":     true,
 	"early":    true,
 	"straight": true,
+	// Words that are already adverbs
+	"well":   true,
+	"ill":    true,
+	"just":   true,
+	"only":   true,
+	"still":  true,
+	"much":   true,
+	"far":    true,
+	"long":   true,
+	"likely": true,
+	"even":   true,
 }
 
 // Adverb returns the adverb form of an English adjective.
@@ -46,6 +62,23 @@ func Adverb(adj string) string {
 	return applyAdverbSuffix(adj, lower)
 }
 
+// leKeepsE contains -le words that keep the e when forming adverbs.
+// Most -le words drop the e (gentle → gently), but these keep it.
+var leKeepsE = map[string]bool{
+	"sole": true,
+}
+
+// shortYAdverbs contains short monosyllabic adjectives ending in consonant + y
+// that just add -ly instead of changing y to i (shy → shyly, not shily).
+var shortYAdverbs = map[string]bool{
+	"shy":  true,
+	"sly":  true,
+	"dry":  true,
+	"wry":  true,
+	"coy":  true,
+	"spry": true,
+}
+
 // applyAdverbSuffix applies the appropriate suffix to form an adverb.
 func applyAdverbSuffix(adj, lower string) string {
 	// Rule: public -> publicly (exception to -ic rule, just add -ly)
@@ -68,15 +101,24 @@ func applyAdverbSuffix(adj, lower string) string {
 		return adj[:len(adj)-1] + matchSuffix(adj, "ly")
 	}
 
-	// Rule 3: Adjectives ending in -le: change -le to -ly (gentle → gently)
+	// Rule 3: Adjectives ending in -le: usually change -le to -ly (gentle → gently)
+	// Exception: some words keep the e (sole → solely)
 	if strings.HasSuffix(lower, "le") {
+		if leKeepsE[lower] {
+			return adj + matchSuffix(adj, "ly")
+		}
 		return adj[:len(adj)-2] + matchSuffix(adj, "ly")
 	}
 
-	// Rule 2: Adjectives ending in consonant + y: change y to -ily (happy → happily)
+	// Rule 2: Adjectives ending in consonant + y
 	if strings.HasSuffix(lower, "y") && len(lower) > 1 {
 		beforeY := lower[len(lower)-2]
 		if !isVowel(rune(beforeY)) {
+			// Short monosyllabic words just add -ly (shy → shyly)
+			if shortYAdverbs[lower] {
+				return adj + matchSuffix(adj, "ly")
+			}
+			// Most words change y to -ily (happy → happily)
 			return adj[:len(adj)-1] + matchSuffix(adj, "ily")
 		}
 	}

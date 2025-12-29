@@ -140,6 +140,33 @@ func TestAdverb(t *testing.T) {
 		{name: "full", input: "full", want: "fully"},
 		{name: "dull", input: "dull", want: "dully"},
 
+		// Additional irregular forms
+		{name: "whole", input: "whole", want: "wholly"},
+		{name: "day", input: "day", want: "daily"},
+		{name: "gay", input: "gay", want: "gaily"},
+
+		// -le words that keep the e
+		{name: "sole", input: "sole", want: "solely"},
+
+		// Short -y words that keep the y (add -ly, not -ily)
+		{name: "shy", input: "shy", want: "shyly"},
+		{name: "sly", input: "sly", want: "slyly"},
+		{name: "dry", input: "dry", want: "dryly"},
+		{name: "wry", input: "wry", want: "wryly"},
+		{name: "spry", input: "spry", want: "spryly"},
+
+		// Words already functioning as adverbs (unchanged)
+		{name: "well", input: "well", want: "well"},
+		{name: "ill", input: "ill", want: "ill"},
+		{name: "just", input: "just", want: "just"},
+		{name: "only", input: "only", want: "only"},
+		{name: "still", input: "still", want: "still"},
+		{name: "much", input: "much", want: "much"},
+		{name: "far", input: "far", want: "far"},
+		{name: "long", input: "long", want: "long"},
+		{name: "likely", input: "likely", want: "likely"},
+		{name: "even", input: "even", want: "even"},
+
 		// Case preservation
 		{name: "QUICK uppercase", input: "QUICK", want: "QUICKLY"},
 		{name: "Quick titlecase", input: "Quick", want: "Quickly"},
