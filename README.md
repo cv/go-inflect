@@ -181,6 +181,27 @@ inflect.Gender("f")
 inflect.SingularNoun("they")  // "she"
 ```
 
+### Template Integration
+
+Use `FuncMap()` for seamless integration with `text/template` and `html/template`:
+
+```go
+tmpl := template.New("example").Funcs(inflect.FuncMap())
+tmpl.Parse(`I have {{plural "cat" .Count}} and {{an "apple"}}`)
+tmpl.Execute(os.Stdout, map[string]int{"Count": 3})
+// Output: I have cats and an apple
+```
+
+Available template functions: `plural`, `singular`, `an`, `a`, `ordinal`, `ordinalWord`, `numberToWords`, `pluralNoun`, `pluralVerb`, `pluralAdj`, `singularNoun`, `pastTense`, `presentParticiple`, `comparative`, `superlative`, `possessive`, `join`, `joinWith`, `camelCase`, `snakeCase`, `kebabCase`, `pascalCase`.
+
+For custom configurations, use `Engine.FuncMap()`:
+
+```go
+eng := inflect.NewEngine()
+eng.DefNoun("foo", "fooz")
+tmpl := template.New("custom").Funcs(eng.FuncMap())
+```
+
 ## Migration
 
 ### From jinzhu/inflection or go-openapi/inflect
