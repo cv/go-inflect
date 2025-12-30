@@ -192,7 +192,7 @@ tmpl.Execute(os.Stdout, map[string]int{"Count": 3})
 // Output: I have cats and an apple
 ```
 
-Available template functions: `plural`, `singular`, `an`, `a`, `ordinal`, `ordinalWord`, `numberToWords`, `pluralNoun`, `pluralVerb`, `pluralAdj`, `singularNoun`, `pastTense`, `presentParticiple`, `comparative`, `superlative`, `possessive`, `join`, `joinWith`, `camelCase`, `snakeCase`, `kebabCase`, `pascalCase`.
+50+ template functions available including `plural`, `singular`, `an`, `ordinal`, `numberToWords`, `pastTense`, `possessive`, `join`, `camelCase`, `tableize`, and more. See [FuncMap documentation](https://pkg.go.dev/github.com/cv/go-inflect#FuncMap) for the complete list.
 
 For custom configurations, use `Engine.FuncMap()`:
 

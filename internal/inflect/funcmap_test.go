@@ -17,14 +17,32 @@ func TestFuncMap(t *testing.T) {
 
 	// Verify all expected functions are present
 	expectedFuncs := []string{
-		"plural", "singular", "pluralNoun", "pluralVerb", "pluralAdj", "singularNoun",
+		// Pluralization and Singularization
+		"plural", "pluralize", "singular", "singularize",
+		"pluralNoun", "pluralVerb", "pluralAdj", "singularNoun",
+		// Articles
 		"an", "a",
-		"ordinal", "ordinalWord", "numberToWords",
-		"pastTense", "presentParticiple",
-		"comparative", "superlative",
+		// Numbers and Ordinals
+		"ordinal", "ordinalSuffix", "ordinalWord", "ordinalToCardinal", "wordToOrdinal",
+		"numberToWords", "numberToWordsWithAnd", "formatNumber",
+		"countingWord", "fractionToWords", "currencyToWords", "no",
+		// Verb Tenses
+		"pastTense", "pastParticiple", "presentParticiple", "futureTense",
+		// Adjectives and Adverbs
+		"comparative", "superlative", "adverb",
+		// Possessives
 		"possessive",
+		// List Formatting
 		"join", "joinWith",
-		"camelCase", "snakeCase", "kebabCase", "pascalCase",
+		// Case Conversion
+		"camelCase", "snakeCase", "underscore", "kebabCase", "dasherize",
+		"pascalCase", "titleCase", "camelize", "camelizeDownFirst",
+		// Text Transformation
+		"capitalize", "titleize", "humanize",
+		// Rails-style Helpers
+		"tableize", "foreignKey", "typeify", "parameterize", "asciify",
+		// Utility
+		"wordCount", "countSyllables",
 	}
 
 	for _, name := range expectedFuncs {
@@ -479,5 +497,71 @@ func BenchmarkFuncMapComplex(b *testing.B) {
 	for b.Loop() {
 		buf.Reset()
 		_ = tmpl.Execute(&buf, data)
+	}
+}
+
+func TestFuncMapNewFunctions(t *testing.T) {
+	tests := []struct {
+		name     string
+		template string
+		data     any
+		want     string
+	}{
+		// Aliases
+		{name: "pluralize", template: `{{pluralize "cat"}}`, want: "cats"},
+		{name: "singularize", template: `{{singularize "cats"}}`, want: "cat"},
+		{name: "underscore", template: `{{underscore "HelloWorld"}}`, want: "hello_world"},
+		{name: "dasherize", template: `{{dasherize "HelloWorld"}}`, want: "hello-world"},
+		{name: "titleCase", template: `{{titleCase "hello_world"}}`, want: "HelloWorld"},
+		{name: "camelize", template: `{{camelize "hello_world"}}`, want: "HelloWorld"},
+		{name: "camelizeDownFirst", template: `{{camelizeDownFirst "hello_world"}}`, want: "helloWorld"},
+
+		// Numbers and Ordinals
+		{name: "ordinalSuffix", template: `{{ordinalSuffix 1}}`, want: "st"},
+		{name: "ordinalToCardinal", template: `{{ordinalToCardinal "first"}}`, want: "one"},
+		{name: "wordToOrdinal", template: `{{wordToOrdinal "one"}}`, want: "first"},
+		{name: "numberToWordsWithAnd", template: `{{numberToWordsWithAnd 123}}`, want: "one hundred and twenty-three"},
+		{name: "formatNumber", template: `{{formatNumber 1000000}}`, want: "1,000,000"},
+		{name: "countingWord", template: `{{countingWord 2}}`, want: "twice"},
+		{name: "fractionToWords", template: `{{fractionToWords 1 4}}`, want: "one quarter"},
+		{name: "currencyToWords", template: `{{currencyToWords 1.50 "USD"}}`, want: "one dollar and fifty cents"},
+		{name: "no zero", template: `{{no "cat" 0}}`, want: "no cats"},
+		{name: "no one", template: `{{no "cat" 1}}`, want: "1 cat"},
+		{name: "no many", template: `{{no "cat" 5}}`, want: "5 cats"},
+
+		// Verb Tenses
+		{name: "pastParticiple", template: `{{pastParticiple "take"}}`, want: "taken"},
+		{name: "futureTense", template: `{{futureTense "walk"}}`, want: "will walk"},
+
+		// Adverbs
+		{name: "adverb", template: `{{adverb "quick"}}`, want: "quickly"},
+
+		// Text Transformation
+		{name: "capitalize", template: `{{capitalize "hello"}}`, want: "Hello"},
+		{name: "titleize", template: `{{titleize "hello world"}}`, want: "Hello World"},
+		{name: "humanize", template: `{{humanize "employee_salary"}}`, want: "Employee salary"},
+
+		// Rails-style Helpers
+		{name: "tableize", template: `{{tableize "Person"}}`, want: "people"},
+		{name: "foreignKey", template: `{{foreignKey "User"}}`, want: "user_id"},
+		{name: "typeify", template: `{{typeify "user_posts"}}`, want: "UserPost"},
+		{name: "parameterize", template: `{{parameterize "Hello World!"}}`, want: "hello-world"},
+		{name: "asciify", template: `{{asciify "café"}}`, want: "cafe"},
+
+		// Utility
+		{name: "wordCount", template: `{{wordCount "hello world"}}`, want: "2"},
+		{name: "countSyllables", template: `{{countSyllables "hello"}}`, want: "2"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tmpl, err := texttemplate.New("test").Funcs(inflect.FuncMap()).Parse(tt.template)
+			require.NoError(t, err)
+
+			var buf bytes.Buffer
+			err = tmpl.Execute(&buf, tt.data)
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, buf.String())
+		})
 	}
 }

@@ -9,7 +9,9 @@ import "text/template"
 //
 // Pluralization and Singularization:
 //   - plural(word string, count ...int) string - Plural form of a noun
+//   - pluralize(word string) string - Alias for plural
 //   - singular(word string) string - Singular form of a noun
+//   - singularize(word string) string - Alias for singular
 //   - pluralNoun(word string, count ...int) string - Plural form with pronoun support
 //   - pluralVerb(word string, count ...int) string - Plural form of a verb
 //   - pluralAdj(word string, count ...int) string - Plural form of an adjective
@@ -21,16 +23,28 @@ import "text/template"
 //
 // Numbers and Ordinals:
 //   - ordinal(n int) string - Ordinal with suffix: 1 -> "1st"
+//   - ordinalSuffix(n int) string - Just the suffix: 1 -> "st"
 //   - ordinalWord(n int) string - Ordinal in words: 1 -> "first"
+//   - ordinalToCardinal(s string) string - "first" -> "one"
+//   - wordToOrdinal(s string) string - "one" -> "first"
 //   - numberToWords(n int) string - Number in words: 42 -> "forty-two"
+//   - numberToWordsWithAnd(n int) string - With "and": 123 -> "one hundred and twenty-three"
+//   - formatNumber(n int) string - With commas: 1000 -> "1,000"
+//   - countingWord(n int) string - 1 -> "once", 2 -> "twice", 3 -> "3 times"
+//   - fractionToWords(num, denom int) string - 1,4 -> "one quarter"
+//   - currencyToWords(amount float64, currency string) string - 1.50, "USD" -> "one dollar and fifty cents"
+//   - no(word string, count int) string - 0 -> "no cats", 1 -> "1 cat"
 //
 // Verb Tenses:
 //   - pastTense(verb string) string - Past tense: "walk" -> "walked"
+//   - pastParticiple(verb string) string - Past participle: "take" -> "taken"
 //   - presentParticiple(verb string) string - Present participle: "run" -> "running"
+//   - futureTense(verb string) string - Future tense: "walk" -> "will walk"
 //
-// Adjective Comparison:
+// Adjectives and Adverbs:
 //   - comparative(adj string) string - Comparative form: "big" -> "bigger"
 //   - superlative(adj string) string - Superlative form: "big" -> "biggest"
+//   - adverb(adj string) string - Adverb form: "quick" -> "quickly"
 //
 // Possessives:
 //   - possessive(word string) string - Possessive form: "cat" -> "cat's"
@@ -42,8 +56,29 @@ import "text/template"
 // Case Conversion:
 //   - camelCase(s string) string - Convert to camelCase
 //   - snakeCase(s string) string - Convert to snake_case
+//   - underscore(s string) string - Alias for snakeCase
 //   - kebabCase(s string) string - Convert to kebab-case
+//   - dasherize(s string) string - Alias for kebabCase
 //   - pascalCase(s string) string - Convert to PascalCase
+//   - titleCase(s string) string - Alias for pascalCase
+//   - camelize(s string) string - Alias for pascalCase
+//   - camelizeDownFirst(s string) string - Alias for camelCase
+//
+// Text Transformation:
+//   - capitalize(s string) string - Capitalize first letter: "hello" -> "Hello"
+//   - titleize(s string) string - Capitalize each word: "hello world" -> "Hello World"
+//   - humanize(s string) string - Human readable: "employee_salary" -> "Employee salary"
+//
+// Rails-style Helpers:
+//   - tableize(word string) string - Type to table: "Person" -> "people"
+//   - foreignKey(word string) string - Type to FK: "User" -> "user_id"
+//   - typeify(word string) string - Table to type: "user_posts" -> "UserPost"
+//   - parameterize(word string) string - URL slug: "Hello World" -> "hello-world"
+//   - asciify(word string) string - Remove diacritics: "café" -> "cafe"
+//
+// Utility:
+//   - wordCount(text string) int - Count words in text
+//   - countSyllables(word string) int - Count syllables in word
 //
 // Example usage:
 //
@@ -76,7 +111,9 @@ func (e *Engine) FuncMap() template.FuncMap {
 	return template.FuncMap{
 		// Pluralization and Singularization
 		"plural":       e.templatePlural,
+		"pluralize":    e.Plural, // alias
 		"singular":     e.Singular,
+		"singularize":  e.Singular, // alias
 		"pluralNoun":   e.templatePluralNoun,
 		"pluralVerb":   e.templatePluralVerb,
 		"pluralAdj":    e.templatePluralAdj,
@@ -87,17 +124,29 @@ func (e *Engine) FuncMap() template.FuncMap {
 		"a":  e.An, // alias
 
 		// Numbers and Ordinals
-		"ordinal":       Ordinal,
-		"ordinalWord":   OrdinalWord,
-		"numberToWords": NumberToWords,
+		"ordinal":              Ordinal,
+		"ordinalSuffix":        OrdinalSuffix,
+		"ordinalWord":          OrdinalWord,
+		"ordinalToCardinal":    OrdinalToCardinal,
+		"wordToOrdinal":        WordToOrdinal,
+		"numberToWords":        NumberToWords,
+		"numberToWordsWithAnd": NumberToWordsWithAnd,
+		"formatNumber":         FormatNumber,
+		"countingWord":         CountingWord,
+		"fractionToWords":      FractionToWords,
+		"currencyToWords":      CurrencyToWords,
+		"no":                   e.templateNo,
 
 		// Verb Tenses
 		"pastTense":         PastTense,
+		"pastParticiple":    PastParticiple,
 		"presentParticiple": PresentParticiple,
+		"futureTense":       FutureTense,
 
-		// Adjective Comparison
+		// Adjectives and Adverbs
 		"comparative": Comparative,
 		"superlative": Superlative,
+		"adverb":      Adverb,
 
 		// Possessives
 		"possessive": e.Possessive,
@@ -107,10 +156,31 @@ func (e *Engine) FuncMap() template.FuncMap {
 		"joinWith": JoinWithConj,
 
 		// Case Conversion
-		"camelCase":  CamelCase,
-		"snakeCase":  SnakeCase,
-		"kebabCase":  KebabCase,
-		"pascalCase": PascalCase,
+		"camelCase":         CamelCase,
+		"snakeCase":         SnakeCase,
+		"underscore":        Underscore, // alias
+		"kebabCase":         KebabCase,
+		"dasherize":         Dasherize, // alias
+		"pascalCase":        PascalCase,
+		"titleCase":         TitleCase,         // alias
+		"camelize":          Camelize,          // alias
+		"camelizeDownFirst": CamelizeDownFirst, // alias
+
+		// Text Transformation
+		"capitalize": Capitalize,
+		"titleize":   Titleize,
+		"humanize":   Humanize,
+
+		// Rails-style Helpers
+		"tableize":     Tableize,
+		"foreignKey":   ForeignKey,
+		"typeify":      Typeify,
+		"parameterize": Parameterize,
+		"asciify":      Asciify,
+
+		// Utility
+		"wordCount":      WordCount,
+		"countSyllables": CountSyllables,
 	}
 }
 
@@ -141,4 +211,9 @@ func (e *Engine) templatePluralAdj(word string, count ...int) string {
 // templateSingularNoun wraps SingularNoun for template use.
 func (e *Engine) templateSingularNoun(word string, count ...int) string {
 	return e.SingularNoun(word, count...)
+}
+
+// templateNo wraps No for template use.
+func (e *Engine) templateNo(word string, count int) string {
+	return e.No(word, count)
 }
