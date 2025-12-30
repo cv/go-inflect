@@ -1,6 +1,7 @@
 package inflect_test
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -120,6 +121,54 @@ func TestCurrencyToWords(t *testing.T) {
 		// ===== Edge cases =====
 		{name: "very small positive", amount: 0.001, currency: "USD", want: "zero dollars"},
 		{name: "very small negative", amount: -0.001, currency: "USD", want: "zero dollars"},
+
+		// ===== Special float values =====
+		{name: "positive infinity", amount: math.Inf(1), currency: "USD", want: ""},
+		{name: "negative infinity", amount: math.Inf(-1), currency: "USD", want: ""},
+		{name: "NaN", amount: math.NaN(), currency: "USD", want: ""},
+
+		// ===== Case insensitive currency codes =====
+		{name: "lowercase usd", amount: 100.00, currency: "usd", want: "one hundred dollars"},
+		{name: "mixed case Usd", amount: 100.00, currency: "Usd", want: "one hundred dollars"},
+		{name: "lowercase gbp", amount: 1.01, currency: "gbp", want: "one pound and one penny"},
+
+		// ===== Additional currencies =====
+		{name: "NZD basic", amount: 123.45, currency: "NZD", want: "one hundred twenty-three New Zealand dollars and forty-five cents"},
+		{name: "NZD one dollar", amount: 1.00, currency: "NZD", want: "one New Zealand dollar"},
+		{name: "MXN basic", amount: 100.50, currency: "MXN", want: "one hundred pesos and fifty centavos"},
+		{name: "MXN one peso", amount: 1.00, currency: "MXN", want: "one peso"},
+		{name: "MXN one centavo", amount: 0.01, currency: "MXN", want: "one centavo"},
+		{name: "BRL basic", amount: 100.50, currency: "BRL", want: "one hundred reais and fifty centavos"},
+		{name: "BRL one real", amount: 1.00, currency: "BRL", want: "one real"},
+		{name: "SGD basic", amount: 100.50, currency: "SGD", want: "one hundred Singapore dollars and fifty cents"},
+		{name: "HKD basic", amount: 100.50, currency: "HKD", want: "one hundred Hong Kong dollars and fifty cents"},
+		{name: "KRW basic", amount: 1000.00, currency: "KRW", want: "one thousand won"},
+		{name: "KRW one won", amount: 1.00, currency: "KRW", want: "one won"},
+		{name: "SEK basic", amount: 100.50, currency: "SEK", want: "one hundred kronor and fifty öre"},
+		{name: "SEK one krona", amount: 1.00, currency: "SEK", want: "one krona"},
+		{name: "NOK basic", amount: 100.50, currency: "NOK", want: "one hundred kroner and fifty øre"},
+		{name: "NOK one krone", amount: 1.00, currency: "NOK", want: "one krone"},
+		{name: "DKK basic", amount: 100.50, currency: "DKK", want: "one hundred kroner and fifty øre"},
+		{name: "DKK one krone", amount: 1.00, currency: "DKK", want: "one krone"},
+		{name: "ZAR basic", amount: 100.50, currency: "ZAR", want: "one hundred rand and fifty cents"},
+		{name: "ZAR one rand", amount: 1.00, currency: "ZAR", want: "one rand"},
+		{name: "PLN basic", amount: 100.50, currency: "PLN", want: "one hundred zlotys and fifty groszy"},
+		{name: "PLN one zloty", amount: 1.00, currency: "PLN", want: "one zloty"},
+		{name: "PLN one grosz", amount: 0.01, currency: "PLN", want: "one grosz"},
+		{name: "THB basic", amount: 100.50, currency: "THB", want: "one hundred baht and fifty satang"},
+		{name: "THB one baht", amount: 1.00, currency: "THB", want: "one baht"},
+		{name: "ILS basic", amount: 100.50, currency: "ILS", want: "one hundred shekels and fifty agorot"},
+		{name: "ILS one shekel", amount: 1.00, currency: "ILS", want: "one shekel"},
+		{name: "ILS one agora", amount: 0.01, currency: "ILS", want: "one agora"},
+		{name: "AED basic", amount: 100.50, currency: "AED", want: "one hundred dirhams and fifty fils"},
+		{name: "AED one dirham", amount: 1.00, currency: "AED", want: "one dirham"},
+		{name: "SAR basic", amount: 100.50, currency: "SAR", want: "one hundred riyals and fifty halalas"},
+		{name: "SAR one riyal", amount: 1.00, currency: "SAR", want: "one riyal"},
+		{name: "TRY basic", amount: 100.50, currency: "TRY", want: "one hundred liras and fifty kurus"},
+		{name: "TRY one lira", amount: 1.00, currency: "TRY", want: "one lira"},
+		{name: "RUB basic", amount: 100.50, currency: "RUB", want: "one hundred rubles and fifty kopecks"},
+		{name: "RUB one ruble", amount: 1.00, currency: "RUB", want: "one ruble"},
+		{name: "RUB one kopeck", amount: 0.01, currency: "RUB", want: "one kopeck"},
 	}
 
 	for _, tt := range tests {

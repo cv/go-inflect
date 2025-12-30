@@ -2,6 +2,7 @@ package inflect
 
 import (
 	"math"
+	"strings"
 )
 
 // currencyInfo holds the singular and plural forms for major and minor currency units.
@@ -15,15 +16,38 @@ type currencyInfo struct {
 
 // currencies maps currency codes to their unit names.
 var currencies = map[string]currencyInfo{
+	// Major world currencies
 	"USD": {"dollar", "dollars", "cent", "cents", true},
 	"GBP": {"pound", "pounds", "penny", "pence", true},
 	"EUR": {"euro", "euros", "cent", "cents", true},
-	"CAD": {"Canadian dollar", "Canadian dollars", "cent", "cents", true},
-	"AUD": {"Australian dollar", "Australian dollars", "cent", "cents", true},
 	"JPY": {"yen", "yen", "", "", false},
 	"CHF": {"franc", "francs", "centime", "centimes", true},
 	"CNY": {"yuan", "yuan", "fen", "fen", true},
+	// Dollar variants
+	"CAD": {"Canadian dollar", "Canadian dollars", "cent", "cents", true},
+	"AUD": {"Australian dollar", "Australian dollars", "cent", "cents", true},
+	"NZD": {"New Zealand dollar", "New Zealand dollars", "cent", "cents", true},
+	"SGD": {"Singapore dollar", "Singapore dollars", "cent", "cents", true},
+	"HKD": {"Hong Kong dollar", "Hong Kong dollars", "cent", "cents", true},
+	// Asian currencies
 	"INR": {"rupee", "rupees", "paisa", "paise", true},
+	"KRW": {"won", "won", "", "", false},
+	"THB": {"baht", "baht", "satang", "satang", true},
+	// Latin American currencies
+	"MXN": {"peso", "pesos", "centavo", "centavos", true},
+	"BRL": {"real", "reais", "centavo", "centavos", true},
+	// Scandinavian currencies
+	"SEK": {"krona", "kronor", "öre", "öre", true},
+	"NOK": {"krone", "kroner", "øre", "øre", true},
+	"DKK": {"krone", "kroner", "øre", "øre", true},
+	// Other currencies
+	"ZAR": {"rand", "rand", "cent", "cents", true},
+	"PLN": {"zloty", "zlotys", "grosz", "groszy", true},
+	"ILS": {"shekel", "shekels", "agora", "agorot", true},
+	"AED": {"dirham", "dirhams", "fil", "fils", true},
+	"SAR": {"riyal", "riyals", "halala", "halalas", true},
+	"TRY": {"lira", "liras", "kurus", "kurus", true},
+	"RUB": {"ruble", "rubles", "kopeck", "kopecks", true},
 }
 
 // CurrencyToWords converts a currency amount to its English word representation.
@@ -46,7 +70,13 @@ var currencies = map[string]currencyInfo{
 //   - CurrencyToWords(123.45, "GBP") returns "one hundred twenty-three pounds and forty-five pence"
 //   - CurrencyToWords(-5.00, "USD") returns "negative five dollars"
 func CurrencyToWords(amount float64, currency string) string {
-	info, ok := currencies[currency]
+	// Handle special float values
+	if math.IsNaN(amount) || math.IsInf(amount, 0) {
+		return ""
+	}
+
+	// Normalize currency code to uppercase for lookup
+	info, ok := currencies[strings.ToUpper(currency)]
 	if !ok {
 		return ""
 	}
