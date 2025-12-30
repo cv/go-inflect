@@ -1,3 +1,5 @@
+//go:build ignore
+
 // gen-exports generates re-export wrappers for the root package.
 //
 // Usage:
