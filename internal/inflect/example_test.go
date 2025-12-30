@@ -1,7 +1,9 @@
 package inflect_test
 
 import (
+	"bytes"
 	"fmt"
+	"text/template"
 
 	inflect "github.com/cv/go-inflect"
 )
@@ -1290,4 +1292,29 @@ func ExampleEngine_Clone() {
 	// cloned: gizmoz
 	// cloned widget: widgetz
 	// original widget: widgets
+}
+
+func ExampleFuncMap() {
+	tmpl := template.New("example").Funcs(inflect.FuncMap())
+	_, _ = tmpl.Parse(`I have {{plural "cat" .Count}} and {{an "apple"}}`)
+
+	var buf bytes.Buffer
+	_ = tmpl.Execute(&buf, map[string]int{"Count": 3})
+	fmt.Println(buf.String())
+	// Output:
+	// I have cats and an apple
+}
+
+func ExampleEngine_FuncMap() {
+	e := inflect.NewEngine()
+	e.DefNoun("gremlin", "gremloz")
+
+	tmpl := template.New("example").Funcs(e.FuncMap())
+	_, _ = tmpl.Parse(`The plural of gremlin is {{plural "gremlin"}}`)
+
+	var buf bytes.Buffer
+	_ = tmpl.Execute(&buf, nil)
+	fmt.Println(buf.String())
+	// Output:
+	// The plural of gremlin is gremloz
 }
