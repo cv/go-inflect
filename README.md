@@ -12,7 +12,7 @@ A Go port of the Python [inflect](https://github.com/jaraco/inflect) library for
 ## Installation
 
 ```bash
-go get github.com/cv/go-inflect
+go get github.com/cv/go-inflect/v2
 ```
 
 ## Quick Start
@@ -23,7 +23,7 @@ The easiest way to use go-inflect is with Go templates:
 import (
     "os"
     "text/template"
-    "github.com/cv/go-inflect"
+    "github.com/cv/go-inflect/v2"
 )
 
 func main() {
@@ -45,7 +45,7 @@ The {{ordinalWord .Position}} message is from {{possessive .Name}} account.
 // The first message is from James's account.
 ```
 
-50+ template functions available: `plural`, `singular`, `an`, `ordinal`, `ordinalWord`, `numberToWords`, `pastTense`, `presentParticiple`, `possessive`, `comparative`, `superlative`, `join`, `camelCase`, `snakeCase`, `tableize`, `humanize`, and [many more](https://pkg.go.dev/github.com/cv/go-inflect#FuncMap).
+50+ template functions available: `plural`, `singular`, `an`, `ordinal`, `ordinalWord`, `numberToWords`, `pastTense`, `presentParticiple`, `possessive`, `comparative`, `superlative`, `join`, `camelCase`, `snakeCase`, `tableize`, `humanize`, and [many more](https://pkg.go.dev/github.com/cv/go-inflect/v2#FuncMap).
 
 ### Direct Function Calls
 
@@ -64,7 +64,7 @@ inflect.Comparative("big")        // "bigger"
 inflect.CamelCase("hello_world")  // "helloWorld"
 ```
 
-See [pkg.go.dev](https://pkg.go.dev/github.com/cv/go-inflect) for the complete API.
+See [pkg.go.dev](https://pkg.go.dev/github.com/cv/go-inflect/v2) for the complete API.
 
 ## Custom Engine
 
@@ -104,7 +104,7 @@ Compatibility aliases: `Pluralize`, `Singularize`, `Camelize`, `CamelizeDownFirs
 
 ## Documentation
 
-Full API documentation: [pkg.go.dev/github.com/cv/go-inflect](https://pkg.go.dev/github.com/cv/go-inflect)
+Full API documentation: [pkg.go.dev/github.com/cv/go-inflect/v2](https://pkg.go.dev/github.com/cv/go-inflect/v2)
 
 ## License
 
