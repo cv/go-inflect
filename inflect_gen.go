@@ -855,6 +855,18 @@ func FractionToWordsWithFourths(numerator int, denominator int) string {
 	return impl.FractionToWordsWithFourths(numerator, denominator)
 }
 
+// FutureTense returns the future tense form of an English verb using "will".
+//
+// Examples:
+//   - FutureTense("walk") returns "will walk"
+//   - FutureTense("go") returns "will go"
+//   - FutureTense("be") returns "will be"
+//   - FutureTense("WALK") returns "WILL WALK"
+//   - FutureTense("Walk") returns "Will Walk"
+func FutureTense(verb string) string {
+	return impl.FutureTense(verb)
+}
+
 // Gender sets the gender for singular third-person pronouns.
 //
 // The gender affects pronoun selection in SingularNoun():

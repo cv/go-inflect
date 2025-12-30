@@ -56,6 +56,7 @@ var inflectFuncPattern = regexp.MustCompile(`(\w+)\(([^)]*)\)`)
 //   - past_tense(verb) - returns past tense like "walk" → "walked"
 //   - past_participle(verb) - returns past participle like "take" → "taken"
 //   - present_participle(verb) - returns present participle like "run" → "running"
+//   - future_tense(verb) - returns future tense like "walk" → "will walk"
 //
 // Other inflections:
 //   - possessive(noun) - returns possessive form like "cat" → "cat's"
@@ -151,6 +152,7 @@ var inflectFuncs = map[string]inflectFunc{
 	"past_tense":         processPastTense,
 	"past_participle":    processPastParticiple,
 	"present_participle": processPresentParticiple,
+	"future_tense":       processFutureTense,
 
 	// Other inflections
 	"possessive":  processPossessive,
@@ -485,6 +487,14 @@ func processPresentParticiple(args []string, original string) string {
 		return original
 	}
 	return PresentParticiple(args[0])
+}
+
+// processFutureTense handles future_tense('verb').
+func processFutureTense(args []string, original string) string {
+	if len(args) == 0 {
+		return original
+	}
+	return FutureTense(args[0])
 }
 
 // processPossessive handles possessive('noun').

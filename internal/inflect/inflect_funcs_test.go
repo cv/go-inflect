@@ -876,6 +876,28 @@ func TestInflectPresentParticiple(t *testing.T) {
 	}
 }
 
+func TestInflectFutureTense(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "regular verb walk", input: "future_tense('walk')", expected: "will walk"},
+		{name: "regular verb play", input: "future_tense('play')", expected: "will play"},
+		{name: "irregular verb go", input: "future_tense('go')", expected: "will go"},
+		{name: "verb be", input: "future_tense('be')", expected: "will be"},
+		{name: "in sentence", input: "She future_tense('walk') home", expected: "She will walk home"},
+		{name: "double quotes", input: `He future_tense("run") fast`, expected: "He will run fast"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.Inflect(tt.input)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
 func TestInflectPossessive(t *testing.T) {
 	tests := []struct {
 		name     string

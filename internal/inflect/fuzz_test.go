@@ -394,6 +394,28 @@ func FuzzPastTense(f *testing.F) {
 	})
 }
 
+func FuzzFutureTense(f *testing.F) {
+	seeds := []string{
+		// Common verbs
+		"walk", "talk", "run", "go", "be", "have", "do", "say", "make", "get",
+		"see", "know", "take", "come", "think", "look", "want", "give", "use", "find",
+		// Case variations
+		"WALK", "Walk", "GO", "Go", "RUN", "Run",
+		// Edge cases
+		"", " ", "123", "a", "I",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(_ *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		_ = FutureTense(input)
+	})
+}
+
 func FuzzPastParticiple(f *testing.F) {
 	seeds := []string{
 		// Regular verbs (-ed)

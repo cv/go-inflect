@@ -1069,6 +1069,18 @@ func ExamplePastTense() {
 	// stopped
 }
 
+func ExampleFutureTense() {
+	fmt.Println(inflect.FutureTense("walk"))
+	fmt.Println(inflect.FutureTense("go"))
+	fmt.Println(inflect.FutureTense("be"))
+	fmt.Println(inflect.FutureTense("Walk"))
+	// Output:
+	// will walk
+	// will go
+	// will be
+	// Will Walk
+}
+
 // --- Possessive examples ---
 
 func ExampleGetPossessiveStyle() {
