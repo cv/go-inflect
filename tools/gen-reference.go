@@ -24,6 +24,7 @@ type funcInfo struct {
 	line      int
 	signature string
 	doc       string
+	covers    []string // for combined tests, list of covered functions
 }
 
 // fileToGroup maps source files to semantic groups.
@@ -99,6 +100,7 @@ func main() {
 					case strings.HasPrefix(name, "Example"):
 						examples = append(examples, info)
 					case strings.HasPrefix(name, "Fuzz"):
+						info.covers = extractCovers(fn.Doc)
 						fuzzTests = append(fuzzTests, info)
 					case strings.HasPrefix(name, "Benchmark"):
 						benchmarks = append(benchmarks, info)
@@ -297,6 +299,7 @@ func extractFirstSentence(doc *ast.CommentGroup) string {
 }
 
 // buildMap creates a mapping from function names to their info.
+// It also parses "// Covers: Func1, Func2" comments for combined tests.
 func buildMap(funcs []funcInfo, prefix string) map[string]funcInfo {
 	m := make(map[string]funcInfo)
 	for _, f := range funcs {
@@ -304,8 +307,39 @@ func buildMap(funcs []funcInfo, prefix string) map[string]funcInfo {
 		if _, exists := m[baseName]; !exists {
 			m[baseName] = f
 		}
+		// Add entries for covered functions
+		for _, covered := range f.covers {
+			if _, exists := m[covered]; !exists {
+				m[covered] = f
+			}
+		}
 	}
 	return m
+}
+
+// extractCovers parses "// Covers: Func1, Func2." from doc comments.
+func extractCovers(doc *ast.CommentGroup) []string {
+	if doc == nil {
+		return nil
+	}
+	for _, c := range doc.List {
+		text := strings.TrimPrefix(c.Text, "//")
+		text = strings.TrimPrefix(text, " ")
+		if strings.HasPrefix(text, "Covers:") {
+			funcs := strings.TrimPrefix(text, "Covers:")
+			funcs = strings.TrimSpace(funcs)
+			funcs = strings.TrimSuffix(funcs, ".")
+			var result []string
+			for _, f := range strings.Split(funcs, ",") {
+				f = strings.TrimSpace(f)
+				if f != "" {
+					result = append(result, f)
+				}
+			}
+			return result
+		}
+	}
+	return nil
 }
 
 // findLoc returns "file:line" for a test, or empty string if not found.

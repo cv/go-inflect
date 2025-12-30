@@ -109,6 +109,7 @@ func FuzzSingular(f *testing.F) {
 	})
 }
 
+// Covers: An, A.
 func FuzzAn(f *testing.F) {
 	seeds := []string{
 		// Basic cases
@@ -241,6 +242,7 @@ func FuzzInflect(f *testing.F) {
 	})
 }
 
+// Covers: NumberToWords, NumberToWordsWithAnd.
 func FuzzNumberToWords(f *testing.F) {
 	seeds := []int{
 		// Zero
@@ -276,6 +278,7 @@ func FuzzNumberToWords(f *testing.F) {
 	})
 }
 
+// Covers: Ordinal, OrdinalWord.
 func FuzzOrdinal(f *testing.F) {
 	seeds := []int{
 		// Basic cases (1-10)
@@ -431,6 +434,7 @@ func FuzzPastParticiple(f *testing.F) {
 	})
 }
 
+// Covers: Comparative, Superlative.
 func FuzzComparative(f *testing.F) {
 	seeds := []string{
 		// Irregular forms
@@ -469,6 +473,7 @@ func FuzzComparative(f *testing.F) {
 	})
 }
 
+// Covers: CamelCase, PascalCase, SnakeCase, KebabCase, Dasherize, Underscore.
 func FuzzCaseConversion(f *testing.F) {
 	seeds := []string{
 		"camelCase", "PascalCase", "snake_case", "kebab-case",
@@ -494,6 +499,7 @@ func FuzzCaseConversion(f *testing.F) {
 	})
 }
 
+// Covers: Join, JoinWithConj, JoinNoOxford.
 func FuzzJoin(f *testing.F) {
 	// Fuzz with varying number of items encoded as newline-separated
 	seeds := []string{
@@ -550,6 +556,7 @@ func FuzzPossessive(f *testing.F) {
 	})
 }
 
+// Covers: Compare, CompareNouns, CompareVerbs, CompareAdjs.
 func FuzzCompare(f *testing.F) {
 	seeds := []struct {
 		a, b string
@@ -576,6 +583,7 @@ func FuzzCompare(f *testing.F) {
 	})
 }
 
+// Covers: WordToOrdinal, OrdinalToCardinal.
 func FuzzWordToOrdinal(f *testing.F) {
 	seeds := []string{
 		// Basic word numbers
@@ -631,6 +639,7 @@ func FuzzCurrency(f *testing.F) {
 	})
 }
 
+// Covers: FractionToWords, FractionToWordsWithFourths.
 func FuzzFraction(f *testing.F) {
 	seeds := []struct {
 		num, den int
@@ -1225,6 +1234,7 @@ func FuzzHumanize(f *testing.F) {
 	})
 }
 
+// Covers: ForeignKey, ForeignKeyCondensed.
 func FuzzForeignKey(f *testing.F) {
 	seeds := []string{
 		"Person", "Message", "AdminUser", "user", "XMLParser",
@@ -1340,6 +1350,7 @@ func FuzzAsciify(f *testing.F) {
 
 // Fuzz tests for compatibility aliases
 
+// Covers: Pluralize, Singularize.
 func FuzzPluralizeSingularize(f *testing.F) {
 	seeds := []string{
 		"cat", "cats", "child", "children", "person", "people",
@@ -1358,6 +1369,7 @@ func FuzzPluralizeSingularize(f *testing.F) {
 	})
 }
 
+// Covers: Camelize, CamelizeDownFirst.
 func FuzzCamelizeVariants(f *testing.F) {
 	seeds := []string{
 		"hello_world", "foo-bar", "some_thing", "XMLParser",
