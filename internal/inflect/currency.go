@@ -15,39 +15,66 @@ type currencyInfo struct {
 }
 
 // currencies maps currency codes to their unit names.
+// Covers the top 50 most traded currencies by volume.
 var currencies = map[string]currencyInfo{
 	// Major world currencies
 	"USD": {"dollar", "dollars", "cent", "cents", true},
-	"GBP": {"pound", "pounds", "penny", "pence", true},
 	"EUR": {"euro", "euros", "cent", "cents", true},
 	"JPY": {"yen", "yen", "", "", false},
+	"GBP": {"pound", "pounds", "penny", "pence", true},
 	"CHF": {"franc", "francs", "centime", "centimes", true},
 	"CNY": {"yuan", "yuan", "fen", "fen", true},
 	// Dollar variants
-	"CAD": {"Canadian dollar", "Canadian dollars", "cent", "cents", true},
 	"AUD": {"Australian dollar", "Australian dollars", "cent", "cents", true},
-	"NZD": {"New Zealand dollar", "New Zealand dollars", "cent", "cents", true},
-	"SGD": {"Singapore dollar", "Singapore dollars", "cent", "cents", true},
+	"CAD": {"Canadian dollar", "Canadian dollars", "cent", "cents", true},
 	"HKD": {"Hong Kong dollar", "Hong Kong dollars", "cent", "cents", true},
-	// Asian currencies
-	"INR": {"rupee", "rupees", "paisa", "paise", true},
-	"KRW": {"won", "won", "", "", false},
-	"THB": {"baht", "baht", "satang", "satang", true},
-	// Latin American currencies
-	"MXN": {"peso", "pesos", "centavo", "centavos", true},
-	"BRL": {"real", "reais", "centavo", "centavos", true},
+	"SGD": {"Singapore dollar", "Singapore dollars", "cent", "cents", true},
+	"NZD": {"New Zealand dollar", "New Zealand dollars", "cent", "cents", true},
+	"TWD": {"New Taiwan dollar", "New Taiwan dollars", "cent", "cents", true},
 	// Scandinavian currencies
 	"SEK": {"krona", "kronor", "öre", "öre", true},
 	"NOK": {"krone", "kroner", "øre", "øre", true},
 	"DKK": {"krone", "kroner", "øre", "øre", true},
-	// Other currencies
-	"ZAR": {"rand", "rand", "cent", "cents", true},
+	// Asian currencies
+	"KRW": {"won", "won", "", "", false},
+	"INR": {"rupee", "rupees", "paisa", "paise", true},
+	"THB": {"baht", "baht", "satang", "satang", true},
+	"IDR": {"rupiah", "rupiah", "sen", "sen", true},
+	"PHP": {"peso", "pesos", "centavo", "centavos", true},
+	"MYR": {"ringgit", "ringgit", "sen", "sen", true},
+	"VND": {"dong", "dong", "", "", false},
+	"PKR": {"rupee", "rupees", "paisa", "paise", true},
+	"BDT": {"taka", "taka", "poisha", "poisha", true},
+	"LKR": {"rupee", "rupees", "cent", "cents", true},
+	// Latin American currencies
+	"MXN": {"peso", "pesos", "centavo", "centavos", true},
+	"BRL": {"real", "reais", "centavo", "centavos", true},
+	"CLP": {"peso", "pesos", "centavo", "centavos", true},
+	"COP": {"peso", "pesos", "centavo", "centavos", true},
+	"PEN": {"sol", "soles", "céntimo", "céntimos", true},
+	"ARS": {"peso", "pesos", "centavo", "centavos", true},
+	"CRC": {"colón", "colones", "céntimo", "céntimos", true},
+	// European currencies (non-EUR)
 	"PLN": {"zloty", "zlotys", "grosz", "groszy", true},
+	"CZK": {"koruna", "koruny", "haléř", "haléřů", true},
+	"HUF": {"forint", "forints", "fillér", "fillérs", true},
+	"RON": {"leu", "lei", "ban", "bani", true},
+	"UAH": {"hryvnia", "hryvnias", "kopiyka", "kopiykas", true},
+	"RUB": {"ruble", "rubles", "kopeck", "kopecks", true},
+	// Middle Eastern currencies
 	"ILS": {"shekel", "shekels", "agora", "agorot", true},
 	"AED": {"dirham", "dirhams", "fil", "fils", true},
 	"SAR": {"riyal", "riyals", "halala", "halalas", true},
 	"TRY": {"lira", "liras", "kurus", "kurus", true},
-	"RUB": {"ruble", "rubles", "kopeck", "kopecks", true},
+	"QAR": {"riyal", "riyals", "dirham", "dirhams", true},
+	"KWD": {"dinar", "dinars", "fil", "fils", true},
+	"EGP": {"pound", "pounds", "piastre", "piastres", true},
+	"MAD": {"dirham", "dirhams", "centime", "centimes", true},
+	// African currencies
+	"ZAR": {"rand", "rand", "cent", "cents", true},
+	"NGN": {"naira", "naira", "kobo", "kobo", true},
+	"KES": {"shilling", "shillings", "cent", "cents", true},
+	"GHS": {"cedi", "cedis", "pesewa", "pesewas", true},
 }
 
 // CurrencyToWords converts a currency amount to its English word representation.
