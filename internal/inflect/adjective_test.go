@@ -128,6 +128,24 @@ func TestComparative(t *testing.T) {
 		{name: "Good titlecase", input: "Good", want: "Better"},
 		{name: "BEAUTIFUL uppercase", input: "BEAUTIFUL", want: "MORE BEAUTIFUL"},
 		{name: "Beautiful titlecase", input: "Beautiful", want: "More Beautiful"},
+
+		// One-syllable words ending in consonant + y where y is the vowel
+		// These should keep y and add -er, not change y to i
+		{name: "shy", input: "shy", want: "shyer"},
+		{name: "sly", input: "sly", want: "slyer"},
+		{name: "spry", input: "spry", want: "spryer"},
+		{name: "wry", input: "wry", want: "wryer"},
+
+		// One-syllable adjectives that idiomatically prefer "more"
+		{name: "real", input: "real", want: "more real"},
+		{name: "right", input: "right", want: "more right"},
+		{name: "wrong", input: "wrong", want: "more wrong"},
+		{name: "just (fair)", input: "just", want: "more just"},
+
+		// Non-gradable adjectives that should use "more"
+		{name: "own", input: "own", want: "more own"},
+		{name: "main", input: "main", want: "more main"},
+		{name: "chief", input: "chief", want: "more chief"},
 	}
 
 	for _, tt := range tests {
@@ -258,6 +276,24 @@ func TestSuperlative(t *testing.T) {
 		{name: "Good titlecase", input: "Good", want: "Best"},
 		{name: "BEAUTIFUL uppercase", input: "BEAUTIFUL", want: "MOST BEAUTIFUL"},
 		{name: "Beautiful titlecase", input: "Beautiful", want: "Most Beautiful"},
+
+		// One-syllable words ending in consonant + y where y is the vowel
+		// These should keep y and add -est, not change y to i
+		{name: "shy", input: "shy", want: "shyest"},
+		{name: "sly", input: "sly", want: "slyest"},
+		{name: "spry", input: "spry", want: "spryest"},
+		{name: "wry", input: "wry", want: "wryest"},
+
+		// One-syllable adjectives that idiomatically prefer "most"
+		{name: "real", input: "real", want: "most real"},
+		{name: "right", input: "right", want: "most right"},
+		{name: "wrong", input: "wrong", want: "most wrong"},
+		{name: "just (fair)", input: "just", want: "most just"},
+
+		// Non-gradable adjectives that should use "most"
+		{name: "own", input: "own", want: "most own"},
+		{name: "main", input: "main", want: "most main"},
+		{name: "chief", input: "chief", want: "most chief"},
 	}
 
 	for _, tt := range tests {

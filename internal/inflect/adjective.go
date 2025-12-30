@@ -48,6 +48,31 @@ var twoSyllableWithSuffix = map[string]bool{
 	"slender": true,
 }
 
+// yAsVowel contains one-syllable words ending in consonant + y where y is the
+// only vowel sound. These keep the y when adding -er/-est (shyer, not shier).
+// Note: "dry" is not included because "drier" is the standard form.
+var yAsVowel = map[string]bool{
+	"shy":  true,
+	"sly":  true,
+	"spry": true,
+	"wry":  true,
+}
+
+// preferMore contains adjectives that idiomatically prefer "more/most" despite
+// being short enough for -er/-est. This includes non-gradable adjectives that
+// sound wrong with suffixes.
+var preferMore = map[string]bool{
+	// One-syllable adjectives that sound better with more/most
+	"real":  true,
+	"right": true,
+	"wrong": true,
+	"just":  true, // as in "fair"
+	// Non-gradable or awkward with suffixes
+	"own":   true, // "owner" is a noun!
+	"main":  true,
+	"chief": true,
+}
+
 // Comparative returns the comparative form of an English adjective.
 //
 // Examples:
@@ -107,9 +132,14 @@ func Superlative(adj string) string {
 // shouldUseSuffix determines if an adjective should use -er/-est suffixes
 // rather than more/most.
 func shouldUseSuffix(lower string) bool {
+	// Check if this word prefers more/most despite being short
+	if preferMore[lower] {
+		return false
+	}
+
 	syllables := countSyllables(lower)
 
-	// One-syllable adjectives always use -er/-est
+	// One-syllable adjectives use -er/-est
 	if syllables == 1 {
 		return true
 	}
@@ -170,10 +200,14 @@ func applyComparativeSuffix(adj, lower string) string {
 		return adj + matchSuffix(adj, "r")
 	}
 
-	// Words ending in consonant + y: change y to -ier
+	// Words ending in consonant + y: usually change y to -ier,
+	// but words where y is the only vowel keep the y (shy → shyer)
 	if strings.HasSuffix(lower, "y") && len(lower) > 1 {
 		beforeY := lower[len(lower)-2]
 		if !isVowel(rune(beforeY)) {
+			if yAsVowel[lower] {
+				return adj + matchSuffix(adj, "er")
+			}
 			return adj[:len(adj)-1] + matchSuffix(adj, "ier")
 		}
 	}
@@ -195,10 +229,14 @@ func applySuperlativeSuffix(adj, lower string) string {
 		return adj + matchSuffix(adj, "st")
 	}
 
-	// Words ending in consonant + y: change y to -iest
+	// Words ending in consonant + y: usually change y to -iest,
+	// but words where y is the only vowel keep the y (shy → shyest)
 	if strings.HasSuffix(lower, "y") && len(lower) > 1 {
 		beforeY := lower[len(lower)-2]
 		if !isVowel(rune(beforeY)) {
+			if yAsVowel[lower] {
+				return adj + matchSuffix(adj, "est")
+			}
 			return adj[:len(adj)-1] + matchSuffix(adj, "iest")
 		}
 	}
