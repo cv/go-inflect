@@ -630,3 +630,128 @@ func TestClassicalNamesIntegration(t *testing.T) {
 		assert.Equal(t, "formulas", inflect.Plural("formula"), "After reset: Plural(formula)")
 	})
 }
+
+func TestClassicalHerd(t *testing.T) {
+	defer inflect.ClassicalHerd(false)
+
+	tests := []struct {
+		name    string
+		enabled bool
+		input   string
+		want    string
+	}{
+		{name: "bison classical", enabled: true, input: "bison", want: "bison"},
+		{name: "bison modern", enabled: false, input: "bison", want: "bisons"},
+		{name: "buffalo classical", enabled: true, input: "buffalo", want: "buffalo"},
+		{name: "buffalo modern", enabled: false, input: "buffalo", want: "buffaloes"},
+		{name: "wildebeest classical", enabled: true, input: "wildebeest", want: "wildebeest"},
+		{name: "wildebeest modern", enabled: false, input: "wildebeest", want: "wildebeests"},
+		// Regular animals unaffected
+		{name: "cat classical", enabled: true, input: "cat", want: "cats"},
+		{name: "cat modern", enabled: false, input: "cat", want: "cats"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.ClassicalHerd(tt.enabled)
+			got := inflect.Plural(tt.input)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestIsClassicalHerd(t *testing.T) {
+	defer inflect.ClassicalAll(false)
+
+	tests := []struct {
+		name  string
+		setup func()
+		want  bool
+	}{
+		{name: "default is false", setup: func() { inflect.ClassicalHerd(false) }, want: false},
+		{name: "enabled", setup: func() { inflect.ClassicalHerd(true) }, want: true},
+		{name: "enabled via ClassicalAll", setup: func() { inflect.ClassicalAll(true) }, want: true},
+		{name: "disabled after enabled", setup: func() { inflect.ClassicalHerd(true); inflect.ClassicalHerd(false) }, want: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.ClassicalAll(false)
+			tt.setup()
+			assert.Equal(t, tt.want, inflect.IsClassicalHerd())
+		})
+	}
+}
+
+func TestClassicalZero(t *testing.T) {
+	defer inflect.ClassicalZero(false)
+
+	tests := []struct {
+		name    string
+		enabled bool
+		word    string
+		count   int
+		want    string
+	}{
+		{name: "zero classical", enabled: true, word: "cat", count: 0, want: "no cat"},
+		{name: "zero modern", enabled: false, word: "cat", count: 0, want: "no cats"},
+		{name: "one classical", enabled: true, word: "cat", count: 1, want: "1 cat"},
+		{name: "one modern", enabled: false, word: "cat", count: 1, want: "1 cat"},
+		{name: "two classical", enabled: true, word: "cat", count: 2, want: "2 cats"},
+		{name: "two modern", enabled: false, word: "cat", count: 2, want: "2 cats"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.ClassicalZero(tt.enabled)
+			got := inflect.No(tt.word, tt.count)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestIsClassicalZero(t *testing.T) {
+	defer inflect.ClassicalAll(false)
+
+	tests := []struct {
+		name  string
+		setup func()
+		want  bool
+	}{
+		{name: "default is false", setup: func() { inflect.ClassicalZero(false) }, want: false},
+		{name: "enabled", setup: func() { inflect.ClassicalZero(true) }, want: true},
+		{name: "enabled via ClassicalAll", setup: func() { inflect.ClassicalAll(true) }, want: true},
+		{name: "disabled after enabled", setup: func() { inflect.ClassicalZero(true); inflect.ClassicalZero(false) }, want: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.ClassicalAll(false)
+			tt.setup()
+			assert.Equal(t, tt.want, inflect.IsClassicalZero())
+		})
+	}
+}
+
+func TestIsClassicalNames(t *testing.T) {
+	defer inflect.ClassicalAll(false)
+
+	tests := []struct {
+		name  string
+		setup func()
+		want  bool
+	}{
+		{name: "default is false", setup: func() { inflect.ClassicalNames(false) }, want: false},
+		{name: "enabled", setup: func() { inflect.ClassicalNames(true) }, want: true},
+		{name: "enabled via ClassicalAll", setup: func() { inflect.ClassicalAll(true) }, want: true},
+		{name: "disabled after enabled", setup: func() { inflect.ClassicalNames(true); inflect.ClassicalNames(false) }, want: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inflect.ClassicalAll(false)
+			tt.setup()
+			assert.Equal(t, tt.want, inflect.IsClassicalNames())
+		})
+	}
+}
