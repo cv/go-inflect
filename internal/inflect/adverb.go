@@ -30,6 +30,21 @@ var unchangedAdverbs = map[string]bool{
 	"long":   true,
 	"likely": true,
 	"even":   true,
+	// A-prefix words that already function as adverbs
+	"ahead":  true,
+	"away":   true,
+	"alone":  true,
+	"aloud":  true,
+	"apart":  true,
+	"abroad": true,
+	"afoot":  true,
+	"afloat": true,
+	"ashore": true,
+	"asleep": true,
+	"awake":  true,
+	"alive":  true,
+	"askew":  true,
+	"awry":   true,
 }
 
 // Adverb returns the adverb form of an English adjective.
@@ -101,7 +116,12 @@ func applyAdverbSuffix(adj, lower string) string {
 		return adj[:len(adj)-1] + matchSuffix(adj, "ly")
 	}
 
-	// Rule 3: Adjectives ending in -le: usually change -le to -ly (gentle → gently)
+	// Rule 3a: Adjectives ending in -ile: keep the e, add -ly (agile → agilely)
+	if strings.HasSuffix(lower, "ile") {
+		return adj + matchSuffix(adj, "ly")
+	}
+
+	// Rule 3b: Adjectives ending in -le (not -ile): usually change -le to -ly (gentle → gently)
 	// Exception: some words keep the e (sole → solely)
 	if strings.HasSuffix(lower, "le") {
 		if leKeepsE[lower] {
