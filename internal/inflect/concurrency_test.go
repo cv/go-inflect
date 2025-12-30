@@ -635,33 +635,6 @@ func TestConcurrentPossessiveOperations(_ *testing.T) {
 	wg.Wait()
 }
 
-// TestConcurrentInflection tests the Inflect function concurrently.
-func TestConcurrentInflection(_ *testing.T) {
-	var wg sync.WaitGroup
-	goroutines := 50
-	iterations := 50
-
-	patterns := []string{
-		"PL(cat)",
-		"SING(cats)",
-		"AN(apple)",
-		"A(car)",
-		"ORD(3)",
-	}
-
-	for range goroutines {
-		wg.Go(func() {
-			for range iterations {
-				for _, pattern := range patterns {
-					_ = Inflect(pattern)
-				}
-			}
-		})
-	}
-
-	wg.Wait()
-}
-
 // TestDefaultEngineIsolation verifies that DefaultEngine returns the same
 // instance and that concurrent access to it is safe.
 func TestDefaultEngineIsolation(_ *testing.T) {

@@ -181,12 +181,6 @@ inflect.Gender("f")
 inflect.SingularNoun("they")  // "she"
 ```
 
-### Inline Inflection
-
-```go
-inflect.Inflect("I saw plural('cat', 3)")  // "I saw cats"
-```
-
 ## Migration
 
 ### From jinzhu/inflection or go-openapi/inflect
