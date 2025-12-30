@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	inflect "github.com/cv/go-inflect"
+	inflect "github.com/cv/go-inflect/v2"
 )
 
 func TestAdverb(t *testing.T) {

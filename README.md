@@ -42,7 +42,7 @@ The {{ordinalWord .Position}} message is from {{possessive .Name}} account.
 // Output:
 // You have 5 messages.
 // That's five messages!
-// The first message is from James' account.
+// The first message is from James's account.
 ```
 
 50+ template functions available: `plural`, `singular`, `an`, `ordinal`, `ordinalWord`, `numberToWords`, `pastTense`, `presentParticiple`, `possessive`, `comparative`, `superlative`, `join`, `camelCase`, `snakeCase`, `tableize`, `humanize`, and [many more](https://pkg.go.dev/github.com/cv/go-inflect#FuncMap).
@@ -58,7 +58,7 @@ inflect.An("apple")               // "an apple"
 inflect.NumberToWords(42)         // "forty-two"
 inflect.Ordinal(3)                // "3rd"
 inflect.PastTense("go")           // "went"
-inflect.Possessive("James")       // "James'"
+inflect.Possessive("James")       // "James's"
 inflect.Join([]string{"a","b","c"}) // "a, b, and c"
 inflect.Comparative("big")        // "bigger"
 inflect.CamelCase("hello_world")  // "helloWorld"

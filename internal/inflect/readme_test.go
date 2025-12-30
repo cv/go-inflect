@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/cv/go-inflect"
+	"github.com/cv/go-inflect/v2"
 )
 
 func TestREADMEExamples(t *testing.T) {

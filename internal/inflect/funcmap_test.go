@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cv/go-inflect/internal/inflect"
+	"github.com/cv/go-inflect/v2/internal/inflect"
 )
 
 func TestFuncMap(t *testing.T) {

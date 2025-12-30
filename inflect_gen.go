@@ -3,7 +3,7 @@
 package inflect
 
 import (
-	impl "github.com/cv/go-inflect/internal/inflect"
+	impl "github.com/cv/go-inflect/v2/internal/inflect"
 	"text/template"
 )
 

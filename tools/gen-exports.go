@@ -22,7 +22,7 @@ import (
 
 const (
 	internalPkg = "./internal/inflect"
-	importPath  = "github.com/cv/go-inflect/internal/inflect"
+	importPath  = "github.com/cv/go-inflect/v2/internal/inflect"
 	implAlias   = "impl"
 	outputFile  = "inflect_gen.go"
 )

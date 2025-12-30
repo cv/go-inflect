@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"text/template"
 
-	inflect "github.com/cv/go-inflect"
+	inflect "github.com/cv/go-inflect/v2"
 )
 
 func ExampleAn() {

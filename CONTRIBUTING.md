@@ -20,7 +20,7 @@ Create an issue with:
 ### Setup
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/go-inflect.git
+git clone https://github.com/cv/go-inflect.git
 cd go-inflect
 ./.githooks/setup.sh  # enables pre-commit hooks
 ```

@@ -1,4 +1,4 @@
-module github.com/cv/go-inflect
+module github.com/cv/go-inflect/v2
 
 go 1.25.5
 
