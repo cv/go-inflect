@@ -27,41 +27,75 @@ import (
 )
 
 func main() {
-    tmpl := template.New("example").Funcs(inflect.FuncMap())
+    tmpl := template.New("report").Funcs(inflect.FuncMap())
     tmpl.Parse(`
-You have {{.Count}} {{plural "message" .Count}}.
-That's {{numberToWords .Count}} {{plural "message" .Count}}!
-The {{ordinalWord .Position}} message is from {{possessive .Name}} account.
+📊 Build Report for {{.Project}}
+
+{{.Tests}} {{plural "test" .Tests}} {{pastTense "run"}} in {{.Duration}} {{plural "second" .Duration}}.
+Found {{no "error" .Errors}} and {{no "warning" .Warnings}}.
+
+This is the {{ordinalWord .BuildNum}} build, and it {{pastTense "complete"}} {{comparative "fast"}}
+than {{numberToWords .Improvement}}% of previous builds — {{possessive .Author}} {{superlative "good"}} yet!
+
+Summary: {{join .Tags}}
 `)
     tmpl.Execute(os.Stdout, map[string]any{
-        "Count":    5,
-        "Position": 1, 
-        "Name":     "James",
+        "Project":     "go-inflect",
+        "Tests":       142,
+        "Duration":    3,
+        "Errors":      0,
+        "Warnings":    2,
+        "BuildNum":    47,
+        "Improvement": 85,
+        "Author":      "James",
+        "Tags":        []string{"fast", "stable", "passing"},
     })
 }
 // Output:
-// You have 5 messages.
-// That's five messages!
-// The first message is from James's account.
+// 📊 Build Report for go-inflect
+// 
+// 142 tests ran in 3 seconds.
+// Found no errors and 2 warnings.
+// 
+// This is the forty-seventh build, and it completed faster
+// than eighty-five% of previous builds — James's best yet!
+// 
+// Summary: fast, stable, and passing
 ```
 
-50+ template functions available: `plural`, `singular`, `an`, `ordinal`, `ordinalWord`, `numberToWords`, `pastTense`, `presentParticiple`, `possessive`, `comparative`, `superlative`, `join`, `camelCase`, `snakeCase`, `tableize`, `humanize`, and [many more](https://pkg.go.dev/github.com/cv/go-inflect/v2#FuncMap).
+50+ template functions available — see [FuncMap documentation](https://pkg.go.dev/github.com/cv/go-inflect/v2#FuncMap) for the complete list.
 
 ### Direct Function Calls
 
 All functions are also available for direct use:
 
 ```go
-inflect.Plural("child")           // "children"
-inflect.Singular("mice")          // "mouse"
-inflect.An("apple")               // "an apple"
-inflect.NumberToWords(42)         // "forty-two"
-inflect.Ordinal(3)                // "3rd"
-inflect.PastTense("go")           // "went"
-inflect.Possessive("James")       // "James's"
-inflect.Join([]string{"a","b","c"}) // "a, b, and c"
-inflect.Comparative("big")        // "bigger"
-inflect.CamelCase("hello_world")  // "helloWorld"
+// Pluralization handles irregular forms
+inflect.Plural("person")             // "people"
+inflect.Plural("criterion")          // "criteria"  
+inflect.Singular("phenomena")        // "phenomenon"
+
+// Verb conjugation
+inflect.PastTense("run")             // "ran"
+inflect.PastParticiple("write")      // "written"
+inflect.PresentParticiple("swim")    // "swimming"
+
+// Numbers in words
+inflect.NumberToWords(42)            // "forty-two"
+inflect.OrdinalWord(3)               // "third"
+inflect.FractionToWords(3, 4)        // "three quarters"
+inflect.CurrencyToWords(99.99, "USD") // "ninety-nine dollars and ninety-nine cents"
+
+// Adjectives and adverbs
+inflect.Comparative("beautiful")     // "more beautiful"
+inflect.Superlative("fast")          // "fastest"
+inflect.Adverb("quick")              // "quickly"
+
+// Handy utilities
+inflect.An("hour")                   // "an hour"
+inflect.Join([]string{"a","b","c"})  // "a, b, and c"
+inflect.No("error", 0)               // "no errors"
+inflect.Possessive("James")          // "James's"
 ```
 
 See [pkg.go.dev](https://pkg.go.dev/github.com/cv/go-inflect/v2) for the complete API.
