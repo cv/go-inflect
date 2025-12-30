@@ -67,10 +67,30 @@ var preferMore = map[string]bool{
 	"right": true,
 	"wrong": true,
 	"just":  true, // as in "fair"
+	"fun":   true,
+	"apt":   true,
+	// Words where -er/-est creates confusion with other words
+	"like":  true, // "liker" sounds wrong; "like" as adj meaning "similar"
+	"prime": true, // "primer" is a paint or textbook
+	"fake":  true, // "faker" is a person who fakes
+	// Words where -er/-est sounds wrong
+	"key":   true,
+	"due":   true,
+	"worth": true,
+	"loath": true,
+	"void":  true,
+	"null":  true,
+	"male":  true,
+	"awry":  true, // two syllables but still sounds wrong with -er
 	// Non-gradable or awkward with suffixes
 	"own":   true, // "owner" is a noun!
 	"main":  true,
 	"chief": true,
+	// Ordinals and positional words (not truly gradable)
+	"past":  true,
+	"next":  true,
+	"last":  true,
+	"first": true,
 }
 
 // Comparative returns the comparative form of an English adjective.

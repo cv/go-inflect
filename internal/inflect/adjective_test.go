@@ -141,11 +141,34 @@ func TestComparative(t *testing.T) {
 		{name: "right", input: "right", want: "more right"},
 		{name: "wrong", input: "wrong", want: "more wrong"},
 		{name: "just (fair)", input: "just", want: "more just"},
+		{name: "fun", input: "fun", want: "more fun"},
+		{name: "ill (not irregular sense)", input: "apt", want: "more apt"},
 
 		// Non-gradable adjectives that should use "more"
 		{name: "own", input: "own", want: "more own"},
 		{name: "main", input: "main", want: "more main"},
 		{name: "chief", input: "chief", want: "more chief"},
+
+		// Words where -er suffix creates confusion with agent nouns or other words
+		{name: "like (similar)", input: "like", want: "more like"},
+		{name: "prime", input: "prime", want: "more prime"},
+		{name: "fake", input: "fake", want: "more fake"},
+
+		// Words where -er sounds wrong
+		{name: "key", input: "key", want: "more key"},
+		{name: "due", input: "due", want: "more due"},
+		{name: "worth", input: "worth", want: "more worth"},
+		{name: "loath", input: "loath", want: "more loath"},
+		{name: "void", input: "void", want: "more void"},
+		{name: "null", input: "null", want: "more null"},
+		{name: "male", input: "male", want: "more male"},
+		{name: "awry", input: "awry", want: "more awry"},
+
+		// Ordinals and positional words (not truly gradable)
+		{name: "past", input: "past", want: "more past"},
+		{name: "next", input: "next", want: "more next"},
+		{name: "last", input: "last", want: "more last"},
+		{name: "first", input: "first", want: "more first"},
 	}
 
 	for _, tt := range tests {
@@ -289,11 +312,34 @@ func TestSuperlative(t *testing.T) {
 		{name: "right", input: "right", want: "most right"},
 		{name: "wrong", input: "wrong", want: "most wrong"},
 		{name: "just (fair)", input: "just", want: "most just"},
+		{name: "fun", input: "fun", want: "most fun"},
+		{name: "apt", input: "apt", want: "most apt"},
 
 		// Non-gradable adjectives that should use "most"
 		{name: "own", input: "own", want: "most own"},
 		{name: "main", input: "main", want: "most main"},
 		{name: "chief", input: "chief", want: "most chief"},
+
+		// Words where -est suffix creates confusion with other words
+		{name: "like (similar)", input: "like", want: "most like"},
+		{name: "prime", input: "prime", want: "most prime"},
+		{name: "fake", input: "fake", want: "most fake"},
+
+		// Words where -est sounds wrong
+		{name: "key", input: "key", want: "most key"},
+		{name: "due", input: "due", want: "most due"},
+		{name: "worth", input: "worth", want: "most worth"},
+		{name: "loath", input: "loath", want: "most loath"},
+		{name: "void", input: "void", want: "most void"},
+		{name: "null", input: "null", want: "most null"},
+		{name: "male", input: "male", want: "most male"},
+		{name: "awry", input: "awry", want: "most awry"},
+
+		// Ordinals and positional words (not truly gradable)
+		{name: "past", input: "past", want: "most past"},
+		{name: "next", input: "next", want: "most next"},
+		{name: "last", input: "last", want: "most last"},
+		{name: "first", input: "first", want: "most first"},
 	}
 
 	for _, tt := range tests {
