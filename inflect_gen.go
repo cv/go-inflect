@@ -501,6 +501,20 @@ func CompareVerbs(verb1 string, verb2 string) string {
 	return impl.CompareVerbs(verb1, verb2)
 }
 
+// CountSyllables estimates the number of syllables in a word using a
+// heuristic based on vowel groups. It provides reasonable estimates for
+// most English words but may not be 100% accurate for all words, especially
+// those with unusual spelling patterns or borrowed words.
+//
+// The algorithm:
+//   - Counts groups of consecutive vowels (a, e, i, o, u, y) as one syllable
+//   - Handles silent 'e' at the end of words
+//   - Returns at least 1 for any non-empty word
+//   - Returns 0 for empty strings
+func CountSyllables(word string) int {
+	return impl.CountSyllables(word)
+}
+
 // CountingWord converts an integer to its counting word representation.
 //
 // This provides frequency/repetition words:
@@ -981,6 +995,7 @@ func Humanize(word string) string {
 //   - past_tense(verb) - returns past tense like "walk" → "walked"
 //   - past_participle(verb) - returns past participle like "take" → "taken"
 //   - present_participle(verb) - returns present participle like "run" → "running"
+//   - future_tense(verb) - returns future tense like "walk" → "will walk"
 //
 // Other inflections:
 //   - possessive(noun) - returns possessive form like "cat" → "cat's"

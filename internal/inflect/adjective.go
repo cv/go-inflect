@@ -213,6 +213,26 @@ func countSyllables(word string) int {
 	return count
 }
 
+// CountSyllables estimates the number of syllables in a word using a
+// heuristic based on vowel groups. It provides reasonable estimates for
+// most English words but may not be 100% accurate for all words, especially
+// those with unusual spelling patterns or borrowed words.
+//
+// The algorithm:
+//   - Counts groups of consecutive vowels (a, e, i, o, u, y) as one syllable
+//   - Handles silent 'e' at the end of words
+//   - Returns at least 1 for any non-empty word
+//   - Returns 0 for empty strings
+func CountSyllables(word string) int {
+	return countSyllables(word)
+}
+
+// CountSyllables estimates the number of syllables in a word.
+// See package-level [CountSyllables] for details.
+func (e *Engine) CountSyllables(word string) int {
+	return countSyllables(word)
+}
+
 // applyComparativeSuffix adds the -er suffix with appropriate modifications.
 func applyComparativeSuffix(adj, lower string) string {
 	// Words ending in -e: just add -r
