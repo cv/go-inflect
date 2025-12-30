@@ -2,6 +2,7 @@ package inflect
 
 import (
 	"math"
+	"strings"
 	"testing"
 	"unicode/utf8"
 )
@@ -520,17 +521,7 @@ func FuzzJoin(f *testing.F) {
 			return
 		}
 		// Split on newlines to get items
-		var items []string
-		start := 0
-		for i := range len(input) {
-			if input[i] == '\n' {
-				items = append(items, input[start:i])
-				start = i + 1
-			}
-		}
-		if start < len(input) {
-			items = append(items, input[start:])
-		}
+		items := strings.Split(input, "\n")
 
 		_ = Join(items)
 		_ = JoinWithConj(items, "or")
