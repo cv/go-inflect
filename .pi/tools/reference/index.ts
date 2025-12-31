@@ -67,6 +67,8 @@ function formatRef(ref: FunctionRef, verbose: boolean): string {
     out += "\n";
     if (ref.test) out += `  Test: ${ref.test}\n`;
     if (ref.example) out += `  Example: ${ref.example}\n`;
+    if (ref.fuzz) out += `  Fuzz: ${ref.fuzz}\n`;
+    if (ref.bench) out += `  Bench: ${ref.bench}\n`;
     return out;
   }
   return `${ref.name}${ref.sig} - ${ref.desc.substring(0, 60)}${ref.desc.length > 60 ? "..." : ""} [${ref.loc}]`;
