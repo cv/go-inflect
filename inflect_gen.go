@@ -1045,6 +1045,22 @@ func Humanize(word string) string {
 	return impl.Humanize(word)
 }
 
+// IntToRoman converts an integer to its Roman numeral representation.
+//
+// Roman numerals are only defined for integers from 1 to 3999.
+// For values outside this range, an empty string is returned.
+//
+// Examples:
+//   - IntToRoman(4) returns "IV"
+//   - IntToRoman(9) returns "IX"
+//   - IntToRoman(1984) returns "MCMLXXXIV"
+//   - IntToRoman(2025) returns "MMXXV"
+//   - IntToRoman(0) returns ""
+//   - IntToRoman(4000) returns ""
+func IntToRoman(n int) string {
+	return impl.IntToRoman(n)
+}
+
 // IsClassical returns whether classical pluralization mode is enabled.
 //
 // Returns true if Classical(true) or ClassicalAll(true) was called, false otherwise.
@@ -1718,6 +1734,27 @@ func Reset() {
 	impl.Reset()
 }
 
+// RomanToInt converts a Roman numeral string to its integer value.
+//
+// The function accepts both uppercase and lowercase input.
+// It validates the input and returns an error for malformed numerals.
+//
+// Validation rules:
+//   - Only valid Roman numeral characters (I, V, X, L, C, D, M)
+//   - No more than 3 consecutive identical numerals (except M)
+//   - V, L, D cannot repeat
+//   - Valid subtractive combinations only (IV, IX, XL, XC, CD, CM)
+//
+// Examples:
+//   - RomanToInt("XIV") returns (14, nil)
+//   - RomanToInt("MMXXV") returns (2025, nil)
+//   - RomanToInt("iv") returns (4, nil)
+//   - RomanToInt("IIII") returns (0, error)
+//   - RomanToInt("ABC") returns (0, error)
+func RomanToInt(s string) (int, error) {
+	return impl.RomanToInt(s)
+}
+
 // Singular returns the singular form of an English noun.
 //
 // Examples:
@@ -2000,3 +2037,6 @@ func WordCount(text string) int {
 func WordToOrdinal(s string) string {
 	return impl.WordToOrdinal(s)
 }
+
+// ErrInvalidRoman is returned when a Roman numeral string is malformed.
+var ErrInvalidRoman = impl.ErrInvalidRoman

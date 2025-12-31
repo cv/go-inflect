@@ -1307,3 +1307,95 @@ func FuzzCamelizeVariants(f *testing.F) {
 		_ = CamelizeDownFirst(input)
 	})
 }
+
+// Covers: IntToRoman.
+func FuzzIntToRoman(f *testing.F) {
+	seeds := []int{
+		// Edge cases
+		0, 1, -1,
+		// Basic numerals
+		1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+		// Subtractive combinations
+		4, 9, 40, 90, 400, 900,
+		// Key boundaries
+		50, 100, 500, 1000,
+		// Complex numbers
+		42, 1984, 2024, 2025, 3999,
+		// Out of range
+		4000, 5000, -100,
+		// Large values
+		math.MaxInt32, math.MinInt32,
+	}
+	for _, n := range seeds {
+		f.Add(n)
+	}
+
+	f.Fuzz(func(t *testing.T, input int) {
+		result := IntToRoman(input)
+		if input < 1 || input > 3999 {
+			// Out of range should return empty
+			if result != "" {
+				t.Errorf("IntToRoman(%d) should return empty, got %q", input, result)
+			}
+			return
+		}
+		// Valid range should produce non-empty result
+		if result == "" {
+			t.Errorf("IntToRoman(%d) returned empty string", input)
+		}
+		// Round-trip should work
+		parsed, err := RomanToInt(result)
+		if err != nil {
+			t.Errorf("RomanToInt(%q) failed: %v", result, err)
+		}
+		if parsed != input {
+			t.Errorf("Round-trip failed: %d -> %q -> %d", input, result, parsed)
+		}
+	})
+}
+
+// Covers: RomanToInt.
+func FuzzRomanToInt(f *testing.F) {
+	seeds := []string{
+		// Valid numerals
+		"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X",
+		"XI", "XIV", "XIX", "XX", "XL", "L", "XC", "C",
+		"CD", "D", "CM", "M", "MM", "MMM",
+		"MCMLXXXIV", "MMXXIV", "MMXXV", "MMMCMXCIX",
+		// Lowercase
+		"i", "iv", "xiv", "mcmlxxxiv",
+		// Invalid
+		"", " ", "IIII", "VV", "LL", "DD", "MMMM",
+		"IL", "IC", "ID", "IM", "VX", "XD", "XM",
+		"ABC", "123", "XIV2",
+		// Edge cases
+		"iIiI", "IVIV", "IXI",
+	}
+	for _, s := range seeds {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(t *testing.T, input string) {
+		if !utf8.ValidString(input) {
+			return
+		}
+		result, err := RomanToInt(input)
+		if err != nil {
+			// Errors are expected for invalid input - no assertion needed
+			return
+		}
+		// Valid parse - verify round-trip
+		if result < 1 || result > 3999 {
+			t.Errorf("RomanToInt(%q) returned out-of-range value: %d", input, result)
+		}
+		// Convert back and re-parse
+		roman := IntToRoman(result)
+		reparsed, err := RomanToInt(roman)
+		if err != nil {
+			t.Errorf("Re-parse of %q failed: %v", roman, err)
+		}
+		if reparsed != result {
+			t.Errorf("Re-parse mismatch: %q -> %d -> %q -> %d", input, result, roman, reparsed)
+		}
+	})
+}

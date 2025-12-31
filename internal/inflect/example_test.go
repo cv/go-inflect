@@ -1318,3 +1318,49 @@ func ExampleEngine_FuncMap() {
 	// Output:
 	// The plural of gremlin is gremloz
 }
+
+// --- Roman numeral examples ---
+
+func ExampleIntToRoman() {
+	fmt.Println(inflect.IntToRoman(4))
+	fmt.Println(inflect.IntToRoman(9))
+	fmt.Println(inflect.IntToRoman(42))
+	fmt.Println(inflect.IntToRoman(1984))
+	fmt.Println(inflect.IntToRoman(2025))
+	// Output:
+	// IV
+	// IX
+	// XLII
+	// MCMLXXXIV
+	// MMXXV
+}
+
+func ExampleRomanToInt() {
+	n1, _ := inflect.RomanToInt("IV")
+	n2, _ := inflect.RomanToInt("XIV")
+	n3, _ := inflect.RomanToInt("MCMLXXXIV")
+	n4, _ := inflect.RomanToInt("MMXXV")
+	fmt.Println(n1)
+	fmt.Println(n2)
+	fmt.Println(n3)
+	fmt.Println(n4)
+	// Output:
+	// 4
+	// 14
+	// 1984
+	// 2025
+}
+
+func ExampleRomanToInt_lowercase() {
+	n, _ := inflect.RomanToInt("xiv")
+	fmt.Println(n)
+	// Output:
+	// 14
+}
+
+func ExampleRomanToInt_error() {
+	_, err := inflect.RomanToInt("IIII")
+	fmt.Println(err)
+	// Output:
+	// invalid Roman numeral
+}
