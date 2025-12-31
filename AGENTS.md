@@ -4,7 +4,17 @@ Go port of Python [inflect](https://pypi.org/project/inflect/) for English word 
 
 ## Populating Context
 
-Run `make reference` to generate a CSV reference of all public functions with signatures, descriptions, locations, and test coverage. Use this to quickly understand the API surface.
+Use the `reference` tool to explore the codebase. It provides a map of all public functions with signatures, descriptions, locations, and test coverage.
+
+```
+reference                           # List all 114 functions
+reference format:groups             # Show available groups
+reference group:verbs               # Functions in a group
+reference filter:ordinal            # Search by name/description
+reference group:numbers format:verbose  # Full details
+```
+
+Alternatively, run `make reference` for raw CSV output.
 
 ## Issue Tracking
 
