@@ -14,6 +14,11 @@ import (
 // form. It capitalizes the first letter, replaces underscores and dashes with
 // spaces, and strips trailing "_id" suffixes.
 //
+// When acronyms are registered (via AddAcronym), they preserve their case:
+//
+//	AddAcronym("GPU")
+//	Humanize("GPUConfig")  // "GPU config"
+//
 // This function is provided for compatibility with github.com/go-openapi/inflect
 // and Rails ActiveSupport.
 //
@@ -22,23 +27,59 @@ import (
 //	Humanize("employee_salary")  // "Employee salary"
 //	Humanize("author_id")        // "Author"
 //	Humanize("hello-world")      // "Hello world"
-//	Humanize("XMLParser")        // "Xml parser"
+//	Humanize("GPUConfig")        // "GPU config" (with GPU registered)
+//	Humanize("DNSRecord")        // "DNS record" (with DNS registered)
 func Humanize(word string) string {
-	// Strip _id suffix
-	word = strings.TrimSuffix(word, "_id")
-	word = strings.TrimSuffix(word, "_ID")
-	word = strings.TrimSuffix(word, "ID")
+	return defaultEngine.Humanize(word)
+}
 
-	// Convert to separated words (handles camelCase, snake_case, kebab-case)
-	word = separatedWords(word, " ")
-
-	// Lowercase and capitalize first letter
-	word = strings.ToLower(word)
-	if word != "" {
-		word = strings.ToUpper(word[:1]) + word[1:]
+// Humanize converts an underscored or dasherized string into a human-readable
+// form. It capitalizes the first letter, replaces underscores and dashes with
+// spaces, and strips trailing "_id" suffixes.
+//
+// When acronyms are registered (via AddAcronym), they preserve their case:
+//
+//	e.AddAcronym("GPU")
+//	e.Humanize("GPUConfig")  // "GPU config"
+//
+// This function is provided for compatibility with github.com/go-openapi/inflect
+// and Rails ActiveSupport.
+//
+// Examples:
+//
+//	e.Humanize("employee_salary")  // "Employee salary"
+//	e.Humanize("author_id")        // "Author"
+//	e.Humanize("hello-world")      // "Hello world"
+//	e.Humanize("GPUConfig")        // "GPU config" (with GPU registered)
+//	e.Humanize("DNSRecord")        // "DNS record" (with DNS registered)
+func (e *Engine) Humanize(word string) string {
+	// Strip _id suffix, but not if the word is just "ID" or "id"
+	if !strings.EqualFold(word, "id") {
+		word = strings.TrimSuffix(word, "_id")
+		word = strings.TrimSuffix(word, "_ID")
+		word = strings.TrimSuffix(word, "ID")
 	}
 
-	return word
+	// Split into words
+	words := SplitPascalCase(word)
+
+	// Process each word
+	var result []string
+	for i, w := range words {
+		switch {
+		case e.IsAcronym(w):
+			// Preserve acronym case
+			result = append(result, e.getAcronymCase(w))
+		case i == 0:
+			// Capitalize first word
+			result = append(result, Capitalize(strings.ToLower(w)))
+		default:
+			// Lowercase subsequent words
+			result = append(result, strings.ToLower(w))
+		}
+	}
+
+	return strings.Join(result, " ")
 }
 
 // ForeignKey creates an underscored foreign key name from a type name.
@@ -164,40 +205,4 @@ func Asciify(word string) string {
 		}
 	}
 	return sb.String()
-}
-
-// separatedWords converts a string to space-separated words, handling
-// camelCase, snake_case, and kebab-case.
-func separatedWords(word, sep string) string {
-	// Replace underscores and dashes with separator
-	word = strings.ReplaceAll(word, "_", sep)
-	word = strings.ReplaceAll(word, "-", sep)
-
-	// Handle camelCase by inserting separator before uppercase letters
-	// Also handle acronyms like "XMLParser" -> "XML Parser"
-	wordRunes := []rune(word)
-	var result strings.Builder
-	for i, r := range wordRunes {
-		if i > 0 && unicode.IsUpper(r) {
-			prev := wordRunes[i-1]
-			// Insert separator if:
-			// 1. Previous char is lowercase or digit (e.g., "myXML" -> "my XML")
-			// 2. Previous char is uppercase but next char is lowercase (e.g., "XMLParser" -> "XML Parser")
-			if unicode.IsLower(prev) || unicode.IsDigit(prev) {
-				result.WriteString(sep)
-			} else if unicode.IsUpper(prev) && i+1 < len(wordRunes) && unicode.IsLower(wordRunes[i+1]) {
-				result.WriteString(sep)
-			}
-		}
-		result.WriteRune(r)
-	}
-
-	// Clean up multiple separators
-	output := result.String()
-	if sep != "" {
-		multiSepPattern := regexp.MustCompile(regexp.QuoteMeta(sep) + `+`)
-		output = multiSepPattern.ReplaceAllString(output, sep)
-	}
-
-	return strings.TrimSpace(output)
 }

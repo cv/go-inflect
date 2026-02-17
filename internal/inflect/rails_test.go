@@ -225,7 +225,7 @@ func TestHumanize(t *testing.T) {
 		{"author_ID", "Author"},
 		{"authorID", "Author"},
 		{"hello-world", "Hello world"},
-		{"XMLParser", "Xml parser"},
+		{"XMLParser", "XML parser"},
 		{"user_name", "User name"},
 		{"firstName", "First name"},
 		{"", ""},

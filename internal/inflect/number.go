@@ -178,14 +178,12 @@ func NumberToWordsFloatWithDecimal(f float64, decimal string) string {
 	str := strconv.FormatFloat(f, 'f', -1, 64)
 
 	// Find the decimal point
-	dotIdx := strings.Index(str, ".")
-	if dotIdx == -1 {
+	intStr, decimalDigits, hasDecimal := strings.Cut(str, ".")
+	_ = intStr // intPart already computed from float
+	if !hasDecimal {
 		// No decimal point, just convert as integer
 		return prefix + cardinalWord(intPart)
 	}
-
-	// Get decimal digits
-	decimalDigits := str[dotIdx+1:]
 
 	// Build the result: integer word + "point" + each decimal digit word
 	parts := make([]string, 0, 2+len(decimalDigits))

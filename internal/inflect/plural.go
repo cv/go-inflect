@@ -374,6 +374,12 @@ func (e *Engine) Plural(word string) string {
 		return ""
 	}
 
+	// Handle registered acronyms: GPU -> GPUs (lowercase "s")
+	// Only applies to all-uppercase words that are registered acronyms
+	if isAllUppercase(word) && len(word) >= 2 && e.IsAcronym(word) {
+		return word + "s"
+	}
+
 	lower := strings.ToLower(word)
 
 	// Check for classical proper name handling when classicalNames is enabled.

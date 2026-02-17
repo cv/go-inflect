@@ -1176,7 +1176,7 @@ func ExampleHumanize() {
 	// Output:
 	// Employee salary
 	// Author
-	// Xml parser
+	// XML parser
 }
 
 func ExampleForeignKey() {
@@ -1292,6 +1292,40 @@ func ExampleEngine_Clone() {
 	// cloned: gizmoz
 	// cloned widget: widgetz
 	// original widget: widgets
+}
+
+func ExampleSplitPascalCase() {
+	fmt.Println(inflect.SplitPascalCase("GPUConfig"))
+	fmt.Println(inflect.SplitPascalCase("DNSRecord"))
+	fmt.Println(inflect.SplitPascalCase("CoreweaveGPUStatus"))
+	fmt.Println(inflect.SplitPascalCase("myXMLParser"))
+	// Output:
+	// [GPU Config]
+	// [DNS Record]
+	// [Coreweave GPU Status]
+	// [my XML Parser]
+}
+
+func ExampleAddAcronym() {
+	e := inflect.NewEngine()
+	e.ClearAcronyms()
+	fmt.Println(e.Humanize("GPUConfig"))
+
+	e.AddAcronym("GPU")
+	fmt.Println(e.Humanize("GPUConfig"))
+	// Output:
+	// Gpu config
+	// GPU config
+}
+
+func ExampleIsAcronym() {
+	fmt.Println(inflect.IsAcronym("GPU"))
+	fmt.Println(inflect.IsAcronym("Cat"))
+	fmt.Println(inflect.IsAcronym("API"))
+	// Output:
+	// true
+	// false
+	// true
 }
 
 func ExampleFuncMap() {

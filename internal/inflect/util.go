@@ -121,7 +121,10 @@ func extractWhitespace(word string) (prefix, trimmed, suffix string) {
 	if trimmed == "" {
 		return word, "", ""
 	}
-	idx := strings.Index(word, trimmed)
+	// Find where the trimmed content starts in the original string.
+	// Note: strings.Cut doesn't apply here as we need the index position,
+	// not a split by delimiter.
+	idx := strings.Index(word, trimmed) //nolint:modernize // strings.Cut not applicable for finding substring position
 	if idx < 0 {
 		// Should never happen after TrimSpace, but handle gracefully
 		return "", word, ""

@@ -127,6 +127,20 @@ func A(word string) string {
 	return impl.A(word)
 }
 
+// AddAcronym registers an acronym that should preserve its case in humanization.
+//
+// Acronyms are matched case-insensitively. For example, AddAcronym("GPU") will
+// preserve the case for "GPU", "gpu", or "Gpu" as "GPU".
+//
+// Examples:
+//
+//	AddAcronym("GPU")
+//	Humanize("GPUConfig")  // returns "GPU config"
+//	Humanize("myGPU")      // returns "My GPU"
+func AddAcronym(acronym string) {
+	impl.AddAcronym(acronym)
+}
+
 // AddIrregular is an alias for DefNoun, provided for compatibility with
 // github.com/jinzhu/inflection.
 //
@@ -415,6 +429,16 @@ func ClassicalPersons(enabled bool) {
 //	No("cat", 0) // returns "no cats"
 func ClassicalZero(enabled bool) {
 	impl.ClassicalZero(enabled)
+}
+
+// ClearAcronyms removes all registered acronyms, including defaults.
+//
+// Example:
+//
+//	ClearAcronyms()
+//	Humanize("GPUConfig")  // returns "Gpu config"
+func ClearAcronyms() {
+	impl.ClearAcronyms()
 }
 
 // Comparative returns the comparative form of an English adjective.
@@ -793,6 +817,11 @@ func DefVerbReset() {
 	impl.DefVerbReset()
 }
 
+// DefaultAcronyms returns a copy of the default acronyms list.
+func DefaultAcronyms() []string {
+	return impl.DefaultAcronyms()
+}
+
 // ForeignKey creates an underscored foreign key name from a type name.
 //
 // This function is provided for compatibility with github.com/go-openapi/inflect
@@ -999,6 +1028,16 @@ func Gender(g string) {
 	impl.Gender(g)
 }
 
+// GetAcronyms returns a sorted list of all registered acronyms.
+//
+// Example:
+//
+//	acronyms := GetAcronyms()
+//	// returns ["ACL", "API", "AWS", "CPU", ...] (sorted)
+func GetAcronyms() []string {
+	return impl.GetAcronyms()
+}
+
 // GetGender returns the current gender setting for singular third-person pronouns.
 //
 // Returns one of:
@@ -1032,6 +1071,11 @@ func GetNum() int {
 // form. It capitalizes the first letter, replaces underscores and dashes with
 // spaces, and strips trailing "_id" suffixes.
 //
+// When acronyms are registered (via AddAcronym), they preserve their case:
+//
+//	AddAcronym("GPU")
+//	Humanize("GPUConfig")  // "GPU config"
+//
 // This function is provided for compatibility with github.com/go-openapi/inflect
 // and Rails ActiveSupport.
 //
@@ -1040,7 +1084,8 @@ func GetNum() int {
 //	Humanize("employee_salary")  // "Employee salary"
 //	Humanize("author_id")        // "Author"
 //	Humanize("hello-world")      // "Hello world"
-//	Humanize("XMLParser")        // "Xml parser"
+//	Humanize("GPUConfig")        // "GPU config" (with GPU registered)
+//	Humanize("DNSRecord")        // "DNS record" (with DNS registered)
 func Humanize(word string) string {
 	return impl.Humanize(word)
 }
@@ -1059,6 +1104,19 @@ func Humanize(word string) string {
 //   - IntToRoman(4000) returns ""
 func IntToRoman(n int) string {
 	return impl.IntToRoman(n)
+}
+
+// IsAcronym checks if a word is a registered acronym.
+//
+// The check is case-insensitive.
+//
+// Examples:
+//
+//	IsAcronym("GPU")  // returns true (if GPU is registered)
+//	IsAcronym("gpu")  // returns true (case-insensitive)
+//	IsAcronym("Cat")  // returns false
+func IsAcronym(word string) bool {
+	return impl.IsAcronym(word)
 }
 
 // IsClassical returns whether classical pluralization mode is enabled.
@@ -1717,6 +1775,18 @@ func PresentParticiple(verb string) string {
 	return impl.PresentParticiple(verb)
 }
 
+// RemoveAcronym removes an acronym from the registry.
+//
+// Returns true if the acronym was removed, false if it wasn't registered.
+//
+// Examples:
+//
+//	RemoveAcronym("GPU")
+//	Humanize("GPUConfig")  // returns "Gpu config"
+func RemoveAcronym(acronym string) bool {
+	return impl.RemoveAcronym(acronym)
+}
+
 // Reset restores the default Engine to its initial state.
 // This clears all custom definitions and resets all options to defaults.
 //
@@ -1732,6 +1802,17 @@ func PresentParticiple(verb string) string {
 //	inflect.Plural("foo") // returns "foos" (standard rule, custom removed)
 func Reset() {
 	impl.Reset()
+}
+
+// ResetAcronyms restores the acronym registry to its default state.
+//
+// Example:
+//
+//	ClearAcronyms()
+//	ResetAcronyms()
+//	Humanize("GPUConfig")  // returns "GPU config"
+func ResetAcronyms() {
+	impl.ResetAcronyms()
 }
 
 // RomanToInt converts a Roman numeral string to its integer value.
@@ -1816,6 +1897,26 @@ func Singularize(word string) string {
 //   - SnakeCase("HTTPServer") returns "http_server"
 func SnakeCase(s string) string {
 	return impl.SnakeCase(s)
+}
+
+// SplitPascalCase splits a PascalCase identifier into words.
+//
+// Consecutive uppercase letters are treated as acronyms. The function handles:
+//   - PascalCase: "HelloWorld" -> ["Hello", "World"]
+//   - Acronyms: "GPUConfig" -> ["GPU", "Config"]
+//   - Mixed: "CoreweaveGPUStatus" -> ["Coreweave", "GPU", "Status"]
+//   - Numbers: "OAuth2Client" -> ["O", "Auth", "2", "Client"]
+//   - Leading lowercase: "myXMLParser" -> ["my", "XML", "Parser"]
+//
+// Examples:
+//
+//	SplitPascalCase("GPUConfig")          // ["GPU", "Config"]
+//	SplitPascalCase("DNSRecord")          // ["DNS", "Record"]
+//	SplitPascalCase("LDAPUser")           // ["LDAP", "User"]
+//	SplitPascalCase("CoreweaveGPUStatus") // ["Coreweave", "GPU", "Status"]
+//	SplitPascalCase("myXMLParser")        // ["my", "XML", "Parser"]
+func SplitPascalCase(s string) []string {
+	return impl.SplitPascalCase(s)
 }
 
 // Superlative returns the superlative form of an English adjective.

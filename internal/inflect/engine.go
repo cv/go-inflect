@@ -104,6 +104,9 @@ type Engine struct {
 
 	// Default number for Num/GetNum
 	defaultNum int
+
+	// Acronym registry: maps uppercase acronym to preferred case
+	acronyms map[string]string
 }
 
 // NewEngine creates a new Engine instance with default settings.
@@ -223,6 +226,13 @@ func (e *Engine) Clone() *Engine {
 		copy(anPatterns, e.customAnPatterns)
 	}
 
+	// Copy acronyms map
+	var acronyms map[string]string
+	if e.acronyms != nil {
+		acronyms = make(map[string]string, len(e.acronyms))
+		maps.Copy(acronyms, e.acronyms)
+	}
+
 	return &Engine{
 		classicalMode:      e.classicalMode,
 		classicalAll:       e.classicalAll,
@@ -244,6 +254,7 @@ func (e *Engine) Clone() *Engine {
 		gender:             e.gender,
 		possessiveStyle:    e.possessiveStyle,
 		defaultNum:         e.defaultNum,
+		acronyms:           acronyms,
 	}
 }
 
@@ -306,4 +317,7 @@ func (e *Engine) Reset() {
 	// Reset other state
 	e.defaultNum = 0
 	e.possessiveStyle = PossessiveModern
+
+	// Reset acronyms to nil (will use defaults)
+	e.acronyms = nil
 }
