@@ -1067,6 +1067,47 @@ func GetNum() int {
 	return impl.GetNum()
 }
 
+// GoCamelCase converts a string to camelCase with Go-conventional acronym
+// casing. Registered acronyms in non-leading positions are fully uppercased.
+//
+// This differs from [CamelCase] which treats acronyms as regular words:
+// CamelCase("get_sql_query") returns "getSqlQuery", while
+// GoCamelCase("get_sql_query") returns "getSQLQuery".
+//
+// When an acronym appears at the start, it remains lowercase per camelCase rules:
+// GoCamelCase("sql_query") returns "sqlQuery" (not "sQLQuery").
+//
+// Examples:
+//   - GoCamelCase("get_sql_query") returns "getSQLQuery"
+//   - GoCamelCase("get_api_key") returns "getAPIKey"
+//   - GoCamelCase("sql_query") returns "sqlQuery"
+//   - GoCamelCase("hello_world") returns "helloWorld"
+func GoCamelCase(s string) string {
+	return impl.GoCamelCase(s)
+}
+
+// GoPascalCase converts a string to PascalCase with Go-conventional acronym
+// casing. Registered acronyms (SQL, API, URL, ID, etc.) are fully uppercased
+// per Go naming conventions enforced by linters like revive and golint.
+//
+// This differs from [PascalCase] which treats acronyms as regular words:
+// PascalCase("execute_sql_query") returns "ExecuteSqlQuery", while
+// GoPascalCase("execute_sql_query") returns "ExecuteSQLQuery".
+//
+// Acronyms are sourced from the engine's acronym registry (see [AddAcronym],
+// [GetAcronyms]). The default set includes common acronyms like API, SQL, URL,
+// HTTP, ID, JSON, XML, etc.
+//
+// Examples:
+//   - GoPascalCase("execute_sql_query") returns "ExecuteSQLQuery"
+//   - GoPascalCase("get_api_key") returns "GetAPIKey"
+//   - GoPascalCase("list_urls") returns "ListURLs"
+//   - GoPascalCase("hello_world") returns "HelloWorld"
+//   - GoPascalCase("user_id") returns "UserID"
+func GoPascalCase(s string) string {
+	return impl.GoPascalCase(s)
+}
+
 // Humanize converts an underscored or dasherized string into a human-readable
 // form. It capitalizes the first letter, replaces underscores and dashes with
 // spaces, and strips trailing "_id" suffixes.

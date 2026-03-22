@@ -199,6 +199,71 @@ func TestPascalCase(t *testing.T) {
 	}
 }
 
+func TestGoPascalCase(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		// Acronym casing (the key difference from PascalCase)
+		{name: "SQL acronym", input: "execute_sql_query", want: "ExecuteSQLQuery"},
+		{name: "API acronym", input: "get_api_key", want: "GetAPIKey"},
+		{name: "URL acronym", input: "list_urls", want: "ListURLs"},
+		{name: "ID acronym", input: "user_id", want: "UserID"},
+		{name: "HTTP acronym", input: "http_server", want: "HTTPServer"},
+		{name: "JSON acronym", input: "parse_json_data", want: "ParseJSONData"},
+		{name: "multiple acronyms", input: "get_api_url", want: "GetAPIURL"},
+		{name: "UUID acronym", input: "generate_uuid", want: "GenerateUUID"},
+
+		// Non-acronym words unchanged
+		{name: "no acronyms", input: "hello_world", want: "HelloWorld"},
+		{name: "three words", input: "one_two_three", want: "OneTwoThree"},
+
+		// Edge cases
+		{name: "empty string", input: "", want: ""},
+		{name: "single word", input: "hello", want: "Hello"},
+		{name: "kebab-case", input: "get-api-key", want: "GetAPIKey"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.GoPascalCase(tt.input)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestGoCamelCase(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		// Acronym casing in non-leading position
+		{name: "SQL acronym", input: "get_sql_query", want: "getSQLQuery"},
+		{name: "API acronym", input: "get_api_key", want: "getAPIKey"},
+		{name: "URL acronym", input: "get_url", want: "getURL"},
+		{name: "ID acronym", input: "get_user_id", want: "getUserID"},
+
+		// Leading acronym stays lowercase (camelCase rule)
+		{name: "leading acronym", input: "sql_query", want: "sqlQuery"},
+		{name: "leading http", input: "http_server", want: "httpServer"},
+
+		// Non-acronym words unchanged
+		{name: "no acronyms", input: "hello_world", want: "helloWorld"},
+
+		// Edge cases
+		{name: "empty string", input: "", want: ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := inflect.GoCamelCase(tt.input)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func TestTitleCase(t *testing.T) {
 	// TitleCase should be an alias for PascalCase
 	tests := []struct {
