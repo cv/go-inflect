@@ -63,6 +63,8 @@ import "text/template"
 //   - titleCase(s string) string - Alias for pascalCase
 //   - camelize(s string) string - Alias for pascalCase
 //   - camelizeDownFirst(s string) string - Alias for camelCase
+//   - goPascalCase(s string) string - PascalCase with Go-conventional acronyms (SQL, API, URL, etc.)
+//   - goCamelCase(s string) string - camelCase with Go-conventional acronyms
 //
 // Text Transformation:
 //   - capitalize(s string) string - Capitalize first letter: "hello" -> "Hello"
@@ -165,6 +167,8 @@ func (e *Engine) FuncMap() template.FuncMap {
 		"titleCase":         TitleCase,         // alias
 		"camelize":          Camelize,          // alias
 		"camelizeDownFirst": CamelizeDownFirst, // alias
+		"goPascalCase":      e.GoPascalCase,
+		"goCamelCase":       e.GoCamelCase,
 
 		// Text Transformation
 		"capitalize": Capitalize,
