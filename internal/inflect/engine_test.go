@@ -836,7 +836,8 @@ func TestEngineResetThreadSafety(_ *testing.T) {
 	for i := range 5 {
 		go func(id int) {
 			for j := range 100 {
-				e.DefNoun("test"+string(rune('a'+id)), "tests")
+				suffix := 'a' + id
+				e.DefNoun("test"+string(rune(suffix)), "tests") //nolint:gosec // id is 0-4, well within rune range
 				e.Classical(j%2 == 0)
 				if j%10 == 0 {
 					e.Reset()
